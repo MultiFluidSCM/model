@@ -1,0 +1,18 @@
+# Do not upload user-generated data
+*.mat
+
+# Do not upload images and figures
+*.fig
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+
+# Do not upload compiled LaTeX files
+*.aux
+*.bbl
+*.blg
+*.log
+*.synctex.gz
+*.pdf

@@ -1,0 +1,24 @@
+% Save max residuals for convergence diagnostics
+maxres1w(qn_iter) = max(abs(res1w));
+maxres2w(qn_iter) = max(abs(res2w));
+maxres1m(qn_iter) = max(abs(res1m));
+maxres2m(qn_iter) = max(abs(res2m));
+maxres1eta(qn_iter) = max(abs(res1eta));
+maxres2eta(qn_iter) = max(abs(res2eta));
+maxres1q(qn_iter) = max(abs(res1q));
+maxres2q(qn_iter) = max(abs(res2q));
+maxres1u(qn_iter) = max(abs(res1u));
+maxres2u(qn_iter) = max(abs(res2u));
+maxres1v(qn_iter) = max(abs(res1v));
+maxres2v(qn_iter) = max(abs(res2v));
+maxressigma(qn_iter) = max(abs(res_s));
+maxres1eosetap(qn_iter) = max(abs(eos.res_etap1));
+maxres1eoseta(qn_iter) = max(abs(eos.res_eta1));
+maxres2eosetap(qn_iter) = max(abs(eos.res_etap2));
+maxres2eoseta(qn_iter) = max(abs(eos.res_eta2));
+maxres1tke(qn_iter) = max(abs(res1tke));
+maxres2tke(qn_iter) = max(abs(res2tke));
+maxres1Veta(qn_iter) = max(abs(tend.fluid(1).mvareta.tot));
+maxres2Veta(qn_iter) = max(abs(tend.fluid(2).mvareta.tot));
+maxres1Vq(qn_iter) = max(abs(tend.fluid(1).mvarq.tot));
+maxres2Vq(qn_iter) = max(abs(tend.fluid(2).mvarq.tot));

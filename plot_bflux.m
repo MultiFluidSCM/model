@@ -1,0 +1,26 @@
+% Plot diffusive and buoyancy correlation eta flux
+
+
+% ----------
+
+% Figure 25: diffusive and buoyancy corelation eta flux
+
+figure(25)
+
+subplot(1,1,1)
+% plot(work.bflux1,zunitsp,'b',...
+%      work.bflux2,zunitsp,'r',...
+%      work.bflux1 + work.bflux2,zunitsp,'k--',...
+%      work.bflux_res,zunitsw,'k')
+plot(work.Deta1,zunitsp,'b',...
+     work.Deta2,zunitsp,'r',...
+     work.Deta1 + work.Deta2,'k',...
+     work.Deta1bc,zunitsp,'b--',...
+     work.Deta2bc,zunitsp,'r--',...
+     work.Deta1bc + work.Deta2bc,'k--')
+ylim([0,zplottop])
+title('SG eta flux')
+xlabel('w \eta')
+ylabel(labelz)
+set(gca,'FontSize',fs)
+

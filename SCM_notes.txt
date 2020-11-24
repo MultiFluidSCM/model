@@ -1,0 +1,161 @@
+Some notes on the two-fluid SCM
+John Thuburn    26/09/20
+
+
+The model extends the work of Thuburn et al. (2019) in various ways.
+A semi-implicit Eulerian scheme (rather than SISL) is used; it is
+much more stable. Equilibrium moist processes are included. TKE is
+predicted. Mellor-Yamada-like steady state equations are solved for
+entropy and total water variance, and cloud fraction is diagnosed
+using an implied subgrid distribution. A more complete linearization
+of the governing equations is used in the solver, though separate
+sub-systems are solved for u, v, tke, and variances. This can lead to
+convergence issues e.g. in situations where variances and w are strongly
+coupled through detrainment - see below - needs further investigation.
+
+The model is set up for the ARM case. At the end of the run it produces
+a file of diagnostics called SCM_results.mat. This can be copied to the
+folder compareARM (and suitably renamed). The the scripts SCMvsLES
+and SCMvsSCM can be used to compare against some LES results and previous
+model versions. These diagnostics have been very useful in developing the
+model and evaluating it.
+
+The version of the model provided is the best so far, and its results are
+in SCM_scheme10.mat. Getting the cloud top high enough has been a challenge,
+and some type of sorting detrainment seems to be crucial - see below. There
+seems to be quite a strong sensitivity to the formulation of this type
+of detrainment.
+
+Two remaining issues are the following.
+(i) Cloud top height tends to collapse (and sometimes rebuild and collapse
+again). Next step would be to look at diagnostics to see if this is
+caused by changes at cloud top (in which case probably unphysical) or at
+cloud base.
+(ii) The boundary layer is too deep throughout the run, even before cloud
+forms. We think fallback of thermals overshooting the inversion, which
+would give an upgradient heat flux, is misrepresented by the eddy
+diffusivity model. We know which extra terms are needed (see the
+multi-fluid high-order turbulence document).
+
+In terms of the code...
+convection.m is the master script.
+plot_diagnostics.m is the master diagnostics routine. It calls several
+other routines, most of which can be commented out, otherwise the output
+is overwhelming (and seriously slows the model).
+tendencies.m is the master function calculating tendencies of everything.
+set_entrain_trial.m computes quantities related to entrainment and
+detrainment, and this is where I've been experimenting a lot.
+
+A brief summary of model versions and how they relate to the results
+files in compareARM follows. dt = 30s unless stated otherwise.
+
+March - July 2020
+
+SCM_scheme0.mat
+Source entrainment plus a `mixing' relaxation towards same eta and q
+in fluids 1 and 2 and towards a small constant reference sigma.
+Cloud top much too low. BL too deep.
+
+SCM_scheme0ug1.mat
+Reduces background wind Ug from 10 m/s to 1 m/s. Less shear, less turbulent
+mixing at BL top, reduces BL growth.
+
+SCM_scheme1.mat
+Source entrainment plus a combination of mixing and sorting detrainment.
+Sorting is based on the fraction of updraft with w<0.
+Sorting rate proportional to dw2/dz.
+Sorting determines rate of detrainment but not properties of detrained fluid.
+Cloud a bit deeper but still much too low.
+
+SCM_scheme3.mat
+Source entrainment plus a combination of mixing and sorting detrainment.
+Sorting is based on the fraction of updraft with w<0.
+Sorting determines rate of detrainment and properties of detrained fluid.
+Cloud forms too early. Cloud top quite good until 10 hours.
+
+19/07/20
+Scheme0 was found to fail with backgound wind Ug = 0. Estimate of drho/dz
+needed for N^2 was calculated as a deta/dz + b dq/dz + c dp/dz . dq/dz
+contribution changes very abruptly if the fluid becomes saturated, which
+happens when Ug = 0 because mixing weak. Replace with a direct finite
+difference calculation of drho/dz. Now runs.
+
+23/07/20
+Scheme3 was found to fail with Ug = 0. Poor solver convergence. Increasing
+the minimum allowed TKE from 1e-6 to 1e-4 seemed to solve the problem.
+
+SCM_scheme4.mat
+24/07/20
+SG eta and q variances were noisy because of poor solver convergence.
+Including sorting detrainment terms in linearization improved convergence.
+A side effect was a reduction in cloud cover and better timing of initial
+cloud formation.
+
+SCM_scheme4dt60.mat
+Divide by zero fixed in the calculation of f_sort. Model runs ARM to
+completion with dt = 60s, but there's some sensitivity to dt.
+
+25/07/20
+Calculation of chi_hat is badly behaved when its argument is large
+(~ 0/0). Replace by an asymptotic formula.
+
+SCM_scheme5.mat ??
+30/07/20
+With dt = 60s convergence of the TKE2 equation becomes poor around 9 hours
+when w2 and TKE2 are large within cloud. Experiments freezing certain
+coefficients or tendencies suggest complex feedbacks involving diffusion,
+moisture, buoyancy flux, possibly shear generation and transport. Attempts
+to include more terms in the linearization of TKE2 did not improve things.
+In the long term it may be necessary to use a more fully coupled linearization
+in the solver. Convergence is satisfactory with dt = 30s; stick with
+this for now.
+
+SCM_scheme6y.mat
+06/08/20
+Poor convergence of the variance equations prompted a re-examination of
+the relabelling terms and their linearization.
+\hat{(q^2)}_{ij} \approx q_j^2 + C_j^{qq}
+should be replaced by
+\hat{(q^2)}_{ij} \approx \hat{q}_{ij}^2 + C_j^{qq}
+This improved the convergence of variance, but convergence of the scheme
+as a whole remained poor when sorting detrainment was strong.
+
+SCM_scheme7.mat
+07/08/20
+Investigation showed that feedback between w2 and sorting detrainment
+via the rate term proportional to dw2/dz was significantly limiting
+convergence. Replacing dw2/dz by the rate of mixing detrainment
+improved convergence somewhat.
+
+SCM_scheme8.mat
+07/08/20
+The above change for relabelling variance was applied to TKE too.
+This slightly improved convergence; little change to other diagnostics.
+
+SCM_scheme9dt5.mat
+07/08/20
+Scheme8 shows very rapid growth of cloud height between hours ~6 and ~7,
+followed by collapse and more transient behaviour. Diagnostics show
+significant acceleration of the updraft by sorting throughout its depth.
+Allowing sorting only where buoyancy < 0 gives better cloud growth, but
+the model crashed before 11 hours. Reducing dt to 5s allowed the model
+to run to completion. However, unphysical spontaneous generation of
+TKE above 3km appears to be related to sorting detrainment.
+
+08/08/20
+Bug fixed: detrained w must be zero at boundaries.
+
+SCM_scheme10.mat
+15/8/20
+Like scheme9 but with a smooth switch based on b / sigma_b (buoyancy
+normalized by its standard deviation). Runs to completion, but
+shows intermittent collapse of cloud top. BL still too deep.
+I've tried several variant schemes with different smooth switches.
+I think 10e might be the best so far(?)
+
+
+
+
+
+
+
