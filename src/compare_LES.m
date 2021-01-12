@@ -168,7 +168,7 @@ if istep == time.nstop
     end
 
     % Write to file
-    filename = 'SCM_results.mat';
+    filename = fullfile(settings.folders.data_scm, 'SCM_results.mat');
     % Save all variables whose name begins SCM...
     save(filename,'-regexp','^SCM');
 
