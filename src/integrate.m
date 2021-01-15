@@ -32,5 +32,5 @@ for istep = 1:time.nstop
 end
 
 % Final plots
-plottype = 1;
+plottype = 0;
 plot_diagnostics
