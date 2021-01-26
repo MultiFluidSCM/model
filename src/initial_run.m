@@ -4,8 +4,14 @@
 % Set up computational grid
 grid = setup_grid();
 
-% Set physical and parameterization constants
-constants = set_constants(grid);
+% Get constants from test case settings
+constants = settings.constants;
+if ~exist('constants.param.mix')
+    constants.param.sort = constants.param;
+    constants.param.dwdz = constants.param;
+    constants.param.mix = constants.param;
+    constants.param.instab = constants.param;
+end
 
 % Decide which approximations to impose
 switches = set_approximations();

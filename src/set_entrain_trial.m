@@ -42,6 +42,10 @@ bdetraint = constants.param.bdetraint;
 bdetrainq = constants.param.bdetrainq;
 bdetrainw = constants.param.bdetrainw;
 bdetrainu = constants.param.bdetrainu;
+sort = constants.param.sort;
+dwdz = constants.param.dwdz;
+mix = constants.param.mix;
+instab = constants.param.instab;
 
 sigma1 = eos.sigma1;
 sigma2 = eos.sigma2;
@@ -239,11 +243,9 @@ relabel.what_deriv = deriv;
 
 % Entrained and detrained values of w
 [relabel.what12_mix,relabel.dwhat12dw1,relabel.dwhat12dw2,...
- relabel.what21    ,relabel.dwhat21dw1,relabel.dwhat21dw2] ...
-    = findqhat(w1,w2,bentrainw,bdetrainw);
-
-disp('*** what21 >= 0 ***')
-relabel.what21 = max(relabel.what21,0);
+ relabel.what21_mix,relabel.dwhat21dw1,relabel.dwhat21dw2] ...
+    = findqhat(w1,w2,mix.bentrainw,mix.bdetrainw);
+relabel.what21_mix = max(relabel.what21_mix,0);
 
 % Entrained and detrained values of u and v
 [relabel.uhat12,relabel.duhat12du1,relabel.duhat12du2,...
@@ -254,8 +256,25 @@ relabel.what21 = max(relabel.what21,0);
     = findqhat(v1,v2,bentrainu,bdetrainu);
     
 
+% Entrained and detrained values of w
+[relabel.what12_instab,relabel.dwhat12dw1,relabel.dwhat12dw2,...
+ relabel.what21_instab,relabel.dwhat21dw1,relabel.dwhat21dw2] ...
+    = findqhat(w1,w2,instab.bentrainw,instab.bdetrainw);
+relabel.what21_instab = max(relabel.what21_instab,0);
+[relabel.what12_dwdz,relabel.dwhat12dw1,relabel.dwhat12dw2,...
+ relabel.what21_dwdz,relabel.dwhat21dw1,relabel.dwhat21dw2] ...
+    = findqhat(w1,w2,dwdz.bentrainw,dwdz.bdetrainw);
+relabel.what21_dwdz = max(relabel.what21_dwdz,0);
+
 % Combined entrainment rate
 relabel.M21 = relabel.M21_instab + relabel.M21_mix;
+
+denominator = relabel.M21 + 1e-8*(relabel.M21 == 0);
+f_instab = weight_to_w(grid,relabel.M21_instab./denominator);
+f_mix  = 1 - f_instab;
+relabel.what12_blend   = f_instab.*relabel.what12_instab ...
+                       + f_mix .*relabel.what12_mix;
+relabel.what12 = relabel.what12_blend;
 
 
 % For testing

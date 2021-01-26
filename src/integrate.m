@@ -17,7 +17,7 @@ for istep = 1:time.nstop
     end
     
     % Save a restart file if needed
-    if mod(istep,60000) == 0
+    if mod(istep,10800) == 0
         save_restart
     end
     
