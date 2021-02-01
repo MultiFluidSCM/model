@@ -13,7 +13,10 @@ function relabel = set_entrain_trial(grid, state, buoy, eos, scales, kdiffw2, co
 %                            sorting determines amount but not properties
 % 3     Instability source + combination of mixing and sorting detrainment
 %                            sorting determines amount and properties
-ischeme = 3;
+% 4     Instability source + combination of mixing and sorting detrainment
+%                            sorting determines amount and properties
+%                          + dynamic entrainment/detrainment based on dw/dz
+ischeme = 4;
 
 % First unpack the fields needed
 nz = grid.nz;
@@ -118,26 +121,43 @@ set_entrain_trial_sort
 % Dynamical entrainment/detrainment based on vertical velocity convergence
 set_entrain_trial_dwdz
 
-% Combined entrainment rate
-relabel.M21 = relabel.M21_instab + relabel.M21_mix;
-
-denominator = relabel.M21 + 1e-8*(relabel.M21 == 0);
-f_instab = weight_to_w(grid,relabel.M21_instab./denominator);
-f_mix  = 1 - f_instab;
-relabel.what12_blend   = f_instab.*relabel.what12_instab ...
-                       + f_mix .*relabel.what12_mix;
-relabel.what12 = relabel.what12_blend;
-
-
-% For testing
+% Remove new transfer contributions for old schemes
 if ischeme == 0
-    relabel.M12 = relabel.M12_mix;
+    relabel.M12_instab = 0*relabel.M12_instab;
+    relabel.M12_sort = 0*relabel.M12_sort;
+    relabel.M12_dwdz = 0*relabel.M12_dwdz;
 elseif ischeme == 1 | ischeme == 3
-    relabel.M12 = relabel.M12_sort + relabel.M12_mix;
-else
-    disp('unknown scheme in set_entrain_trial')
-    pause
+    relabel.M12_instab = 0*relabel.M12_instab;
+    relabel.M12_dwdz = 0*relabel.M12_dwdz;
 end
+
+% Combined entrainment (M21) and detrainment (M12) rates
+relabel.M12 = relabel.M12_instab + relabel.M12_mix + relabel.M12_sort + relabel.M12_dwdz;
+relabel.M21 = relabel.M21_instab + relabel.M21_mix + relabel.M21_sort + relabel.M21_dwdz;
+
+% Catch divide by zero
+denominator12 = relabel.M21 + 1e-8*(relabel.M21 == 0);
+denominator21 = relabel.M21 + 1e-8*(relabel.M21 == 0);
+
+% Calculate mean vertical velocity detrained from updraft
+frac12_instab = weight_to_w(grid,relabel.M12_instab./denominator12);
+frac12_sort   = weight_to_w(grid,relabel.M12_sort./denominator12);
+frac12_dwdz   = weight_to_w(grid,relabel.M12_dwdz./denominator12);
+frac12_mix  = 1 - frac12_instab - frac12_sort - frac12_dwdz;
+relabel.what12 = frac12_instab.*relabel.what12_instab ...
+               + frac12_sort  .*relabel.what12_sort ...
+               + frac12_dwdz  .*relabel.what12_dwdz ...
+               + frac12_mix   .*relabel.what12_mix;
+
+% Calculate mean vertical velocity entrained into updraft
+frac21_instab = weight_to_w(grid,relabel.M21_instab./denominator21);
+frac21_sort   = weight_to_w(grid,relabel.M21_sort./denominator21);
+frac21_dwdz   = weight_to_w(grid,relabel.M21_dwdz./denominator21);
+frac21_mix  = 1 - frac21_instab - frac21_sort - frac21_dwdz;
+relabel.what21 = frac21_instab.*relabel.what21_instab ...
+               + frac21_sort  .*relabel.what21_sort ...
+               + frac21_dwdz  .*relabel.what21_dwdz ...
+               + frac21_mix   .*relabel.what21_mix;
 
 
 % Experimental option for detrained values
@@ -150,8 +170,8 @@ relabel.etahat12_blend = f_sort.*relabel.etahat12_sort ...
                        + f_mix .*relabel.etahat12_mix;
 relabel.qhat12_blend   = f_sort.*relabel.qhat12_sort ...
                        + f_mix .*relabel.qhat12_mix;
-relabel.what12_blend   = f_sort.*relabel.what12_sort ...
-                       + f_mix .*relabel.what12_mix;
+% relabel.what12_blend   = f_sort.*relabel.what12_sort ...
+                       % + f_mix .*relabel.what12_mix;
 
                    
 if ischeme == 0 | ischeme == 1
@@ -167,6 +187,9 @@ elseif ischeme == 3
     relabel.qhat12   = relabel.qhat12_blend;
     relabel.what12   = relabel.what12_blend;
     % Factor needed for linearized variance equation
+elseif ischeme == 4
+    relabel.etahat12 = relabel.etahat12_blend;
+    relabel.qhat12   = relabel.qhat12_blend;
     relabel.f_sort_chi_hat = f_sort.*chi_hat;
 else
     disp('unknown scheme in set_entrain_trial')
