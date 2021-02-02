@@ -1,9 +1,17 @@
 % Dynamical entrainment/detrainment based on vertical velocity convergence
-relabel.M12_dwdz = 0.*m2;
-relabel.M21_dwdz = 0.*m1;
+rate_sort12 = 0*m2;
+rate_sort21 = 0*m1;
 
-dM12dm2_dwdz = 0.*m2;
-dM21dm1_dwdz = 0.*m1;
+if ischeme == 4
+    rate_sort12 = rate_sort + min(max(0, -dw2dz), rdt);
+    rate_sort21 = rate_sort + min(max(0, -dw1dz), rdt);
+end
+
+relabel.M12_dwdz = m2.*rate_sort12;
+relabel.M21_dwdz = m1.*rate_sort21;
+
+dM12dm2_dwdz = rate_sort12;
+dM21dm1_dwdz = rate_sort21;
 
 % Entrained and detrained values of eta
 [relabel.etahat12_dwdz,relabel.detahat12deta1_dwdz,relabel.detahat12deta2_dwdz,...

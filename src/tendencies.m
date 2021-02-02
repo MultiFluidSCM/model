@@ -672,6 +672,10 @@ sigma1 = m1./eos.rho1;
 sigma1bar(2:nz) = grid.abovew(2:nz).*sigma1(2:nz) + grid.beloww(2:nz).*sigma1(1:nz-1);
 sigma1bar(1)   = sigma1bar(2);
 sigma1bar(nzp) = sigma1bar(nz);
+
+% rho_mean = weight_to_w(grid, m1 + m2);
+% buoy = gravity*sigma1bar.*(eos.rhow1 - rho_mean)./rho_mean;
+
 buoy = gravity*sigma1bar.*(eos.rhow1 - eos.rhow2)./eos.rhow2;
 %buoyx = gravity*sigma1bar.*(eosx.rhow1 - eosx.rhow2)./eosx.rhow2;
 % Calculate resolved buoyancy flux while we're here

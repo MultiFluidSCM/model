@@ -16,7 +16,7 @@ relabel.frac = 0.5*(1 + erf(chi_cut));
 % rate_sort = 5*(wstd./scales.L_plume);
 if ischeme == 1
     rate_sort = min(10*max(0,-dw2dz),rdt);
-elseif ischeme == 3
+elseif ischeme == 3 | ischeme == 4
     % rate_sort = min(20*max(0,-dw2dz),rdt);
     % rate_sort = sign(n1pos).*min(20*rate_mix,rdt);  % Strictly this is scheme 7 or 8
     % rate_sort = (buoybar < 0).*min(20*rate_mix,rdt);  % 

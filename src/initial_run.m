@@ -6,7 +6,8 @@ grid = setup_grid();
 
 % Get constants from test case settings
 constants = settings.constants;
-if ~exist('constants.param.mix')
+if not(isfield(constants.param, 'mix'))
+    disp("oh no");
     constants.param.sort = constants.param;
     constants.param.dwdz = constants.param;
     constants.param.mix = constants.param;

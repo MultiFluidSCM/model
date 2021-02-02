@@ -4,7 +4,7 @@
 % the old time level solution
 
 disp(' ')
-disp(['Step ',num2str(istep)])
+disp(['Step ',num2str(istep),' of ',num2str(time.nstop),'(',num2str(100*istep/time.nstop),'%)'])
 
 % if (istep == 5)
 %     % To check equal tendencies result from equal fluid properties

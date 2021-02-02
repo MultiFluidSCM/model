@@ -10,7 +10,7 @@ if ischeme == 0
     r2 = n1pos;
 elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
-elseif ischeme == 3
+elseif ischeme == 3 | ischeme == 4
     r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
 else
     disp('unknown scheme in set_entrain_trial')
