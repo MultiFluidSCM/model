@@ -140,8 +140,8 @@ denominator21 = relabel.M21 + 1e-8*(relabel.M21 == 0);
 
 % Calculate mean vertical velocity detrained from updraft
 frac12_instab = weight_to_w(grid,relabel.M12_instab./denominator12);
-frac12_sort   = weight_to_w(grid,relabel.M12_sort./denominator12);
-frac12_dwdz   = weight_to_w(grid,relabel.M12_dwdz./denominator12);
+frac12_sort   = weight_to_w(grid,relabel.M12_sort  ./denominator12);
+frac12_dwdz   = weight_to_w(grid,relabel.M12_dwdz  ./denominator12);
 frac12_mix  = 1 - frac12_instab - frac12_sort - frac12_dwdz;
 relabel.what12 = frac12_instab.*relabel.what12_instab ...
                + frac12_sort  .*relabel.what12_sort ...
@@ -150,8 +150,8 @@ relabel.what12 = frac12_instab.*relabel.what12_instab ...
 
 % Calculate mean vertical velocity entrained into updraft
 frac21_instab = weight_to_w(grid,relabel.M21_instab./denominator21);
-frac21_sort   = weight_to_w(grid,relabel.M21_sort./denominator21);
-frac21_dwdz   = weight_to_w(grid,relabel.M21_dwdz./denominator21);
+frac21_sort   = weight_to_w(grid,relabel.M21_sort  ./denominator21);
+frac21_dwdz   = weight_to_w(grid,relabel.M21_dwdz  ./denominator21);
 frac21_mix  = 1 - frac21_instab - frac21_sort - frac21_dwdz;
 relabel.what21 = frac21_instab.*relabel.what21_instab ...
                + frac21_sort  .*relabel.what21_sort ...
@@ -236,8 +236,8 @@ relabel.what21(1  )   = 0;
 relabel.what21(nzp)   = 0;
     
 % Derivatives
-relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab;
-relabel.dM21dm2   = dM21dm2_mix;
+relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab + dM21dm1_dwdz;
+relabel.dM21dm2   = dM21dm2_mix + dM21dm2_dwdz;
 relabel.dM21dw1   = zeros(1,nz);
 relabel.dM21dw2   = zeros(1,nz);
 relabel.dM21deta1 = zeros(1,nz);
@@ -245,8 +245,8 @@ relabel.dM21deta2 = zeros(1,nz);
 relabel.dM21dq1   = zeros(1,nz);
 relabel.dM21dq2   = zeros(1,nz);
 
-relabel.dM12dm1   = dM12dm1_mix;
-relabel.dM12dm2   = dM12dm2_mix;
+relabel.dM12dm1   = dM12dm1_mix + dM12dm1_dwdz;
+relabel.dM12dm2   = dM12dm2_mix + dM12dm2_dwdz;
 relabel.dM12dw1   = zeros(1,nz);
 relabel.dM12dw2   = zeros(1,nz);
 relabel.dM12deta1 = zeros(1,nz);
