@@ -3,8 +3,8 @@ rate_sort12 = 0*m2;
 rate_sort21 = 0*m1;
 
 if ischeme == 4
-    rate_sort12 = min(max(0, -dw2dz), rdt);
-    rate_sort21 = min(max(0, -dw1dz), rdt);
+    rate_sort12 = 0*min(max(0, -dw2dz), rdt);
+    rate_sort21 = 0*min(max(0, -dw1dz), rdt);
 end
 
 relabel.M12_dwdz = m2.*rate_sort12;

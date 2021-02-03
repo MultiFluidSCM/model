@@ -13,6 +13,7 @@ if not(isfield(constants.param, 'mix'))
     constants.param.mix = constants.param;
     constants.param.instab = constants.param;
 end
+disp([num2str(constants.param.mix.bentrainw), " ", num2str(constants.param.mix.bdetrainw)]);
 
 % Decide which approximations to impose
 switches = set_approximations();

@@ -147,6 +147,10 @@ relabel.what12 = frac12_instab.*relabel.what12_instab ...
                + frac12_sort  .*relabel.what12_sort ...
                + frac12_dwdz  .*relabel.what12_dwdz ...
                + frac12_mix   .*relabel.what12_mix;
+relabel.etahat12 = frac12_instab.*relabel.etahat12_instab ...
+                 + frac12_sort  .*relabel.etahat12_sort ...
+                 + frac12_dwdz  .*relabel.etahat12_dwdz ...
+                 + frac12_mix   .*relabel.etahat12_mix;
 
 % Calculate mean vertical velocity entrained into updraft
 frac21_instab = weight_to_w(grid,relabel.M21_instab./denominator21);
@@ -157,7 +161,10 @@ relabel.what21 = frac21_instab.*relabel.what21_instab ...
                + frac21_sort  .*relabel.what21_sort ...
                + frac21_dwdz  .*relabel.what21_dwdz ...
                + frac21_mix   .*relabel.what21_mix;
-
+relabel.etahat21 = frac21_instab.*relabel.etahat21_instab ...
+                 + frac21_sort  .*relabel.etahat21_sort ...
+                 + frac21_dwdz  .*relabel.etahat21_dwdz ...
+                 + frac21_mix   .*relabel.etahat21_mix;
 
 % Experimental option for detrained values
 % To catch divide by zero
@@ -182,8 +189,8 @@ if ischeme == 0 | ischeme == 1
     relabel.f_sort_chi_hat = 0*chi_hat;
 elseif ischeme == 3 | ischeme == 4
     % Apply experimental option
-    relabel.etahat12 = relabel.etahat12_blend;
-    relabel.etahat21 = relabel.etahat21_mix;
+    % relabel.etahat12 = relabel.etahat12_blend;
+    % relabel.etahat21 = relabel.etahat21_mix;
     relabel.qhat12   = relabel.qhat12_blend;
     relabel.qhat21   = relabel.qhat21_mix;
     relabel.uhat12   = relabel.uhat12_mix;
@@ -236,8 +243,8 @@ relabel.what21(1  )   = 0;
 relabel.what21(nzp)   = 0;
     
 % Derivatives
-relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab + dM21dm1_dwdz;
-relabel.dM21dm2   = dM21dm2_mix + dM21dm2_dwdz;
+relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab;% + dM21dm1_dwdz;
+relabel.dM21dm2   = dM21dm2_mix;% + dM21dm2_dwdz;
 relabel.dM21dw1   = zeros(1,nz);
 relabel.dM21dw2   = zeros(1,nz);
 relabel.dM21deta1 = zeros(1,nz);
