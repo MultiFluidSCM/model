@@ -32,6 +32,11 @@ elseif ischeme == 3 | ischeme == 4
     
     % rate_sort = rate_sort + max(0,-dw2dz);
     % rate_sort = min(rate_sort,rdt);
+    
+    % [temp, cbase_index] = min(abs(grid.zw-2200));
+    % for k = cbase_index:length(rate_sort)
+        % rate_sort(k) = 0;
+    % end
 else
     rate_sort = 0;
 end

@@ -118,7 +118,7 @@ plot_time_series
 
 % Figure 3: Budget diagnostics
 
-% plot_budgets
+plot_budgets
 
 % ----------
 

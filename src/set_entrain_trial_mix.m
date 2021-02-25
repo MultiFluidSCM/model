@@ -38,6 +38,11 @@ m2fac = min(1, max(0,m2fac) );
 relabel.M21_mix = rate_mix.*m2.*m1fac;
 relabel.M12_mix = rate_mix.*m1.*m2fac;
 
+% [temp, cbase_index] = min(abs(grid.zw-2000));
+% for k = cbase_index:length(relabel.M12_mix)
+    % relabel.M12_mix(k) = relabel.M12_mix(k)*2000/grid.zw(k);
+% end
+
 % Derivatives *** Need to think carefully about these ***
 dM21dm1_mix = case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf2.*mf2            + case3.*zeros(1,nz);
 dM21dm2_mix = case1.*zeros(1,nz) + case2.*rate_mix.*(2*mf1.*mf1 - sigma10) + case3.*rate_mix;
