@@ -96,10 +96,6 @@ diagnose_cloud_frac
 % Append current time to array for plotting time series
 if exist('ts')
     plotstep = numel(ts.time) + 1;
-    % ts.zstar(plotstep) = zstar;
-    % ts.zcbaseSG(plotstep) = z_cld_base;
-    % ts.zctopSG(plotstep) = z_cld_top;
-    % ts.totcldcov(plotstep) = tot_cld_cov;
 else
     plotstep = 1;
 end
@@ -109,95 +105,81 @@ if settings.switches.plot
 
     % Figure 1: Basic fields mass frac, w, eta, q, u and v, buoyancy, N^2,
     % thetal, RH, tke
-
-    plot_basic_fields
-
-    % ----------
-
+    if settings.switches.plot_basic_fields
+        plot_basic_fields
+    end
+    
     % Figure 2: Profile snapshots and time series diagnostics
-
-    plot_time_series
-
-    % ----------
+    if settings.switches.plot_time_series
+        plot_time_series
+    end
 
     % Figure 3: Budget diagnostics
-
-    plot_budgets
-
-    % ----------
+    if settings.switches.plot_budgets
+        plot_budgets
+    end
 
     % Figure 4: Turbulence related diagnostics
-
-    % plot_turbulence
-
-    % ----------
+    if settings.switches.plot_turbulence
+        plot_turbulence
+    end
 
     % Figure 18: For development: actual and candidate entrainment and
     % detrainment profiles
-
-    % plotED
-
-    % ----------
+    if settings.switches.plot_ED
+        plot_ED
+    end
 
     % Figure 19: Plot buoyancy of a selection of parcels lifted adiabatically
-
-    % plot_adiabats
-
-    % ----------
+    if settings.switches.plot_adiabats
+        plot_adiabats
+    end
 
     % Figure 20: Plot estimated standard deviations of updraft tracers
-
-    plot_std
-
-    % ----------
+    if settings.switches.plot_std
+        plot_std
+    end
 
     % Figure 21: Plot estimated cloud fractions using APDF
-
-    plot_cloud_frac
-
-    % ----------
+    if settings.switches.plot_cloud_frac
+        plot_cloud_frac
+    end
 
     % Figure 22: Compare N and turbulence inverse time scale
-
-    % plot_T_turb
-
-    % ----------
+    if settings.switches.plot_T_turb
+        plot_T_turb
+    end
 
     % Figure 23: Plot variance tendencies for updraft tracers
-
-    % plot_var_tend
-
-    % ----------
+    if settings.switches.plot_var_tend
+        plot_var_tend
+    end
 
     % Figure 24: Plot diffusive buoyancy fluxes
-
-    % plot_bflux
-
-    % ----------% 
+    if settings.switches.plot_bflux
+        plot_bflux
+    end
 
     % Figure 25: Plot diffusive and buoyancy correlation eta fluxes
-
-    % plot_bc_flux
-
-    % ----------% 
+    if settings.switches.plot_bc_flux
+        plot_bc_flux
+    end
 
     % Figure 26: Check that eta and q variance tendencies balance
-
-    % plot_var_budgets
-
-    % ----------% 
+    if settings.switches.plot_var_budgets
+        plot_var_budgets
+    end
 
     % Figure 27: Plot time series of max residuals
-
-    plot_res_time_series
-
-    % ----------% 
+    if settings.switches.plot_res_time_series
+        plot_res_time_series
+    end
 
     % Figure 28: 
+    if settings.switches.plot_ql_var
+        plot_ql_var
+    end
 
-    plot_ql_var
-
-    % ----------% 
 end
 
 
