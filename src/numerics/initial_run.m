@@ -2,12 +2,12 @@
 
 
 % Set up computational grid
-grid = setup_grid();
+grid = settings.grid;
 
 % Get constants from test case settings
 constants = settings.constants;
 if not(isfield(constants.param, 'mix'))
-    disp("oh no");
+    disp("Individual settings for transfer terms not detected");
     constants.param.sort = constants.param;
     constants.param.dwdz = constants.param;
     constants.param.mix = constants.param;
@@ -16,13 +16,13 @@ end
 disp([num2str(constants.param.mix.bentrainw), " ", num2str(constants.param.mix.bdetrainw)]);
 
 % Decide which approximations to impose
-switches = set_approximations();
+switches = settings.switches;
 
 % Initialize accumulated forcing and budget diagnostics
 [accum_force,accum] = ini_accum_force();
 
 % Set initial data
-state_old = set_initial(grid,constants);
+state_old = set_initial(grid, settings);
 
 % Set initial time
 current_time = 0;

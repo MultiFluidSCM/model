@@ -65,7 +65,7 @@ xx(9:9:9*nz)   = pp_p;
 % Tendencies computed from new state
 dt = time.dt;
 t_new = time.t + dt;
-[tend,relabel,eos,force,scales,surface_flux,budgets,work] = tendencies(grid,state_new,constants,t_new,dt,switches);
+[tend,relabel,eos,force,scales,surface_flux,budgets,work] = tendencies(grid,state_new,settings,t_new,dt,switches);
 
 % Unpack some fields for clarity of code
 m1 = state_new.fluid(1).m;
@@ -243,7 +243,7 @@ state_new.fluid(2).varq   =  state_new.fluid(2).varq   + pp_varq2;
 % Tendencies computed from new state
 dt = time.dt;
 t_new = time.t + dt;
-[tend,relabel,eos,force,scales,surface_flux,budgets,work] = tendencies(grid,state_new,constants,t_new,dt,switches);
+[tend,relabel,eos,force,scales,surface_flux,budgets,work] = tendencies(grid,state_new,settings,t_new,dt,switches);
 
 % Unpack some fields for clarity of code
 m1 = state_new.fluid(1).m;

@@ -3,18 +3,29 @@ rate_sort12 = 0*m2;
 rate_sort21 = 0*m1;
 
 if ischeme == 4
-    rate_sort12 = 0*min(max(0, -dw2dz), rdt);
-    rate_sort21 = 0*min(max(0, -dw1dz), rdt);
+    % Maximum area fraction for downdraft (w < 0) regions from LES
+    sigmad = 0.5;
+    % Fraction of fluid 1 that is a downdraft
+    frac1_down = min(sigma1, sigmad);
+    % Fraction of transfer that actually enters fluid 2
+    frac1_transfer = 2*min(sigma2, 0.5);
+    
+    rate_sort12 = min(max(0, -dw2dz), rdt);
+    rate_sort21 = min(max(0, -dw1dz), rdt) .* frac1_down .* frac1_transfer;
 end
 
-relabel.M12_dwdz = m2.*rate_sort12;
-relabel.M21_dwdz = m1.*rate_sort21;
+relabel.M12_dwdz = dwdz.detrain * m2.*rate_sort12;
+relabel.M21_dwdz = dwdz.entrain * m1.*rate_sort21;
 
-dM12dm1_dwdz = 0*rate_sort12;
-dM12dm2_dwdz = rate_sort12;
+dM12dm1_dwdz = 0 * dwdz.detrain * rate_sort12;
+dM12dm2_dwdz =     dwdz.detrain * rate_sort12;
 
-dM21dm1_dwdz = rate_sort21;
-dM21dm2_dwdz = 0*rate_sort21;
+dM21dm1_dwdz =     dwdz.entrain * rate_sort21;
+dM21dm2_dwdz = 0 * dwdz.entrain * rate_sort21;
+
+% Prevent double counting from instab entrainment 
+% relabel.M21_dwdz = max(relabel.M21_dwdz-relabel.M21_instab, 0);
+% dM21dm1_dwdz = max(dM21dm1_dwdz-dM21dm1_instab, 0);
 
 % Entrained and detrained values of eta
 [relabel.etahat12_dwdz,relabel.detahat12deta1_dwdz,relabel.detahat12deta2_dwdz,...
@@ -39,13 +50,13 @@ dM21dm2_dwdz = 0*rate_sort21;
  relabel.what21_dwdz,relabel.dwhat21dw1_dwdz,relabel.dwhat21dw2_dwdz] ...
     = findqhat(w1, w2, dwdz.bentrainw, dwdz.bdetrainw);
     
-% relabel.what12_dwdz = 0*relabel.what12_dwdz;
-% relabel.dwhat12dw1_dwdz = 0*relabel.dwhat12dw1_dwdz;
-% relabel.dwhat12dw2_dwdz = 0*relabel.dwhat12dw2_dwdz;
+relabel.what12_dwdz = 0*relabel.what12_dwdz;
+relabel.dwhat12dw1_dwdz = 0*relabel.dwhat12dw1_dwdz;
+relabel.dwhat12dw2_dwdz = 0*relabel.dwhat12dw2_dwdz;
 
-% relabel.what21_dwdz = 0*relabel.what21_dwdz;
-% relabel.dwhat21dw1_dwdz = 0*relabel.dwhat21dw1_dwdz;
-% relabel.dwhat21dw2_dwdz = 0*relabel.dwhat21dw2_dwdz;
+relabel.what21_dwdz = 0*relabel.what21_dwdz;
+relabel.dwhat21dw1_dwdz = 0*relabel.dwhat21dw1_dwdz;
+relabel.dwhat21dw2_dwdz = 0*relabel.dwhat21dw2_dwdz;
 
 
 % relabel.what12_dwdz = min(relabel.what21_dwdz, 0);

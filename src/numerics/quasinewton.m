@@ -34,7 +34,7 @@ fixmtke2 = zeros(1,nz);
 
 for qn_iter = 1:qn_iter_max
 
-    disp(' ')
+    % disp(' ')
     disp(['Iteration ' num2str(qn_iter)])
  
     % Check for nans and infs in state_new
@@ -74,7 +74,7 @@ for qn_iter = 1:qn_iter_max
     t_new = time.t + dt;
     old_diff.flag = 0;
     [tend,relabel,eos,force,scales,surface_flux,budgets,work] = ...
-              tendencies(grid,state_new,constants,t_new,dt,switches,old_diff);
+              tendencies(grid,state_new,settings,t_new,dt,switches,old_diff);
     
     % Check for nans and infs in tendencies
     %check_this = 'tend';
@@ -1000,7 +1000,7 @@ save_res_convergence
 %     state_new.fluid(1).varq   = max(0,state_new.fluid(1).varq   + inc_varq1  );
 %     state_new.fluid(2).varq   = max(0,state_new.fluid(2).varq   + inc_varq2  );
     
-disp('*** bounded var decrements ***')
+% disp('*** bounded var decrements ***')
 %disp('*** frozen variances ***')
     state_new.fluid(1).vareta = max(0.1*state_new.fluid(1).vareta,state_new.fluid(1).vareta + inc_vareta1);
     state_new.fluid(2).vareta = max(0.1*state_new.fluid(2).vareta,state_new.fluid(2).vareta + inc_vareta2);

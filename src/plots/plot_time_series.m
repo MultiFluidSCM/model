@@ -63,7 +63,6 @@ end
 
 
 % Time series of zstar
-ts.zstar(plotstep) = zstar;
 if plottype == 0
     figure(2)
     subplot(2,3,4)
@@ -95,7 +94,6 @@ while lq < 1e-5 & k < nzp
     end
 end
 ts.zcbase(plotstep) = zcldbase;
-ts.zcbaseSG(plotstep) = z_cld_base;
 zcldtop = 0;
 k = nzp;
 lq = liquid1(k) + liquid2(k);
@@ -107,7 +105,6 @@ while lq < 1e-5 & k > 1
     end
 end
 ts.zctop(plotstep) = zcldtop;
-ts.zctopSG(plotstep) = z_cld_top;
 ts.lnbgas(plotstep) = scales.LNBgas;
 if plottype == 0
     figure(2)
@@ -130,7 +127,7 @@ else
     pause
 end
 %ts.tke_thresh(plotstep) = scales.tke_thresh;
-ts.totcldcov(plotstep) = tot_cld_cov;
+
 figure(21)
 subplot(1,3,3)
 plot(ts.time/3600,ts.totcldcov,'k','linewidth',1.2)

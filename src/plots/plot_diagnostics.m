@@ -65,7 +65,7 @@ zstar = scales.zstar;
 wstar = scales.wstar;
 etastar = scales.etastar;
 thetastar = scales.thetastar;
-force2 = set_forcing(time.t);
+force2 = set_forcing(settings.forcing, time.t);
 qstar = scales.qstar;
 setaf = surface_flux.eta;
 sqf   = force2.sqf;
@@ -93,227 +93,112 @@ sigma2w = weight_to_w(grid,sigma2);
 % Diagnose cloud fractions
 diagnose_cloud_frac
 
-% ----------
-
-% Figure 1: Basic fields mass frac, w, eta, q, u and v, buoyancy, N^2,
-% thetal, RH, tke
-
-plot_basic_fields
-
-% ----------
-
-% Figure 2: Profile snapshots and time series diagnostics
-
 % Append current time to array for plotting time series
 if exist('ts')
     plotstep = numel(ts.time) + 1;
+    % ts.zstar(plotstep) = zstar;
+    % ts.zcbaseSG(plotstep) = z_cld_base;
+    % ts.zctopSG(plotstep) = z_cld_top;
+    % ts.totcldcov(plotstep) = tot_cld_cov;
 else
     plotstep = 1;
 end
 ts.time(plotstep) = time.t;
 
-plot_time_series
+if settings.switches.plot
 
-% ----------
+    % Figure 1: Basic fields mass frac, w, eta, q, u and v, buoyancy, N^2,
+    % thetal, RH, tke
 
-% Figure 3: Budget diagnostics
+    plot_basic_fields
 
-plot_budgets
+    % ----------
 
-% ----------
+    % Figure 2: Profile snapshots and time series diagnostics
 
-% Figure 4: Turbulence related diagnostics
+    plot_time_series
 
-% plot_turbulence
+    % ----------
 
-% ----------
+    % Figure 3: Budget diagnostics
 
-% Figure 18: For development: actual and candidate entrainment and
-% detrainment profiles
+    plot_budgets
 
-% plotED
+    % ----------
 
-% ----------
+    % Figure 4: Turbulence related diagnostics
 
-% Figure 19: Plot buoyancy of a selection of parcels lifted adiabatically
+    % plot_turbulence
 
-% plot_adiabats
+    % ----------
 
-% ----------
+    % Figure 18: For development: actual and candidate entrainment and
+    % detrainment profiles
 
-% Figure 20: Plot estimated standard deviations of updraft tracers
+    % plotED
 
-plot_std
+    % ----------
 
-% ----------
+    % Figure 19: Plot buoyancy of a selection of parcels lifted adiabatically
 
-% Figure 21: Plot estimated cloud fractions using APDF
+    % plot_adiabats
 
-plot_cloud_frac
+    % ----------
 
-% ----------
+    % Figure 20: Plot estimated standard deviations of updraft tracers
 
-% Figure 22: Compare N and turbulence inverse time scale
+    plot_std
 
-% plot_T_turb
+    % ----------
 
-% ----------
+    % Figure 21: Plot estimated cloud fractions using APDF
 
-% Figure 23: Plot variance tendencies for updraft tracers
+    plot_cloud_frac
 
-% plot_var_tend
+    % ----------
 
-% ----------
+    % Figure 22: Compare N and turbulence inverse time scale
 
-% Figure 24: Plot diffusive buoyancy fluxes
+    % plot_T_turb
 
-% plot_bflux
+    % ----------
 
-% ----------% 
+    % Figure 23: Plot variance tendencies for updraft tracers
 
-% Figure 25: Plot diffusive and buoyancy correlation eta fluxes
+    % plot_var_tend
 
-% plot_bc_flux
+    % ----------
 
-% ----------% 
+    % Figure 24: Plot diffusive buoyancy fluxes
 
-% Figure 26: Check that eta and q variance tendencies balance
+    % plot_bflux
 
-% plot_var_budgets
+    % ----------% 
 
-% ----------% 
+    % Figure 25: Plot diffusive and buoyancy correlation eta fluxes
 
-% Figure 27: Plot time series of max residuals
+    % plot_bc_flux
 
-plot_res_time_series
+    % ----------% 
 
-% ----------% 
+    % Figure 26: Check that eta and q variance tendencies balance
 
-% Figure 28: 
+    % plot_var_budgets
 
-plot_ql_var
+    % ----------% 
 
-% ----------% 
+    % Figure 27: Plot time series of max residuals
 
-% 
-% % Check nonhydrostatic PG balances w variance gradient
-% % Crude normalization ignoring density
-% wnorm = wstar*wstar/zstar;
-% % calculate average w-level density
-% sigma1 = m1./eos.rho1;
-% sigma2 = m2./eos.rho2;
-% sigma1bar(2:nz) = abovew(2:nz).*sigma1(2:nz) + beloww(2:nz).*sigma1(1:nz-1);
-% sigma2bar(2:nz) = abovew(2:nz).*sigma2(2:nz) + beloww(2:nz).*sigma2(1:nz-1);
-% rhow(2:nz) = sigma1bar(2:nz).*eos.rhow1(2:nz) + sigma2bar(2:nz).*eos.rhow2(2:nz);
-% rhow(1) = 0;
-% rhow(nzp) = 0;
-% % Deviation of pressure from hydrostatic
-% pgpert = work.dpdz + rhow*constants.phys.gravity;
-% pgpert = pgpert/wnorm;
-% % Resolved w variance
-% wvar = m1bar.*w1.*w1 + m2bar.*w2.*w2;
-% dwvar = (wvar(2:nzp) - wvar(1:nz))./dzp;
-% dwvar = dwvar/wnorm;
-% if plottype == 0
-%     subplot(3,6,11)
-%     set(gca,'FontSize',fs);
-%     plot(dwvar,zndp,'b',pgpert,zndw,'r')
-%     axis([-1.5,1.5,0,zndtop])
-%     %%axis([0,0.2,0.85,1.15])
-%     xlabel('wvar_z and pg-pert')
-%     ylabel('z / z_*')
-% else
-%     figure(2)
-%     set(gca,'FontSize',fs);
-%     plot(dwvar,zndp,'b',pgpert,zndw,'r')
-%     axis([-1.5,1.5,0,zndtop])
-%     xlabel('wvar_z and pg-pert')
-%     ylabel('z / z_*')
-%     pause
-%     figure(1)
-% end
-% 
+    plot_res_time_series
 
+    % ----------% 
 
+    % Figure 28: 
 
-% 
-% % Check various flavours of Courant number
-% dt = time.dt;
-% cn = dt*w2(1:nzp)./dzw(1:nzp);
-% kcn = dt*work.kdifft1./(dzp.*dzp);
-% entcn = entrate*dt;
-% detcn = detrate*dt;
-% if plottype == 0
-%     subplot(3,6,18)
-%     set(gca,'FontSize',fs)
-%     plot(cn,grid.zw,'r',kcn,grid.zp,'g',entcn,grid.zp,'r:',detcn,grid.zp,'b:')
-%     ylim([0,grid.zw(nzp)])
-%     xlim([0,4])
-%     title('cn, kcn, ecn, dcn')
-% else
-%     figure(2)
-%     set(gca,'FontSize',fs)
-%     plot(cn,grid.zw,'r',kcn,grid.zp,'g',entcn,grid.zp,'r:',detcn,grid.zp,'b:')
-%     ylim([0,grid.zw(nzp)])
-%     title('cn, kcn, ecn, dcn')
-%     pause
-%     figure(1)
-% end
-% 
-% 
+    plot_ql_var
 
+    % ----------% 
+end
 
-% 
-% % Time series of minimum theta flux
-% % and zstar - z(k)
-% tsmintf(istep+1) = -wtmin/qstar;
-% tsdzstar(istep+1) = (zstar - zw(k_bltop-1))/(zw(2) - zw(1));
-% % And smoothed version
-% nshhour = ceil(1800/dt);
-% if (istep >= 2*nshhour)
-%     tssmoothtf(istep+1-nshhour) = sum(tsmintf(istep+1-2*nshhour:istep+1))/(1+2*nshhour);
-% end
-% if lpanel
-%     subplot(3,5,13)
-%     set(gca,'FontSize',fs)
-%     %plot(tstime,tsmintf,'b',tstime,tsdzstar,'r')
-%     %axis([0,nstop*dt,0,1])
-%     plot(tstime/3600,tsmintf,'b')
-%     hold on
-%     if (istep >= 2*nshhour)
-%         plot(tstime(nshhour:istep+1-nshhour)/3600,tssmoothtf(nshhour:istep+1-nshhour),'b:')
-%     end
-%     axis([0,nstop*dt/3600,0,0.3])
-%     xlabel('time')
-%     ylabel('Entrainment flux')
-%     hold off
-% 
-%     subplot(3,5,14)
-%     set(gca,'FontSize',fs)
-%     %plot(tstime,tsmintf,'b',tstime,tsdzstar,'r')
-%     %axis([0,nstop*dt,0,1])
-%     semilogx(tstime*Nbv,tsmintf,'b')
-%     axis([10,1000,0.05,0.2])
-%     xlabel('tN')
-%     ylabel('Entrainment flux')
-% end
-% if lindiv
-%     figure(2)
-%     set(gca,'FontSize',fs)
-%     %plot(tstime,tsmintf,'b',tstime,tsdzstar,'r')
-%     %axis([0,nstop*dt,0,1])
-%     plot(tstime/3600,tsmintf,'b')
-%     hold on
-%     if (istep >= 2*nshhour)
-%         plot(tstime(nshhour:istep+1-nshhour)/3600,tssmoothtf(nshhour:istep+1-nshhour),'b:')
-%     end
-%     axis([0,nstop*dt/3600,0,0.3])
-%     xlabel('time')
-%     ylabel('Entrainment flux')
-%     hold off
-%     pause
-%     figure(1)
-% end
-% 
 
 pause(0.01)

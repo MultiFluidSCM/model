@@ -1,5 +1,5 @@
 function [ tend, relabel, eos, force, scales, surface_flux, budgets, work ] ...
-        = tendencies( grid, state, constants, t, dt, switches , old_diff)
+        = tendencies( grid, state, settings, t, dt, switches , old_diff)
 
 % Compute time tendencies of all fields for a given state
 
@@ -33,6 +33,7 @@ vareta1 = state.fluid(1).vareta;
 vareta2 = state.fluid(2).vareta;
 varq1   = state.fluid(1).varq;
 varq2   = state.fluid(2).varq;
+constants = settings.constants;
 gravity = constants.phys.gravity;
 bentraint = constants.param.bentraint;
 bentrainq = constants.param.bentrainq;
@@ -122,7 +123,7 @@ ddz_sigrho(nzp) = 0;
 % ------
 
 % Determine surface forcing and the partitioning of surface fluxes
-force = set_forcing(t);
+force = set_forcing(settings.forcing, t);
 surface_flux = find_surface_flux(state,grid,eos,force,psurf,dpdzbar,constants);
 
 % Calculate certain scales - these are non-local quantities, so difficult
@@ -623,7 +624,7 @@ tend.fluid(1).mvareta.diffuse = weight_to_w(grid,dg1);
 tend.fluid(2).mvareta.diffuse = weight_to_w(grid,dg2);
 
 % Buoyancy correlation terms
-disp('** No Buoyancy correl in eta variance budget **')
+% disp('** No Buoyancy correl in eta variance budget **')
 % Bterm = eos.rho_deriv_eta1.*vareta1 + eos.rho_deriv_q1.*covaretaq1;
 % tend.fluid(1).mvareta.diffuse = tend.fluid(1).mvareta.diffuse ...
 %     + weight_to_w(grid,gravity*t_scale1.*eos.sigma1.*deta1dz).*Bterm;
@@ -755,7 +756,7 @@ dwsq = (relabel.what21 - w2).^2;
 du21_2_sq = (relabel.uhat21 - u2).^2 ...
           + (relabel.vhat21 - v2).^2 ...
           + grid.aboves.*dwsq(2:nzp) + grid.belows.*dwsq(1:nz);
-disp('*** Alternative TKE relabelling ***')
+% disp('*** Alternative TKE relabelling ***')
 % TKE tendencies due to entrainment/detrainment
 tend.fluid(1).mtke.relabel = M12.*(tkehat12 + 0.5*du12_1_sq) ...
                            - M21.*(tkehat21 + 0.5*du21_1_sq);

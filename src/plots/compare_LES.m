@@ -159,14 +159,11 @@ if istep == time.nstop
     SCM_zw = grid.zw;
     SCM_zp = grid.zp;
     
-    SCM_time_ser = ts.time;
-    if exist('zcldtop')
-        % This will be true if plot_time_series has been called
-        SCM_zstar = ts.zstar;
-        SCM_zcbase = ts.zcbaseSG;
-        SCM_zctop = ts.zctopSG;
-        SCM_cldcov = ts.totcldcov;
-    end
+    SCM_time_ser = ts.time_high_res;
+    SCM_zstar = ts.zstar;
+    SCM_zcbase = ts.zcbaseSG;
+    SCM_zctop = ts.zctopSG;
+    SCM_cldcov = ts.totcldcov;
 
     % Write to file
     filename = fullfile(settings.folders.data_scm, 'SCM_results.mat');

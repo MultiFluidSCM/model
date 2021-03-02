@@ -12,7 +12,7 @@ dt = time.dt;
 t_new = time.t + dt;
 old_diff.flag = 0;
 [tend,relabel,eos,force,scales,surface_flux,budgets,work] = ...
-    tendencies(grid,state_new,constants,t_new,dt,switches,old_diff);
+    tendencies(grid,state_new,settings,t_new,dt,switches,old_diff);
 
 
 % Unpack some fields for clarity of code

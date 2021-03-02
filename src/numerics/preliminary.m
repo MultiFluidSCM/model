@@ -9,7 +9,7 @@ initial_run
 % ---
 
 % Set up timing information
-time = setup_time(current_time);
+time = settings.time;
 
 % First guess for next time step is the current state
 state_new = state_old;
@@ -20,7 +20,7 @@ gdiags = global_diags(grid,state_new,constants);
 % Compute tendencies to obtain diagnostic quantities for plotting
 old_diff.flag = 0;
 [tend,relabel,eos,force,scales,surface_flux,budgets,work] = ...
-         tendencies(grid,state_new,constants,time.t,time.dt,switches,old_diff);
+         tendencies(grid,state_new,settings,time.t,time.dt,switches,old_diff);
 
 % and set some fields that otherwise would not be set
 budgets.w2.wfix   = zeros(1,grid.nz + 1);

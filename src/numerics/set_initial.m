@@ -1,4 +1,4 @@
-function state = set_initial( grid, constants )
+function state = set_initial( grid, settings )
 
 % Define initial state
 
@@ -17,6 +17,7 @@ aboves = grid.aboves;
 belows = grid.belows;
 
 % Useful constants
+constants = settings.constants;
 % Gravity
 gravity = constants.phys.gravity;
 
@@ -27,7 +28,7 @@ p0s =  97000;
 
 % Specify profiles in balance with a given thetal(z)
 disp('** note that initial_theta is used as thetal **')
-pause
+% pause
 hydrostatic_thetal
 
 % or a given T(z)
@@ -53,7 +54,7 @@ end
 
 
 % Set winds to geostrophic values, which are set in set_forcing
-force = set_forcing(0);
+force = set_forcing(settings.forcing, 0);
 
 % Save in state structure
 %state.fluid(1).m   = (1.0 - constants.param.confrac)*rho;

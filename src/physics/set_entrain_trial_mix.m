@@ -12,6 +12,7 @@ elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
 elseif ischeme == 3 | ischeme == 4
     r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
+    % r2 = min(0.5*sqrt(sigma2.*tke2)./scales.L_plume,rdt);
 else
     disp('unknown scheme in set_entrain_trial')
     pause
@@ -35,8 +36,8 @@ m1fac = min(1, max(0,m1fac) );
 m2fac = min(1, max(0,m2fac) );
 
 % Relabelling rates
-relabel.M21_mix = rate_mix.*m2.*m1fac;
-relabel.M12_mix = rate_mix.*m1.*m2fac;
+relabel.M21_mix = mix.entrain * rate_mix.*m2.*m1fac;
+relabel.M12_mix = mix.detrain * rate_mix.*m1.*m2fac;
 
 % [temp, cbase_index] = min(abs(grid.zw-2000));
 % for k = cbase_index:length(relabel.M12_mix)
@@ -44,10 +45,10 @@ relabel.M12_mix = rate_mix.*m1.*m2fac;
 % end
 
 % Derivatives *** Need to think carefully about these ***
-dM21dm1_mix = case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf2.*mf2            + case3.*zeros(1,nz);
-dM21dm2_mix = case1.*zeros(1,nz) + case2.*rate_mix.*(2*mf1.*mf1 - sigma10) + case3.*rate_mix;
-dM12dm1_mix = case1.*rate_mix    + case2.*rate_mix.*(2*mf2.*mf2 - sigma20) + case3.*zeros(1,nz);
-dM12dm2_mix = case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1            + case3.*zeros(1,nz);
+dM21dm1_mix = mix.entrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf2.*mf2            + case3.*zeros(1,nz));
+dM21dm2_mix = mix.entrain * (case1.*zeros(1,nz) + case2.*rate_mix.*(2*mf1.*mf1 - sigma10) + case3.*rate_mix);
+dM12dm1_mix = mix.detrain * (case1.*rate_mix    + case2.*rate_mix.*(2*mf2.*mf2 - sigma20) + case3.*zeros(1,nz));
+dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1            + case3.*zeros(1,nz));
 
 % Entrained and detrained values of eta
 [relabel.etahat12_mix,relabel.detahat12deta1_mix,relabel.detahat12deta2_mix,...

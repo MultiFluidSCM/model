@@ -36,6 +36,7 @@ u1   = state.fluid(1).u;
 u2   = state.fluid(2).u;
 v1   = state.fluid(1).v;
 v2   = state.fluid(2).v;
+tke1 = state.fluid(1).tke;
 tke2 = state.fluid(2).tke;
 bentraint = constants.param.bentraint;
 bentrainq = constants.param.bentrainq;

@@ -9,11 +9,11 @@ for istep = 1:time.nstop
     time.t = time.t + time.dt;
     
     % Compute diagnostics and produce plots
+    update_timeseries_cloud
     if mod(istep,20) == 0
         gdiags = global_diags(grid,state_new,constants);
         plottype = 0;
         plot_diagnostics
-        figure(1)
     end
     
     % Save a restart file if needed

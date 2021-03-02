@@ -56,14 +56,17 @@ energy2 = internal2 + potential2 + kinetic2 + turbKE2;
 
 % Display diagnostics
 disp([' '])
-disp(['Mass      ' num2str(mass1     ) '  ' num2str(mass2     ) '  ' num2str(mass1     + mass2     )])
-disp(['Entropy   ' num2str(entropy1  ) '  ' num2str(entropy2  ) '  ' num2str(entropy1  + entropy2  )])
-disp(['Water     ' num2str(water1    ) '  ' num2str(water2    ) '  ' num2str(water1    + water2    )])
-disp(['Energy(I) ' num2str(internal1 ) '  ' num2str(internal2 ) '  ' num2str(internal1 + internal2 )])
-disp(['Energy(P) ' num2str(potential1) '  ' num2str(potential2) '  ' num2str(potential1+ potential2)])
-disp(['Energy(K) ' num2str(kinetic1  ) '  ' num2str(kinetic2  ) '  ' num2str(kinetic1  + kinetic2  )])
-disp(['Energy(t) ' num2str(turbKE1   ) '  ' num2str(turbKE2   ) '  ' num2str(turbKE1   + turbKE2   )])
-disp(['Energy(T) ' num2str(energy1   ) '  ' num2str(energy2   ) '  ' num2str(energy1   + energy2   )])
+disp(['Diagnostics:'])
+disp(['Variable      Fluid 1   Fluid 2   Total'])
+disp(['Mass         ' num2str(mass1     ) '  ' num2str(mass2     ) '  ' num2str(mass1     + mass2     )])
+disp(['Entropy      ' num2str(entropy1  ) '  ' num2str(entropy2  ) '  ' num2str(entropy1  + entropy2  )])
+disp(['Water        ' num2str(water1    ) '  ' num2str(water2    ) '  ' num2str(water1    + water2    )])
+disp(['Energy(I)    ' num2str(internal1 ) '  ' num2str(internal2 ) '  ' num2str(internal1 + internal2 )])
+disp(['Energy(P)    ' num2str(potential1) '  ' num2str(potential2) '  ' num2str(potential1+ potential2)])
+disp(['Energy(K)    ' num2str(kinetic1  ) '  ' num2str(kinetic2  ) '  ' num2str(kinetic1  + kinetic2  )])
+disp(['Energy(TKE)  ' num2str(turbKE1   ) '  ' num2str(turbKE2   ) '  ' num2str(turbKE1   + turbKE2   )])
+disp(['Energy(Tot)  ' num2str(energy1   ) '  ' num2str(energy2   ) '  ' num2str(energy1   + energy2   )])
+disp([' '])
 
 % Save diagnostics for use elsewhere
 gdiags.mass1 = mass1;

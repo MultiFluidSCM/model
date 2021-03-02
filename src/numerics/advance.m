@@ -25,7 +25,7 @@ m2   = state_new.fluid(2).m;
 % Tendencies computed from current state
 old_diff.flag = 0;
 [tend,relabel,eos,force,scales,surface_flux,budgets,work] = ...
-         tendencies(grid,state_old,constants,time.t,time.dt,switches,old_diff);
+         tendencies(grid,state_old,settings,time.t,time.dt,switches,old_diff);
 m1bar = work.m1bar;
 m2bar = work.m2bar;
 

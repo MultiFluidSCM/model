@@ -40,11 +40,11 @@ elseif ischeme == 3 | ischeme == 4
 else
     rate_sort = 0;
 end
-
+% rate_sort = 0;
 
 % Resulting detrainment rate
-relabel.M12_sort = rate_sort.*m2.*relabel.frac;
-relabel.M21_sort = 0*m1;
+relabel.M12_sort = sort.detrain * rate_sort.*m2.*relabel.frac;
+relabel.M21_sort = sort.entrain * 0 * m1;
 
 
 % w, eta and q of detrained fluid
