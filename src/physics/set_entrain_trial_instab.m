@@ -3,8 +3,10 @@
 relabel.M12_instab = instab.detrain * 0.  * m2 .* n2pos;
 relabel.M21_instab = instab.entrain * 0.2 * m1 .* n1neg;
 
+dM12dm1_instab = instab.detrain * 0.  * n2pos;
 dM12dm2_instab = instab.detrain * 0.  * n2pos;
 dM21dm1_instab = instab.entrain * 0.2 * n1neg;
+dM21dm2_instab = instab.entrain * 0.  * n1neg;
 
 % Entrained and detrained values of eta
 [relabel.etahat12_instab,relabel.detahat12deta1_instab,relabel.detahat12deta2_instab,...

@@ -135,52 +135,10 @@ end
 relabel.M12 = relabel.M12_instab + relabel.M12_mix + relabel.M12_sort + relabel.M12_dwdz;
 relabel.M21 = relabel.M21_instab + relabel.M21_mix + relabel.M21_sort + relabel.M21_dwdz;
 
-% Catch divide by zero
-denominator12 = relabel.M12 + 1e-8*(relabel.M12 == 0);
-denominator21 = relabel.M21 + 1e-8*(relabel.M21 == 0);
+% Get the properties of the entrained and detrained fluids
+set_entrain_trial_transfer_properties
 
-% Calculate mean vertical velocity detrained from updraft
-frac12_instab = weight_to_w(grid,relabel.M12_instab./denominator12);
-frac12_sort   = weight_to_w(grid,relabel.M12_sort  ./denominator12);
-frac12_dwdz   = weight_to_w(grid,relabel.M12_dwdz  ./denominator12);
-frac12_mix  = 1 - frac12_instab - frac12_sort - frac12_dwdz;
-relabel.what12 = frac12_instab.*relabel.what12_instab ...
-               + frac12_sort  .*relabel.what12_sort ...
-               + frac12_dwdz  .*relabel.what12_dwdz ...
-               + frac12_mix   .*relabel.what12_mix;
-relabel.etahat12 = frac12_instab.*relabel.etahat12_instab ...
-                 + frac12_sort  .*relabel.etahat12_sort ...
-                 + frac12_dwdz  .*relabel.etahat12_dwdz ...
-                 + frac12_mix   .*relabel.etahat12_mix;
 
-% Calculate mean vertical velocity entrained into updraft
-frac21_instab = weight_to_w(grid,relabel.M21_instab./denominator21);
-frac21_sort   = weight_to_w(grid,relabel.M21_sort  ./denominator21);
-frac21_dwdz   = weight_to_w(grid,relabel.M21_dwdz  ./denominator21);
-frac21_mix  = 1 - frac21_instab - frac21_sort - frac21_dwdz;
-relabel.what21 = frac21_instab.*relabel.what21_instab ...
-               + frac21_sort  .*relabel.what21_sort ...
-               + frac21_dwdz  .*relabel.what21_dwdz ...
-               + frac21_mix   .*relabel.what21_mix;
-relabel.etahat21 = frac21_instab.*relabel.etahat21_instab ...
-                 + frac21_sort  .*relabel.etahat21_sort ...
-                 + frac21_dwdz  .*relabel.etahat21_dwdz ...
-                 + frac21_mix   .*relabel.etahat21_mix;
-
-% Experimental option for detrained values
-% To catch divide by zero
-denominator = relabel.M12 + 1e-8*(relabel.M12 == 0);
-f_sort = weight_to_w(grid,relabel.M12_sort./denominator);
-f_mix  = 1 - f_sort;
-relabel.f_sort = f_sort;
-relabel.etahat12_blend = f_sort.*relabel.etahat12_sort ...
-                       + f_mix .*relabel.etahat12_mix;
-relabel.qhat12_blend   = f_sort.*relabel.qhat12_sort ...
-                       + f_mix .*relabel.qhat12_mix;
-% relabel.what12_blend   = f_sort.*relabel.what12_sort ...
-                       % + f_mix .*relabel.what12_mix;
-
-                   
 if ischeme == 0 | ischeme == 1
     % Safe option for detrained values
     relabel.etahat12 = relabel.etahat12_mix;
@@ -189,46 +147,8 @@ if ischeme == 0 | ischeme == 1
     % Factor needed for linearized variance equation
     relabel.f_sort_chi_hat = 0*chi_hat;
 elseif ischeme == 3 | ischeme == 4
-    % Apply experimental option
-    % relabel.etahat12 = relabel.etahat12_blend;
-    % relabel.etahat21 = relabel.etahat21_mix;
-    relabel.qhat12   = relabel.qhat12_blend;
-    relabel.qhat21   = relabel.qhat21_mix;
-    relabel.uhat12   = relabel.uhat12_mix;
-    relabel.uhat21   = relabel.uhat21_mix;
-    relabel.vhat12   = relabel.vhat12_mix;
-    relabel.vhat21   = relabel.vhat21_mix;
-    
-    relabel.detahat12deta1 = relabel.detahat12deta1_mix;
-    relabel.detahat12deta2 = relabel.detahat12deta2_mix;
-    relabel.detahat21deta1 = relabel.detahat21deta1_mix;
-    relabel.detahat21deta2 = relabel.detahat21deta2_mix;
-    
-    relabel.dqhat12dq1 = relabel.dqhat12dq1_mix;
-    relabel.dqhat12dq2 = relabel.dqhat12dq2_mix;
-    relabel.dqhat21dq1 = relabel.dqhat21dq1_mix;
-    relabel.dqhat21dq2 = relabel.dqhat21dq2_mix;
-    
-    relabel.duhat12du1 = relabel.duhat12du1_mix;
-    relabel.duhat12du2 = relabel.duhat12du2_mix;
-    relabel.duhat21du1 = relabel.duhat21du1_mix;
-    relabel.duhat21du2 = relabel.duhat21du2_mix;
-    
-    relabel.dvhat12dv1 = relabel.dvhat12dv1_mix;
-    relabel.dvhat12dv2 = relabel.dvhat12dv2_mix;
-    relabel.dvhat21dv1 = relabel.dvhat21dv1_mix;
-    relabel.dvhat21dv2 = relabel.dvhat21dv2_mix;
-    
-    relabel.dwhat12dw1 = relabel.dwhat12dw1_mix;
-    relabel.dwhat12dw2 = relabel.dwhat12dw2_mix;
-    relabel.dwhat21dw1 = relabel.dwhat21dw1_mix;
-    relabel.dwhat21dw2 = relabel.dwhat21dw2_mix;
-    
-    % Factor needed for linearized variance equation
-    relabel.f_sort_chi_hat = f_sort.*chi_hat;
-elseif ischeme == 4
-    relabel.etahat12 = relabel.etahat12_blend;
-    relabel.qhat12   = relabel.qhat12_blend;
+    denominator = relabel.M12 + 1e-8*(relabel.M12 == 0);
+    f_sort = weight_to_w(grid,relabel.M12_sort./denominator);
     
     % Factor needed for linearized variance equation
     relabel.f_sort_chi_hat = f_sort.*chi_hat;
@@ -244,8 +164,8 @@ relabel.what21(1  )   = 0;
 relabel.what21(nzp)   = 0;
     
 % Derivatives
-relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab;% + dM21dm1_dwdz;
-relabel.dM21dm2   = dM21dm2_mix;% + dM21dm2_dwdz;
+relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab + dM21dm1_dwdz;% + dM21dm1_sort; % Is sort contribution already included in Newton solver separately?
+relabel.dM21dm2   = dM21dm2_mix + dM21dm2_instab + dM21dm2_dwdz;% + dM21dm2_sort;
 relabel.dM21dw1   = zeros(1,nz);
 relabel.dM21dw2   = zeros(1,nz);
 relabel.dM21deta1 = zeros(1,nz);
@@ -253,8 +173,8 @@ relabel.dM21deta2 = zeros(1,nz);
 relabel.dM21dq1   = zeros(1,nz);
 relabel.dM21dq2   = zeros(1,nz);
 
-relabel.dM12dm1   = dM12dm1_mix + dM12dm1_dwdz;
-relabel.dM12dm2   = dM12dm2_mix + dM12dm2_dwdz;
+relabel.dM12dm1   = dM12dm1_mix + dM12dm1_instab + dM12dm1_dwdz;% + dM12dm1_sort;
+relabel.dM12dm2   = dM12dm2_mix + dM12dm2_instab + dM12dm2_dwdz;% + dM12dm2_sort;
 relabel.dM12dw1   = zeros(1,nz);
 relabel.dM12dw2   = zeros(1,nz);
 relabel.dM12deta1 = zeros(1,nz);
@@ -269,7 +189,7 @@ relabel.dM12dq2   = zeros(1,nz);
 relabel.M12bar = weight_to_w(grid,relabel.M12);
 relabel.M21bar = weight_to_w(grid,relabel.M21);
 
-% Save bckground profile 
+% Save background profile 
 relabel.ideal = ones(1,nz)*sigma20;
 
 end

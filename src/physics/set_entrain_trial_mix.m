@@ -12,7 +12,9 @@ elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
 elseif ischeme == 3 | ischeme == 4
     r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
-    % r2 = min(0.25*sqrt(tke1+tke2)./scales.L_plume,rdt);
+    % r2 = min(0.25*sqrt(tke2)./scales.L_turb2,rdt);
+    % r2 = min(0.25*sqrt(tke2)./(sigma1.*scales.L_turb1+sigma2.*scales.L_turb2),rdt);
+    % r2 = min(0.25*sqrt(tke1+tke2)./(scales.L_turb1+scales.L_turb2),rdt);
 else
     disp('unknown scheme in set_entrain_trial')
     pause
@@ -73,5 +75,6 @@ dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1  
  relabel.what21_mix,relabel.dwhat21dw1_mix,relabel.dwhat21dw2_mix] ...
     = findqhat(w1, w2, mix.bentrainw, mix.bdetrainw);
 
+% Force transferred velocities to have closer values to their new fluid
 % relabel.what12_mix = min(relabel.what21_mix, 0);
 relabel.what21_mix = max(relabel.what21_mix, 0);

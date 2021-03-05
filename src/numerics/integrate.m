@@ -4,16 +4,23 @@ for istep = 1:time.nstop
     
     time.istep = istep;
     
-    % Step forward
-    advance
+    % Step forward if simulation hasn't crashed
+    if ~isnan(state_new.fluid(1).m(1))
+        advance
+    end
     time.t = time.t + time.dt;
     
+    % Update cloud parameters for diagnostics
+    % if mod(istep,20) == 0
+        % update_timeseries_cloud
+    % end
+    
     % Compute diagnostics and produce plots
-    update_timeseries_cloud
-    if mod(istep,60) == 0
+    if mod(istep,20) == 0
         gdiags = global_diags(grid,state_new,constants);
         plottype = 0;
         plot_diagnostics
+        update_timeseries_cloud
     end
     
     % Save a restart file if needed

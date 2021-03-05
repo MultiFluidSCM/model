@@ -2,6 +2,7 @@ function [ L_turb ] = find_lturb( grid, nsq, tke, tke_min )
 % Compute a turbulence length scale
 
 power = 1;
+% power = 10;
 
 nz = numel(grid.zp);
 

@@ -265,7 +265,7 @@ for k = 1:nzp
         disp([num2str(sq2*eos.cldfrac2(k)),'  ',...
               num2str(dqldq_alt*Deltaq*eos.ql2(k)),'  ',...
               num2str(- eos.ql2(k)^2)]);
-        pause
+        % pause
     end
                 
     eos.pbar(k) = pbar;

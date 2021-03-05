@@ -69,3 +69,30 @@ relabel.qhat21_sort   = q1;
 
 % Derivative of what12_sort wrt wstdw
 relabel.what_deriv = deriv;
+
+
+% Property derivatives. Assume transferred properties close to fluid mean values.
+relabel.detahat12deta1_sort = zeros(1,nzp);
+relabel.detahat12deta2_sort = ones(1,nzp);
+relabel.detahat21deta1_sort = ones(1,nzp);
+relabel.detahat21deta2_sort = zeros(1,nzp);
+
+relabel.dqhat12dq1_sort = zeros(1,nzp);
+relabel.dqhat12dq2_sort = ones(1,nzp);
+relabel.dqhat21dq1_sort = ones(1,nzp);
+relabel.dqhat21dq2_sort = zeros(1,nzp);
+
+relabel.duhat12du1_sort = zeros(1,nz);
+relabel.duhat12du2_sort = ones(1,nz);
+relabel.duhat21du1_sort = ones(1,nz);
+relabel.duhat21du2_sort = zeros(1,nz);
+
+relabel.dvhat12dv1_sort = zeros(1,nz);
+relabel.dvhat12dv2_sort = ones(1,nz);
+relabel.dvhat21dv1_sort = ones(1,nz);
+relabel.dvhat21dv2_sort = zeros(1,nz);
+
+relabel.dwhat12dw1_sort = zeros(1,nzp);
+relabel.dwhat12dw2_sort = ones(1,nzp);
+relabel.dwhat21dw1_sort = ones(1,nzp);
+relabel.dwhat21dw2_sort = zeros(1,nzp);
