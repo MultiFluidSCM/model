@@ -48,8 +48,8 @@ if (dwdz.entrain | dwdz.detrain) & ischeme == 4
     % Fraction of transfer that actually enters fluid 2
     frac1_transfer = 2*min(sigma2, 0.5);
     
-    rate_sort12 = min(max(0, -dw2dz), rdt);
-    rate_sort21 = min(max(0, -dw1dz), rdt) .* frac1_down .* frac1_transfer;
+    rate_sort12 = min(max(0, -dw2dz * dwdz.detrain_factor), rdt);
+    rate_sort21 = min(max(0, -dw1dz * dwdz.entrain_factor), rdt) .* frac1_down .* frac1_transfer;
 
     relabel.M12_dwdz = dwdz.detrain * m2.*rate_sort12;
     relabel.M21_dwdz = dwdz.entrain * m1.*rate_sort21;

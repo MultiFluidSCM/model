@@ -113,8 +113,8 @@ end
 
 
 % Estimate turbulence length scales
-scales.L_turb1 = find_lturb(grid,eos.nsq1,state.fluid(1).tke,constants.param.tke_min);
-scales.L_turb2 = find_lturb(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
+scales.L_turb1 = find_lturb(grid,eos.nsq1,state.fluid(1).tke,constants.param.tke_min);% .* m1 ./ (m1+m2);
+scales.L_turb2 = find_lturb(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);% .* m2 ./ (m1+m2);
 
 % and time scales
 scales.T_turb1 = scales.L_turb1./sqrt(state.fluid(1).tke);
