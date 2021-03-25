@@ -21,6 +21,9 @@ tke1 = state.fluid(1).tke;
 Tw11 = state.fluid(1).Tw(1);
 Tw21 = state.fluid(2).Tw(1);
 
+sigma1 = m1 ./ (m1+m2);
+sigma2 = m2 ./ (m1+m2);
+
 % Remap mass to w levels
 m1bar = weight_to_w(grid,m1);
 m2bar = weight_to_w(grid,m2);
@@ -113,15 +116,26 @@ end
 
 
 % Estimate turbulence length scales
-scales.L_turb1 = find_lturb(grid,eos.nsq1,state.fluid(1).tke,constants.param.tke_min);% .* m1 ./ (m1+m2);
-scales.L_turb2 = find_lturb(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);% .* m2 ./ (m1+m2);
+scales.L_turb1 = find_lturb(grid,eos.nsq1,state.fluid(1).tke,constants.param.tke_min);
+scales.L_turb2 = find_lturb(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
+% scales.L_turb1 = find_lturb(grid,eos.nsq1,state.fluid(1).tke .* sigma1,constants.param.tke_min);
+% scales.L_turb2 = find_lturb(grid,eos.nsq2,state.fluid(2).tke .* sigma2,constants.param.tke_min);
+% scales.L_turb1 = find_lturb(grid,eos.nsq1,sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke,constants.param.tke_min);
+% scales.L_turb2 = find_lturb(grid,eos.nsq2,sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke,constants.param.tke_min);
+
 
 % and time scales
 scales.T_turb1 = scales.L_turb1./sqrt(state.fluid(1).tke);
 scales.T_turb2 = scales.L_turb2./sqrt(state.fluid(2).tke);
+% scales.T_turb1 = scales.L_turb1./sqrt(sigma1 .* state.fluid(1).tke);
+% scales.T_turb2 = scales.L_turb2./sqrt(sigma2 .* state.fluid(2).tke);
+% scales.T_turb1 = scales.L_turb1./sqrt(sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke);
+% scales.T_turb2 = scales.L_turb2./sqrt(sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke);
 
 % and plume length scales
 scales.L_plume = find_lplume(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
+% scales.L_plume = find_lplume(grid,eos.nsq2,state.fluid(2).tke .* m2 ./ (m1+m2),constants.param.tke_min);
+% scales.L_plume = find_lplume(grid,eos.nsq2,sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke,constants.param.tke_min);
 
 end
 

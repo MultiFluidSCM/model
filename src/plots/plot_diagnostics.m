@@ -182,5 +182,46 @@ if settings.switches.plot
 
 end
 
+% fig = figure(6);
+% set(gcf,'Position',[76 166 1257 624])
+
+% LturbMax = max(max(scales.L_turb1, scales.L_turb2));
+
+% subplot(1,2,1)
+% plot(scales.L_turb1,zunitsp,'b',...
+     % scales.L_turb2,zunitsp,'r')
+% xlim([0,max(LturbMax)])
+% ylim([0,zplottop])
+% title('Entrainment')
+% xlabel('Turbulent length scales')
+% ylabel(labelz)
+% legend('L_1,turb','L_2,turb','Location','NorthEast')
+% set(gca,'FontSize',fs)
+
+% if isfield(ts, 'zstar')
+    % subplot(1,2,2)
+    % SCM_zstar = ts.zstar*1e-3;
+    % SCM_zcbase = ts.zcbaseSG*1e-3;
+    % SCM_zctop = ts.zctopSG*1e-3;
+    % SCM_time_ser_hours = ts.time_high_res/3600.;
+    % plot(SCM_time_ser_hours,SCM_zstar ,'b--',...
+         % SCM_time_ser_hours,SCM_zctop ,'r--',...
+         % SCM_time_ser_hours,SCM_zcbase,'k--')
+    % xlabel('Time','fontsize',fs)
+    % ylabel('Cld base/top (km)','fontsize',fs)
+    % xlim([0,15]);
+    % ylim([0,zplottop]);
+    % sgtitle([num2str(ts.time(end)/3600,'%.2f'),' hours'],'fontsize',1.5*fs)
+    % set(gca,'fontsize',fs,'XTick',[1:3:14])
+% end
+
+% saveas(...
+    % fig,...
+    % fullfile(...
+        % settings.folders.images,...
+        % join(["profiles_L_turb_",num2str(plotstep),".png"], "")...
+    % )...
+% );
+
 
 pause(0.01)
