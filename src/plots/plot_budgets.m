@@ -8,7 +8,7 @@
 
 % Updraft mass budget
 if settings.switches.plot_budgets_mass
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,1)
         plot(tend.fluid(2).m.transport,zunitsp,'g',...
@@ -22,19 +22,28 @@ if settings.switches.plot_budgets_mass
         legend('Tr','E','D','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(tend.fluid(2).m.transport,zunitsp,'g',...
              relabel.M21,zunitsp,'r',...
             -relabel.M12,zunitsp,'b',...
              tend.fluid(2).m.tot,zunitsp,'k')
+        xlim([-4e-3,4e-3])
         ylim([0,zplottop])
         title('m_2 budget')
         xlabel('dm2/dt')
         ylabel(labelz)
         legend('Tr','E','D','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_mass_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 end
 
@@ -46,7 +55,7 @@ m2totbar   = weight_to_w(grid,tend.fluid(2).m.tot);
 
 % Updraft vertical velocity budget (advective form)
 if settings.switches.plot_budgets_w
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,5)
         plot(budgets.w2.transport,zunitsw,'g',...
@@ -64,7 +73,8 @@ if settings.switches.plot_budgets_w
         legend('Tr','K','E','D','PG','P','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(budgets.w2.transport,zunitsw,'g',...
              budgets.w2.diffuse  ,zunitsw,'g--',...
@@ -74,19 +84,27 @@ if settings.switches.plot_budgets_w
              budgets.w2.drag     ,zunitsw,'r--',...
              budgets.w2.wfix     ,zunitsw,'k--',...
              budgets.w2.tot      ,zunitsw,'k')
+        xlim([-2e-2,2e-2])
         ylim([0,zplottop])
         title('w_2 budget')
         xlabel('dw_2/dt')
         ylabel(labelz)
         legend('Tr','K','E','D','PG','P','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_w2_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 end
 
 if settings.switches.plot_budgets_entropy
     % Updraft entropy budget (advective form)
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,6)
         plot(budgets.eta2.transport,zunitsw,'g',...
@@ -104,7 +122,8 @@ if settings.switches.plot_budgets_entropy
         legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
         set(gca,'FontSize',14)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(budgets.eta2.transport,zunitsw,'g',...
              budgets.eta2.diffuse  ,zunitsw,'g--',...
@@ -114,18 +133,26 @@ if settings.switches.plot_budgets_entropy
              budgets.eta2.dissn    ,zunitsw,'r--',...
              budgets.eta2.wfix     ,zunitsw,'k--',...
              budgets.eta2.tot      ,zunitsw,'k')
+        xlim([-1e-1,1e-1])
         ylim([0,zplottop])
         title('\eta_2 budget')
         xlabel('deta_2/dt')
         ylabel(labelz)
         legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_eta2_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 
 
     % Downdraft entropy budget (advective form)
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,2)
         plot(budgets.eta1.transport,zunitsw,'g',...
@@ -143,7 +170,8 @@ if settings.switches.plot_budgets_entropy
         legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(budgets.eta1.transport,zunitsw,'g',...
              budgets.eta1.diffuse  ,zunitsw,'g--',...
@@ -153,19 +181,27 @@ if settings.switches.plot_budgets_entropy
              budgets.eta1.dissn    ,zunitsw,'r--',...
              budgets.eta1.wfix     ,zunitsw,'k--',...
              budgets.eta1.tot      ,zunitsw,'k')
+        xlim([-1e-2,1e-2])
         ylim([0,zplottop])
         title('\eta_1 budget')
         xlabel('deta_1/dt')
         ylabel(labelz)
         legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_eta1_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 end
 
 if settings.switches.plot_budgets_water
     % Updraft water budget (advective form)
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,7)
         plot(budgets.q2.transport,zunitsw,'g',...
@@ -181,7 +217,8 @@ if settings.switches.plot_budgets_water
         legend('Tr','K','E','D','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(budgets.q2.transport,zunitsw,'g',...
              budgets.q2.diffuse  ,zunitsw,'g--',...
@@ -189,18 +226,26 @@ if settings.switches.plot_budgets_water
              budgets.q2.detrain  ,zunitsw,'b',...
              budgets.q2.wfix     ,zunitsw,'k--',...
              budgets.q2.tot      ,zunitsw,'k')
+        xlim([-5e-3,5e-3])
         ylim([0,zplottop])
         title('q_2 budget')
         xlabel('dq_2/dt')
         ylabel(labelz)
         legend('Tr','K','E','D','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_q2_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 
 
     % Downdraft water budget (advective form)
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,3)
         plot(budgets.q1.transport,zunitsw,'g',...
@@ -216,7 +261,8 @@ if settings.switches.plot_budgets_water
         legend('Tr','K','E','D','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(budgets.q1.transport,zunitsw,'g',...
              budgets.q1.diffuse  ,zunitsw,'g--',...
@@ -224,19 +270,27 @@ if settings.switches.plot_budgets_water
              budgets.q1.detrain  ,zunitsw,'b',...
              budgets.q1.wfix     ,zunitsw,'k--',...
              budgets.q1.tot      ,zunitsw,'k')
+        xlim([-5e-3,5e-3])
         ylim([0,zplottop])
         title('q_1 budget')
         xlabel('dq_1/dt')
         ylabel(labelz)
         legend('Tr','K','E','D','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_q1_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 end
 
 % TKE budgets (flux form)
 if settings.switches.plot_budgets_tke
-    if plottype == 0
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,4)
         plot(tend.fluid(1).mtke.transport,zunitsp,'g',...
@@ -254,7 +308,8 @@ if settings.switches.plot_budgets_tke
         legend('Tr','E-D','S','B','K','P','D','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(tend.fluid(1).mtke.transport,zunitsp,'g',...
              tend.fluid(1).mtke.relabel,zunitsp,'r',...
@@ -264,15 +319,24 @@ if settings.switches.plot_budgets_tke
              tend.fluid(1).mtke.drag,zunitsp,'k--',...
              tend.fluid(1).mtke.dissn,zunitsp,'r--',...
              tend.fluid(1).mtke.tot,zunitsp,'k')
+        xlim([-5e-3,5e-3])
         ylim([0,zplottop])
         title('TKE_1 budget')
         xlabel('d/dt')
         ylabel(labelz)
         legend('Tr','E-D','S','B','K','P','D','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_tke1_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
-    if plottype == 0
+    
+    if settings.switches.plottype == 0
         figure(3)
         subplot(2,4,8)
         plot(tend.fluid(2).mtke.transport,zunitsp,'g',...
@@ -290,7 +354,8 @@ if settings.switches.plot_budgets_tke
         legend('Tr','E-D','S','B','K','P','D','To','Location','NorthEast')
         set(gca,'FontSize',fs)
     else
-        figure(5)
+        fig = figure(5);
+        set(gcf,'Position',[76 166 657 624])
         subplot(1,1,1)
         plot(tend.fluid(2).mtke.transport,zunitsp,'g',...
              tend.fluid(2).mtke.relabel,zunitsp,'r',...
@@ -300,13 +365,21 @@ if settings.switches.plot_budgets_tke
              tend.fluid(2).mtke.drag,zunitsp,'k--',...
              tend.fluid(2).mtke.dissn,zunitsp,'r--',...
              tend.fluid(2).mtke.tot,zunitsp,'k')
+        xlim([-5e-3,5e-3])
         ylim([0,zplottop])
         title('TKE_2 budget')
         xlabel('d/dt')
         ylabel(labelz)
         legend('Tr','E-D','S','B','K','P','D','To','Location','NorthEast')
         set(gca,'FontSize',fs)
-        pause
+        
+        saveas(...
+            fig,...
+            fullfile(...
+                settings.folders.images,...
+                join(["profiles_budget_tke2_",num2str(plotstep),".png"], "")...
+            )...
+        );
     end
 end
 
