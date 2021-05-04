@@ -116,25 +116,25 @@ end
 
 
 % Estimate turbulence length scales
-% scales.L_turb1 = constants.param.Lfactor1 * find_lturb(grid,eos.nsq1,state.fluid(1).tke,constants.param.tke_min);
-% scales.L_turb2 = constants.param.Lfactor2 * find_lturb(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
-scales.L_turb1 = constants.param.Lfactor1 * find_lturb(grid,eos.nsq1,state.fluid(1).tke .* sigma1,constants.param.tke_min);
-scales.L_turb2 = constants.param.Lfactor2 * find_lturb(grid,eos.nsq2,state.fluid(2).tke .* sigma2,constants.param.tke_min);
+scales.L_turb1 = constants.param.Lfactor1 * find_lturb(grid,eos.nsq1,state.fluid(1).tke,constants.param.tke_min);
+scales.L_turb2 = constants.param.Lfactor2 * find_lturb(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
+% scales.L_turb1 = constants.param.Lfactor1 * find_lturb(grid,eos.nsq1,state.fluid(1).tke .* sigma1,constants.param.tke_min);
+% scales.L_turb2 = constants.param.Lfactor2 * find_lturb(grid,eos.nsq2,state.fluid(2).tke .* sigma2,constants.param.tke_min);
 % scales.L_turb1 = constants.param.Lfactor1 * find_lturb(grid,eos.nsq1,sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke,constants.param.tke_min);
 % scales.L_turb2 = constants.param.Lfactor2 * find_lturb(grid,eos.nsq2,sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke,constants.param.tke_min);
 
 
 % and time scales
-% scales.T_turb1 = scales.L_turb1./sqrt(state.fluid(1).tke);
-% scales.T_turb2 = scales.L_turb2./sqrt(state.fluid(2).tke);
-scales.T_turb1 = scales.L_turb1./sqrt(sigma1 .* state.fluid(1).tke);
-scales.T_turb2 = scales.L_turb2./sqrt(sigma2 .* state.fluid(2).tke);
+scales.T_turb1 = scales.L_turb1./sqrt(state.fluid(1).tke);
+scales.T_turb2 = scales.L_turb2./sqrt(state.fluid(2).tke);
+% scales.T_turb1 = scales.L_turb1./sqrt(sigma1 .* state.fluid(1).tke);
+% scales.T_turb2 = scales.L_turb2./sqrt(sigma2 .* state.fluid(2).tke);
 % scales.T_turb1 = scales.L_turb1./sqrt(sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke);
 % scales.T_turb2 = scales.L_turb2./sqrt(sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke);
 
 % and plume length scales
-% scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
-scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,state.fluid(2).tke .* sigma2,constants.param.tke_min);
+scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
+% scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,state.fluid(2).tke .* sigma2,constants.param.tke_min);
 % scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,sigma1.*state.fluid(1).tke + sigma2.*state.fluid(2).tke,constants.param.tke_min);
 
 end
