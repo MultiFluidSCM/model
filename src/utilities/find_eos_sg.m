@@ -59,7 +59,7 @@ for k = 1:nz
 
     % Residual in sigma equation
     eos.res_sigma(k) = 1 - eos.sigma1(k) - eos.sigma2(k);
-
+    
 end
 
 
@@ -82,6 +82,16 @@ for k = 1:nzp
                                                    state.fluid(1).q(k),  ...
                                                    constants.therm);
     eos.res_eta1(k) = state.fluid(1).eta(k) + gt;
+    for iter = 1:3
+        res = state.fluid(1).eta(k) + gt;
+        T_inc = -res/gtt;
+        state.fluid(1).Tw(k) = state.fluid(1).Tw(k) + T_inc;
+        [g,gp,gt,gw,gpp,gpt,gtt,gpw,gtw,gww,a] = gibbs(pbar,                 ...
+                                                   state.fluid(1).Tw(k), ...
+                                                   state.fluid(1).q(k),  ...
+                                                   constants.therm);
+    end
+ 
     eos.drdpbar1(k) = (gpt*gpt/gtt - gpp);
     eos.drdeta1(k)  =  gpt/gtt;
     eos.drdq1(k)    = (gpt*gtw/gtt - gpw);
@@ -155,6 +165,12 @@ for k = 1:nzp
     eos.rho_deriv_eta1(k) = drhogasdeta + eos.cldfrac1(k)*ddrhodql_alt*dqldeta;
     eos.rho_deriv_q1(k)   = drhogasdq   + eos.cldfrac1(k)*ddrhodql_alt*dqldq_alt;
     
+    % Improved estimates of derivatives of density wrt p, eta, and q
+    rrhosq = 1/eos.rhow1(k)^2;
+    eos.drdpbar1(k) = drho_parceldp1(k)*rrhosq;
+    eos.drdeta1(k)  = eos.rho_deriv_eta1(k)*rrhosq;
+    eos.drdq1(k)    = eos.rho_deriv_q1(k)*rrhosq;
+    
     % Density variance
     eos.Varrhow1(k) = (drhogasdeta*etastd)^2 ...
                     + rr*drhogasdeta*drhogasdq*etastd*qstd ...
@@ -170,6 +186,15 @@ for k = 1:nzp
                                                    state.fluid(2).q(k),  ...
                                                    constants.therm);
     eos.res_eta2(k) = state.fluid(2).eta(k) + gt;
+    for iter = 1:3
+        res = state.fluid(2).eta(k) + gt;
+        T_inc = -res/gtt;
+        state.fluid(2).Tw(k) = state.fluid(2).Tw(k) + T_inc;
+        [g,gp,gt,gw,gpp,gpt,gtt,gpw,gtw,gww,a] = gibbs(pbar,                 ...
+                                                   state.fluid(2).Tw(k), ...
+                                                   state.fluid(2).q(k),  ...
+                                                   constants.therm);
+    end
     eos.drdpbar2(k) = (gpt*gpt/gtt - gpp);
     eos.drdeta2(k)  =  gpt/gtt;
     eos.drdq2(k)    = (gpt*gtw/gtt - gpw);
@@ -243,6 +268,12 @@ for k = 1:nzp
     eos.rho_deriv_eta2(k) = drhogasdeta + eos.cldfrac2(k)*ddrhodql_alt*dqldeta;
     eos.rho_deriv_q2(k)   = drhogasdq   + eos.cldfrac2(k)*ddrhodql_alt*dqldq_alt;
     
+    % Improved estimates of derivatives of density wrt p, eta, and q
+    rrhosq = 1/eos.rhow2(k)^2;
+    eos.drdpbar2(k) = drho_parceldp2(k)*rrhosq;
+    eos.drdeta2(k)  = eos.rho_deriv_eta2(k)*rrhosq;
+    eos.drdq2(k)    = eos.rho_deriv_q2(k)*rrhosq;
+
     % Density variance
     eos.Varrhow2(k) = (drhogasdeta*etastd)^2 ...
                     + rr*drhogasdeta*drhogasdq*etastd*qstd ...
@@ -265,7 +296,7 @@ for k = 1:nzp
         disp([num2str(sq2*eos.cldfrac2(k)),'  ',...
               num2str(dqldq_alt*Deltaq*eos.ql2(k)),'  ',...
               num2str(- eos.ql2(k)^2)]);
-        % pause
+        pause
     end
                 
     eos.pbar(k) = pbar;
@@ -315,9 +346,4 @@ eos.nsq1 = constants.phys.gravity*(drho_parceldz - drhoenvdz)./eos.rho1;
 temp = drho_parceldp2.*dpdz;
 drho_parceldz = grid.abovep.*temp(2:nzp) + grid.belowp.*temp(1:nz);
 eos.nsq2 = constants.phys.gravity*(drho_parceldz - drhoenvdz)./eos.rho2;
-
-
-%disp('** buoyancy correlation times 0.3 **')
-%eos.rho_deriv_eta1(:) = 0.3*eos.rho_deriv_eta1(:);
-%eos.rho_deriv_eta2(:) = 0.3*eos.rho_deriv_eta2(:);
 

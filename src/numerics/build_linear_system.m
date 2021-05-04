@@ -432,8 +432,8 @@ cc(7 ,ix) = cc(7 ,ix) - m2.*eos.drdqp2  .*belowp;
 cc(8 ,ix) = cc(8 ,ix) + 1./eos.rho1;
 cc(9 ,ix) = cc(9 ,ix) + 1./eos.rho2;
 cc(10,ix) = - m1.*eos.drdp1 - m2.*eos.drdp2; 
-cc(13,ix) = cc(11,ix) - m1.*eos.drdetap1.*abovep;
-cc(14,ix) = cc(12,ix) - m2.*eos.drdetap2.*abovep;
-cc(15,ix) = cc(13,ix) - m1.*eos.drdqp1  .*abovep;
-cc(16,ix) = cc(14,ix) - m2.*eos.drdqp2  .*abovep;
+cc(13,ix) = cc(13,ix) - m1.*eos.drdetap1.*abovep;
+cc(14,ix) = cc(14,ix) - m2.*eos.drdetap2.*abovep;
+cc(15,ix) = cc(15,ix) - m1.*eos.drdqp1  .*abovep;
+cc(16,ix) = cc(16,ix) - m2.*eos.drdqp2  .*abovep;
 
