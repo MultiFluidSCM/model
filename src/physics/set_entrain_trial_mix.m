@@ -12,9 +12,21 @@ elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
 elseif ischeme == 3 | ischeme == 4
     r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
+    % r2 = min(0.25*sqrt(tke2)./grid.zp,rdt);
+    % r2 = min(0.25*sqrt(sigma2.*tke2)./scales.L_plume,rdt);
+    % r2 = min(0.25*sqrt(tke1)./scales.L_plume,rdt);
     % r2 = min(0.25*sqrt(tke2)./scales.L_turb2,rdt);
     % r2 = min(0.25*sqrt(tke2)./(sigma1.*scales.L_turb1+sigma2.*scales.L_turb2),rdt);
     % r2 = min(0.25*sqrt(tke1+tke2)./(scales.L_turb1+scales.L_turb2),rdt);
+    
+    % Caltech mixing formulation
+    % zFluid2Max = 100;
+    % for i=1:length(sigma2)
+        % if (sigma2(i)-sigma20) > 0
+            % zFluid2Max = max(100, grid.zp(i));
+        % end
+    % end
+    % r2 = min(0.15*sqrt(tke1)/zFluid2Max,rdt);
 else
     disp('unknown scheme in set_entrain_trial')
     pause
