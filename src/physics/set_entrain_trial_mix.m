@@ -12,6 +12,7 @@ elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
 elseif ischeme == 3 | ischeme == 4
     r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
+    % r2 = min(mix.tke_factor*sqrt(tke1)./scales.L_plume,rdt);
     % r2 = min(0.25*sqrt(tke2)./grid.zp,rdt);
     % r2 = min(0.25*sqrt(sigma2.*tke2)./scales.L_plume,rdt);
     % r2 = min(0.25*sqrt(tke1)./scales.L_plume,rdt);
@@ -27,6 +28,9 @@ elseif ischeme == 3 | ischeme == 4
         % end
     % end
     % r2 = min(0.15*sqrt(tke1)/zFluid2Max,rdt);
+    % r2 = min(sqrt(tke1)/zFluid2Max,rdt);
+    % r2 = min(mix.tke_factor*sqrt(tke2)/zFluid2Max,rdt);
+    % r2 = min(sqrt(sigma1.*tke1+sigma2.*tke2)/zFluid2Max,rdt);
 else
     disp('unknown scheme in set_entrain_trial')
     pause
@@ -64,29 +68,105 @@ dM21dm2_mix = mix.entrain * (case1.*zeros(1,nz) + case2.*rate_mix.*(2*mf1.*mf1 -
 dM12dm1_mix = mix.detrain * (case1.*rate_mix    + case2.*rate_mix.*(2*mf2.*mf2 - sigma20) + case3.*zeros(1,nz));
 dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1            + case3.*zeros(1,nz));
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Transfer coefficients in the boundary layer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Entrained and detrained values of eta
-[relabel.etahat12_mix,relabel.detahat12deta1_mix,relabel.detahat12deta2_mix,...
- relabel.etahat21_mix,relabel.detahat21deta1_mix,relabel.detahat21deta2_mix] ...
+[relabel.etahat12_mix_dry,relabel.detahat12deta1_mix_dry,relabel.detahat12deta2_mix_dry,...
+ relabel.etahat21_mix_dry,relabel.detahat21deta1_mix_dry,relabel.detahat21deta2_mix_dry] ...
     = findqhat(eta1, eta2, mix.bentraint, mix.bdetraint);
 
 % Entrained and detrained values of q
-[relabel.qhat12_mix,relabel.dqhat12dq1_mix,relabel.dqhat12dq2_mix,...
- relabel.qhat21_mix,relabel.dqhat21dq1_mix,relabel.dqhat21dq2_mix] ...
+[relabel.qhat12_mix_dry,relabel.dqhat12dq1_mix_dry,relabel.dqhat12dq2_mix_dry,...
+ relabel.qhat21_mix_dry,relabel.dqhat21dq1_mix_dry,relabel.dqhat21dq2_mix_dry] ...
     = findqhat(q1, q2, mix.bentrainq, mix.bdetrainq);
 
 % Entrained and detrained values of velocities u, v and w
-[relabel.uhat12_mix,relabel.duhat12du1_mix,relabel.duhat12du2_mix,...
- relabel.uhat21_mix,relabel.duhat21du1_mix,relabel.duhat21du2_mix] ...
+[relabel.uhat12_mix_dry,relabel.duhat12du1_mix_dry,relabel.duhat12du2_mix_dry,...
+ relabel.uhat21_mix_dry,relabel.duhat21du1_mix_dry,relabel.duhat21du2_mix_dry] ...
     = findqhat(u1, u2, mix.bentrainu, mix.bdetrainu);
 
-[relabel.vhat12_mix,relabel.dvhat12dv1_mix,relabel.dvhat12dv2_mix,...
- relabel.vhat21_mix,relabel.dvhat21dv1_mix,relabel.dvhat21dv2_mix] ...
+[relabel.vhat12_mix_dry,relabel.dvhat12dv1_mix_dry,relabel.dvhat12dv2_mix_dry,...
+ relabel.vhat21_mix_dry,relabel.dvhat21dv1_mix_dry,relabel.dvhat21dv2_mix_dry] ...
     = findqhat(v1, v2, mix.bentrainu, mix.bdetrainu);
 
-[relabel.what12_mix,relabel.dwhat12dw1_mix,relabel.dwhat12dw2_mix,...
- relabel.what21_mix,relabel.dwhat21dw1_mix,relabel.dwhat21dw2_mix] ...
+[relabel.what12_mix_dry,relabel.dwhat12dw1_mix_dry,relabel.dwhat12dw2_mix_dry,...
+ relabel.what21_mix_dry,relabel.dwhat21dw1_mix_dry,relabel.dwhat21dw2_mix_dry] ...
     = findqhat(w1, w2, mix.bentrainw, mix.bdetrainw);
+    
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Transfer coefficients in the cloud layer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Entrained and detrained values of eta
+[relabel.etahat12_mix_cloud,relabel.detahat12deta1_mix_cloud,relabel.detahat12deta2_mix_cloud,...
+ relabel.etahat21_mix_cloud,relabel.detahat21deta1_mix_cloud,relabel.detahat21deta2_mix_cloud] ...
+    = findqhat(eta1, eta2, mix_cloud.bentraint, mix_cloud.bdetraint);
+
+% Entrained and detrained values of q
+[relabel.qhat12_mix_cloud,relabel.dqhat12dq1_mix_cloud,relabel.dqhat12dq2_mix_cloud,...
+ relabel.qhat21_mix_cloud,relabel.dqhat21dq1_mix_cloud,relabel.dqhat21dq2_mix_cloud] ...
+    = findqhat(q1, q2, mix_cloud.bentrainq, mix_cloud.bdetrainq);
+
+% Entrained and detrained values of velocities u, v and w
+[relabel.uhat12_mix_cloud,relabel.duhat12du1_mix_cloud,relabel.duhat12du2_mix_cloud,...
+ relabel.uhat21_mix_cloud,relabel.duhat21du1_mix_cloud,relabel.duhat21du2_mix_cloud] ...
+    = findqhat(u1, u2, mix_cloud.bentrainu, mix_cloud.bdetrainu);
+
+[relabel.vhat12_mix_cloud,relabel.dvhat12dv1_mix_cloud,relabel.dvhat12dv2_mix_cloud,...
+ relabel.vhat21_mix_cloud,relabel.dvhat21dv1_mix_cloud,relabel.dvhat21dv2_mix_cloud] ...
+    = findqhat(v1, v2, mix_cloud.bentrainu, mix_cloud.bdetrainu);
+
+[relabel.what12_mix_cloud,relabel.dwhat12dw1_mix_cloud,relabel.dwhat12dw2_mix_cloud,...
+ relabel.what21_mix_cloud,relabel.dwhat21dw1_mix_cloud,relabel.dwhat21dw2_mix_cloud] ...
+    = findqhat(w1, w2, mix_cloud.bentrainw, mix_cloud.bdetrainw);
+
+
+
+
+% Smooth switch for weather a cloud is present or not
+cloud = 0.5*(1 + tanh( 1e6*(q2-1e-5) ));
+cloudp = grid.abovep.*cloud(2:nzp) + grid.belowp.*cloud(1:nz);
+
+% Combine transfer coefficients
+relabel.etahat12_mix       = (1-cloud).*relabel.etahat12_mix_dry       + cloud.*relabel.etahat12_mix_cloud;
+relabel.etahat21_mix       = (1-cloud).*relabel.etahat21_mix_dry       + cloud.*relabel.etahat21_mix_cloud;
+relabel.detahat12deta1_mix = (1-cloud).*relabel.detahat12deta1_mix_dry + cloud.*relabel.detahat12deta1_mix_cloud;
+relabel.detahat21deta1_mix = (1-cloud).*relabel.detahat21deta1_mix_dry + cloud.*relabel.detahat21deta1_mix_cloud;
+relabel.detahat12deta2_mix = (1-cloud).*relabel.detahat12deta2_mix_dry + cloud.*relabel.detahat12deta2_mix_cloud;
+relabel.detahat21deta2_mix = (1-cloud).*relabel.detahat21deta2_mix_dry + cloud.*relabel.detahat21deta2_mix_cloud;
+
+relabel.qhat12_mix     = (1-cloud).*relabel.qhat12_mix_dry     + cloud.*relabel.qhat12_mix_cloud;
+relabel.qhat21_mix     = (1-cloud).*relabel.qhat21_mix_dry     + cloud.*relabel.qhat21_mix_cloud;
+relabel.dqhat12dq1_mix = (1-cloud).*relabel.dqhat12dq1_mix_dry + cloud.*relabel.dqhat12dq1_mix_cloud;
+relabel.dqhat21dq1_mix = (1-cloud).*relabel.dqhat21dq1_mix_dry + cloud.*relabel.dqhat21dq1_mix_cloud;
+relabel.dqhat12dq2_mix = (1-cloud).*relabel.dqhat12dq2_mix_dry + cloud.*relabel.dqhat12dq2_mix_cloud;
+relabel.dqhat21dq2_mix = (1-cloud).*relabel.dqhat21dq2_mix_dry + cloud.*relabel.dqhat21dq2_mix_cloud;
+
+relabel.uhat12_mix     = (1-cloudp).*relabel.uhat12_mix_dry     + cloudp.*relabel.uhat12_mix_cloud;
+relabel.uhat21_mix     = (1-cloudp).*relabel.uhat21_mix_dry     + cloudp.*relabel.uhat21_mix_cloud;
+relabel.duhat12du1_mix = (1-cloudp).*relabel.duhat12du1_mix_dry + cloudp.*relabel.duhat12du1_mix_cloud;
+relabel.duhat21du1_mix = (1-cloudp).*relabel.duhat21du1_mix_dry + cloudp.*relabel.duhat21du1_mix_cloud;
+relabel.duhat12du2_mix = (1-cloudp).*relabel.duhat12du2_mix_dry + cloudp.*relabel.duhat12du2_mix_cloud;
+relabel.duhat21du2_mix = (1-cloudp).*relabel.duhat21du2_mix_dry + cloudp.*relabel.duhat21du2_mix_cloud;
+
+relabel.vhat12_mix     = (1-cloudp).*relabel.vhat12_mix_dry     + cloudp.*relabel.vhat12_mix_cloud;
+relabel.vhat21_mix     = (1-cloudp).*relabel.vhat21_mix_dry     + cloudp.*relabel.vhat21_mix_cloud;
+relabel.dvhat12dv1_mix = (1-cloudp).*relabel.dvhat12dv1_mix_dry + cloudp.*relabel.dvhat12dv1_mix_cloud;
+relabel.dvhat21dv1_mix = (1-cloudp).*relabel.dvhat21dv1_mix_dry + cloudp.*relabel.dvhat21dv1_mix_cloud;
+relabel.dvhat12dv2_mix = (1-cloudp).*relabel.dvhat12dv2_mix_dry + cloudp.*relabel.dvhat12dv2_mix_cloud;
+relabel.dvhat21dv2_mix = (1-cloudp).*relabel.dvhat21dv2_mix_dry + cloudp.*relabel.dvhat21dv2_mix_cloud;
+
+relabel.what12_mix     = (1-cloud).*relabel.what12_mix_dry     + cloud.*relabel.what12_mix_cloud;
+relabel.what21_mix     = (1-cloud).*relabel.what21_mix_dry     + cloud.*relabel.what21_mix_cloud;
+relabel.dwhat12dw1_mix = (1-cloud).*relabel.dwhat12dw1_mix_dry + cloud.*relabel.dwhat12dw1_mix_cloud;
+relabel.dwhat21dw1_mix = (1-cloud).*relabel.dwhat21dw1_mix_dry + cloud.*relabel.dwhat21dw1_mix_cloud;
+relabel.dwhat12dw2_mix = (1-cloud).*relabel.dwhat12dw2_mix_dry + cloud.*relabel.dwhat12dw2_mix_cloud;
+relabel.dwhat21dw2_mix = (1-cloud).*relabel.dwhat21dw2_mix_dry + cloud.*relabel.dwhat21dw2_mix_cloud;
+
 
 % Force transferred velocities to have closer values to their new fluid
 % relabel.what12_mix = min(relabel.what21_mix, 0);
-relabel.what21_mix = max(relabel.what21_mix, 0);
+% relabel.what21_mix = max(relabel.what21_mix, 0);

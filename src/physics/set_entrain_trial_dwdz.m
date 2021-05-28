@@ -41,6 +41,17 @@ relabel.detahat21deta1_dwdz = 0;
 relabel.detahat21deta2_dwdz = 0;
 
 if (dwdz.entrain | dwdz.detrain) & ischeme == 4
+    % Vertical derivative of vertical velocity
+    dw1dz = (w1(2:nzp) - w1(1:nz))./grid.dzp;
+    dw2dz = (w2(2:nzp) - w2(1:nz))./grid.dzp;
+    
+    % Vertical derivative of vertical velocity variance
+    ww2_below = circshift(ww2, 1);
+    ww2(1) = 0;
+    ww2_below(1) = 0;
+    dww2dz = (ww2 - ww2_below)./grid.dzp;
+    gauss_factor = exp(0.5*((w2(2:nzp) - w2(1:nz)).^2)./(ww2+ww2_below)) ./ sqrt(2*3.14159*(ww2+ww2_below));
+    
     % Maximum area fraction for downdraft (w < 0) regions from LES
     sigmad = 0.5;
     % Fraction of fluid 1 that is a downdraft
@@ -48,7 +59,7 @@ if (dwdz.entrain | dwdz.detrain) & ischeme == 4
     % Fraction of transfer that actually enters fluid 2
     frac1_transfer = 2*min(sigma2, 0.5);
     
-    rate_sort12 = min(max(0, -dw2dz * dwdz.detrain_factor), rdt);
+    rate_sort12 = min(max(0, -(dw2dz - dww2dz.*gauss_factor) * dwdz.detrain_factor), rdt);
     rate_sort21 = min(max(0, -dw1dz * dwdz.entrain_factor), rdt) .* frac1_down .* frac1_transfer;
 
     relabel.M12_dwdz = dwdz.detrain * m2.*rate_sort12;

@@ -38,6 +38,8 @@ v1   = state.fluid(1).v;
 v2   = state.fluid(2).v;
 tke1 = state.fluid(1).tke;
 tke2 = state.fluid(2).tke;
+ww1 = (2/3)*state.fluid(1).tke;
+ww2 = (2/3)*state.fluid(2).tke;
 bentraint = constants.param.bentraint;
 bentrainq = constants.param.bentrainq;
 bentrainw = constants.param.bentrainw;
@@ -49,6 +51,7 @@ bdetrainu = constants.param.bdetrainu;
 sort = constants.param.sort;
 dwdz = constants.param.dwdz;
 mix = constants.param.mix;
+mix_cloud = constants.param.mix_cloud;
 instab = constants.param.instab;
 
 sigma1 = eos.sigma1;
@@ -87,9 +90,6 @@ n2pos = min(sqrt(max( eos.nsq2,0)),rdt);
 
 % Vertically averaged updraft w
 w2bar = max(0,grid.abovep.*w2(2:nzp) + grid.belowp.*w2(1:nz));
-% and vertical derivative
-dw1dz = (w1(2:nzp) - w1(1:nz))./grid.dzp;
-dw2dz = (w2(2:nzp) - w2(1:nz))./grid.dzp;
 
 % Subfilter standard deviation of w, assuming tke has equal contributions
 % from u, v and w

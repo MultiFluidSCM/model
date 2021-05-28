@@ -6,14 +6,6 @@ grid = settings.grid;
 
 % Get constants from test case settings
 constants = settings.constants;
-if not(isfield(constants.param, 'mix'))
-    disp("Individual settings for transfer terms not detected");
-    constants.param.sort = constants.param;
-    constants.param.dwdz = constants.param;
-    constants.param.mix = constants.param;
-    constants.param.instab = constants.param;
-end
-disp([num2str(constants.param.mix.bentrainw), " ", num2str(constants.param.mix.bdetrainw)]);
 
 % Decide which approximations to impose
 switches = settings.switches;
@@ -27,3 +19,5 @@ state_old = set_initial(grid, settings);
 % Set initial time
 current_time = 0;
 
+% Compatibility corrections to ensure older scripts can still run the model
+compatibility
