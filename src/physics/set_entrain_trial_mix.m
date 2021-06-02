@@ -124,10 +124,26 @@ dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1  
     = findqhat(w1, w2, mix_cloud.bentrainw, mix_cloud.bdetrainw);
 
 
-
+% Determine liquid water
+for k = 1:nzp
+    if k == 1
+        pbar = grid.extrapb1*p(1) + grid.extrapb2*p(2);
+    elseif k == nzp
+        pbar = grid.extraptnz*p(nz) + grid.extraptnzm*p(nz-1);
+    else
+        pbar   = grid.abovew(k)*p(k) ...
+               + grid.beloww(k)*p(k-1);
+    end
+    % [g,gp,gt,gw,gpp,gpt,gtt,gpw,gtw,gww,a] = gibbs(pbar,Tw1(k),q1(k),constants.therm);
+    % vapour1(k) = (1 - q1(k))*(1 - a)/a;
+    % liquid1(k) = q1(k) - vapour1(k);
+    [g,gp,gt,gw,gpp,gpt,gtt,gpw,gtw,gww,a] = gibbs(pbar,Tw2(k),q2(k),constants.therm);
+    vapour2(k) = (1 - q2(k))*(1 - a)/a;
+    liquid2(k) = q2(k) - vapour2(k);
+end
 
 % Smooth switch for weather a cloud is present or not
-cloud = 0.5*(1 + tanh( 1e6*(q2-1e-5) ));
+cloud = 0.5*(1 + tanh( 2e3*(liquid2-1e-5) ));
 cloudp = grid.abovep.*cloud(2:nzp) + grid.belowp.*cloud(1:nz);
 
 % Combine transfer coefficients

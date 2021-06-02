@@ -384,19 +384,26 @@ if settings.switches.plot_budgets_tke
 end
 
 % Entrainment budget
-if settings.switches.plot_budgets_transfers
+if settings.switches.plot_budgets_transfers & isfield(ts, 'time_high_res') > 0
+    SCM_zstar = ts.zstar*1e-3;
+    SCM_zcbase = ts.zcbaseSG*1e-3;
+    SCM_zctop = ts.zctopSG*1e-3;
+    SCM_time_ser_hours = ts.time_high_res/3600.;
+    
     fig = figure(5);
     set(gcf,'Position',[76 166 1257 624])
     
     relabelMax = max(max(relabel.M21, relabel.M12));
     
-    subplot(1,3,1)
+    subplot(2,4,1)
     plot(relabel.M21_instab,zunitsp,'r',...
          relabel.M21_sort,  zunitsp,'b',...
          relabel.M21_dwdz,  zunitsp,'c',...
          relabel.M21_mix,   zunitsp,'m',...
-         relabel.M21,       zunitsp,'k--')
-    xlim([0,relabelMax])
+         relabel.M21,       zunitsp,'k--',...
+         [0 3e-3], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
+         [0 3e-3], [SCM_zctop(end) SCM_zctop(end)],'r:')
+    xlim([0,3e-3])
     ylim([0,zplottop])
     title('Entrainment')
     xlabel('dm2/dt')
@@ -404,13 +411,15 @@ if settings.switches.plot_budgets_transfers
     legend('Instab','Sort','dw/dz','Mix','Total','Location','NorthEast')
     set(gca,'FontSize',fs)
     
-    subplot(1,3,2)
+    subplot(2,4,2)
     plot(relabel.M12_instab,zunitsp,'r',...
          relabel.M12_sort,  zunitsp,'b',...
          relabel.M12_dwdz,  zunitsp,'c',...
          relabel.M12_mix,   zunitsp,'m',...
-         relabel.M12,       zunitsp,'k--')
-    xlim([0,relabelMax])
+         relabel.M12,       zunitsp,'k--',...
+         [0 3e-3], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
+         [0 3e-3], [SCM_zctop(end)  SCM_zctop(end)] ,'r:')
+    xlim([0,3e-3])
     ylim([0,zplottop])
     title('Detrainment')
     xlabel('dm2/dt')
@@ -418,25 +427,75 @@ if settings.switches.plot_budgets_transfers
     legend('Instab','Sort','dw/dz','Mix','Total','Location','NorthEast')
     set(gca,'FontSize',fs)
     
-    if isfield(ts, 'zstar')
-        subplot(1,3,3)
-        % Cloud top and base
-        % Tidy cases with cloud base at lid
-        SCM_zstar = ts.zstar*1e-3;
-        SCM_zcbase = ts.zcbaseSG*1e-3;
-        SCM_zctop = ts.zctopSG*1e-3;
-        SCM_time_ser_hours = ts.time_high_res/3600.;
-        plot(SCM_time_ser_hours,SCM_zstar ,'b--',...
-             SCM_time_ser_hours,SCM_zctop ,'r--',...
-             SCM_time_ser_hours,SCM_zcbase,'k--')
-        xlabel('Time','fontsize',fs)
-        ylabel('Cld base/top (km)','fontsize',fs)
-        xlim([0,15]);
-        ylim([0,zplottop]);
-        %title('Cloud base/top','fontsize',fs)
-        sgtitle([num2str(ts.time(end)/3600,'%.2f'),' hours'],'fontsize',1.5*fs)
-        set(gca,'fontsize',fs,'XTick',[1:3:14])
-    end
+    subplot(2,4,[5 6])
+    % Cloud top and base
+    % Tidy cases with cloud base at lid
+    plot(SCM_time_ser_hours,SCM_zstar ,'b',...
+         SCM_time_ser_hours,SCM_zctop ,'r',...
+         SCM_time_ser_hours,SCM_zcbase,'k')
+    xlabel('Time','fontsize',fs)
+    ylabel('Cld base/top (km)','fontsize',fs)
+    xlim([0,15]);
+    ylim([0,zplottop]);
+    %title('Cloud base/top','fontsize',fs)
+    sgtitle([num2str(ts.time(end)/3600,'%.2f'),' hours'],'fontsize',1.5*fs)
+    set(gca,'fontsize',fs,'XTick',[1:3:14])
+    
+    subplot(2,4,3)
+    plot([-1 2], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
+         [-1 2], [SCM_zctop(end)  SCM_zctop(end)] ,'r:',...
+         0*zunitsw+1,zunitsw,'k',...
+         0*zunitsw,  zunitsw,'k',...
+         relabel.bt12,zunitsw,'r',...
+         relabel.bt21,zunitsw,'b')
+    xlim([-1,2])
+    ylim([0,zplottop])
+    % title('bij for entropy')
+    xlabel('bt')
+    ylabel(labelz)
+    set(gca,'FontSize',fs)
+    
+    subplot(2,4,4)
+    plot([-1 2], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
+         [-1 2], [SCM_zctop(end)  SCM_zctop(end)] ,'r:',...
+         0*zunitsw+1,zunitsw,'k',...
+         0*zunitsw,  zunitsw,'k',...
+         relabel.bw12,zunitsw,'r',...
+         relabel.bw21,zunitsw,'b')
+    xlim([-1,2])
+    ylim([0,zplottop])
+    % title('bij for vert. velocity')
+    xlabel('bw')
+    ylabel(labelz)
+    set(gca,'FontSize',fs)
+    
+    subplot(2,4,7)
+    plot([-1 2], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
+         [-1 2], [SCM_zctop(end)  SCM_zctop(end)] ,'r:',...
+         0*zunitsw+1,zunitsw,'k',...
+         0*zunitsw,  zunitsw,'k',...
+         relabel.bq12,zunitsw,'r',...
+         relabel.bq21,zunitsw,'b')
+    xlim([-1,2])
+    ylim([0,zplottop])
+    % title('bij for moisture')
+    xlabel('bq')
+    ylabel(labelz)
+    set(gca,'FontSize',fs)
+    
+    subplot(2,4,8)
+    plot([-1 2], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
+         [-1 2], [SCM_zctop(end)  SCM_zctop(end)] ,'r:',...
+         0*zunitsp+1,zunitsp,'k',...
+         0*zunitsp,  zunitsp,'k',...
+         relabel.bu12,zunitsp,'r',...
+         relabel.bu21,zunitsp,'b')
+    xlim([-1,2])
+    ylim([0,zplottop])
+    % title('bij for hor. velocity')
+    xlabel('bu')
+    ylabel(labelz)
+    set(gca,'FontSize',fs)
     
     saveas(...
         fig,...

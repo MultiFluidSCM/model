@@ -1,5 +1,7 @@
 % Set up model for an initial run
 
+% Compatibility corrections to ensure older scripts can still run the model
+compatibility
 
 % Set up computational grid
 grid = settings.grid;
@@ -19,5 +21,3 @@ state_old = set_initial(grid, settings);
 % Set initial time
 current_time = 0;
 
-% Compatibility corrections to ensure older scripts can still run the model
-compatibility
