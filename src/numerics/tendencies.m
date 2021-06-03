@@ -623,8 +623,8 @@ T_turb2_bar = weight_to_w(grid,scales.T_turb2);
 % Downgradient flux source terms ...
 deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
 deta2dz = (eta2(2:nzp) - eta2(1:nz))./grid.dzp;
-dg1 = -Deta1.*deta1dz;
-dg2 = -Deta2.*deta2dz;
+dg1 = -2*Deta1.*deta1dz;
+dg2 = -2*Deta2.*deta2dz;
 % ... mapped to w levels
 tend.fluid(1).mvareta.diffuse = weight_to_w(grid,dg1);
 tend.fluid(2).mvareta.diffuse = weight_to_w(grid,dg2);
@@ -655,8 +655,8 @@ tend.fluid(2).mvareta.dissn = - m2bar.*vareta2./T_turb2_bar;
 % Downgradient flux source terms ...
 dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
 dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
-dg1 = -Dq1.*dq1dz;
-dg2 = -Dq2.*dq2dz;
+dg1 = -2*Dq1.*dq1dz;
+dg2 = -2*Dq2.*dq2dz;
 % ... mapped to w levels
 tend.fluid(1).mvarq.diffuse = weight_to_w(grid,dg1);
 tend.fluid(2).mvarq.diffuse = weight_to_w(grid,dg2);

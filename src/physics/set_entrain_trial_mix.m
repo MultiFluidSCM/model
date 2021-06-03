@@ -11,8 +11,8 @@ if ischeme == 0
 elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
 elseif ischeme == 3 | ischeme == 4
-    r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
-    % r2 = min(mix.tke_factor*sqrt(tke1)./scales.L_plume,rdt);
+    % r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
+    r2 = min(mix.tke_factor*sqrt(tke1)./scales.L_plume,rdt);
     % r2 = min(0.25*sqrt(tke2)./grid.zp,rdt);
     % r2 = min(0.25*sqrt(sigma2.*tke2)./scales.L_plume,rdt);
     % r2 = min(0.25*sqrt(tke1)./scales.L_plume,rdt);

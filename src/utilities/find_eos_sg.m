@@ -111,7 +111,7 @@ for k = 1:nzp
     rhogas = 1/gp;
     drhogasdp = (gpt*gpt/gtt - gpp)*rhogas*rhogas;
     drhogasdeta = (gpt/gtt)*rhogas*rhogas;
-    drhogasdq = (gpt*gtw/gtt - gpw)*rhogas*rhogas;
+    drhogasdq = (gpa - gpt*gta/gtt)*rhogas*rhogas;
     
     % Compute qsat and some derivatives at this eta
     [qsat,dqsatdeta,dqldq,dqldeta,ddrhodql,dqsatdp] = ...
@@ -214,7 +214,7 @@ for k = 1:nzp
     rhogas = 1/gp;
     drhogasdp = (gpt*gpt/gtt - gpp)*rhogas*rhogas;
     drhogasdeta = (gpt/gtt)*rhogas*rhogas;
-    drhogasdq = (gpt*gtw/gtt - gpw)*rhogas*rhogas;
+    drhogasdq = (gpa - gpt*gta/gtt)*rhogas*rhogas;
     
     % Compute qsat and some derivatives at this eta
     [qsat,dqsatdeta,dqldq,dqldeta,ddrhodql,dqsatdp] = ...
