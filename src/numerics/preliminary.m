@@ -1,10 +1,15 @@
 % Preliminary calculations
 
-% Either set up model for an initial run
-initial_run
+% Compatibility corrections to ensure older scripts can still run the model
+compatibility
 
-% or do a bit-reproducible restart
-% read_restart
+if (settings.restart_simulation)
+    % Either set up model for an initial run
+    initial_run
+else
+    % or do a bit-reproducible restart
+    read_restart
+end
 
 % ---
 

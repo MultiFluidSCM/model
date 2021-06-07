@@ -1,8 +1,5 @@
 % Set up model for an initial run
 
-% Compatibility corrections to ensure older scripts can still run the model
-compatibility
-
 % Set up computational grid
 grid = settings.grid;
 
