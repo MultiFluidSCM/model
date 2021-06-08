@@ -922,38 +922,36 @@ save_res_convergence
     T_turb1_bar = weight_to_w(grid,scales.T_turb1);
     T_turb2_bar = weight_to_w(grid,scales.T_turb2);
     
-%     % and for dissipation of flux in buoyancy correlation terms
-%     t_scale1 = 6*scales.L_turb1./sqrt(tke1);
-%     t_scale2 = 6*scales.L_turb2./sqrt(tke2);
-%     
-%     % Factors needed to allow for buoyancy correlation terms in
-%     % linearization
-%     deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
-%     deta2dz = (eta2(2:nzp) - eta2(1:nz))./grid.dzp;
-%     temp = constants.phys.gravity*t_scale1.*deta1dz.*eos.sigma1;
-%     factor1(2:nzp) = belowr(2:nzp).*abovep.*temp;
-%     factor1(1) = 0;
-%     factor1(1:nz) = factor1(1:nz) + abover(1:nz).*belowp.*temp;
-%     factor1 = -factor1.*eos.rho_deriv_eta1;
-%     temp = constants.phys.gravity*t_scale2.*deta2dz.*eos.sigma2;
-%     factor2(2:nzp) = belowr(2:nzp).*abovep.*temp;
-%     factor2(1) = 0;
-%     factor2(1:nz) = factor2(1:nz) + abover(1:nz).*belowp.*temp;
-%     factor2 = -factor2.*eos.rho_deriv_eta2;
-    
-%    disp(['m1/T1   = ',num2str(m1bar(1:4)/T_turb1_bar(1:4))])
-%    disp(['factor1 = ',num2str(factor1(1:4))])
-    
+    % and for dissipation of flux in buoyancy correlation terms
+    t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
+    t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
+
+    % Factors needed to allow for buoyancy correlation terms in
+    % linearization
+    % Assume zero correlation between eta and q
+    deta1dz = max(0,(eta1(2:nzp) - eta1(1:nz))./grid.dzp);
+    deta2dz = max(0,(eta2(2:nzp) - eta2(1:nz))./grid.dzp);
+    temp = 2*constants.phys.gravity*t_scale1.*deta1dz.*eos.sigma1;
+    factor1(2:nzp) = belowr(2:nzp).*abovep.*temp;
+    factor1(1) = 0;
+    factor1(1:nz) = factor1(1:nz) + abover(1:nz).*belowp.*temp;
+    factor1 = -factor1.*eos.rho_deriv_eta1;
+    temp = 2*constants.phys.gravity*t_scale2.*deta2dz.*eos.sigma2;
+    factor2(2:nzp) = belowr(2:nzp).*abovep.*temp;
+    factor2(1) = 0;
+    factor2(1:nz) = factor2(1:nz) + abover(1:nz).*belowp.*temp;
+    factor2 = -factor2.*eos.rho_deriv_eta2;
+        
     % Find increment towards local equilibrium solution for
     % eta variance 1 and 2 and for q variance 1 and 2
     for k = 1:nzp
         
         % Set up 2x2 linear system for eta variance
         detfac = 0*M12bar(k)*relabel.f_sort_chi_hat(k)/max(0.001,sqrt(state_new.fluid(2).vareta(k)));
-        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k); % + factor1(k);
+        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k) + factor1(k);
         A12 = -M12bar(k) - (relabel.etahat12(k) - eta1(k))*detfac;
         A21 = -M21bar(k);
-        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.etahat12(k) - eta2(k))*detfac; % + factor2(k);
+        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.etahat12(k) - eta2(k))*detfac + factor2(k);
     
         % And solve the linear system
         rdet = 1/(A11*A22 - A12*A21);
@@ -964,14 +962,31 @@ save_res_convergence
  
     end
     
+    % Factors needed to allow for buoyancy correlation terms in
+    % linearization
+    % Assume zero correlation between eta and q
+    dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
+    dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
+    temp = 2*constants.phys.gravity*t_scale1.*dq1dz.*eos.sigma1;
+    factor1(2:nzp) = belowr(2:nzp).*abovep.*temp;
+    factor1(1) = 0;
+    factor1(1:nz) = factor1(1:nz) + abover(1:nz).*belowp.*temp;
+    factor1 = -factor1.*eos.rho_deriv_q1;
+    temp = 2*constants.phys.gravity*t_scale2.*dq2dz.*eos.sigma2;
+    factor2(2:nzp) = belowr(2:nzp).*abovep.*temp;
+    factor2(1) = 0;
+    factor2(1:nz) = factor2(1:nz) + abover(1:nz).*belowp.*temp;
+    factor2 = -factor2.*eos.rho_deriv_q2;
+    disp('** No bq term in linearization **')
+
     for k = 1:nzp
         
         % Set up 2x2 linear system for q variance
         detfac = M12bar(k)*relabel.f_sort_chi_hat(k)/max(1e-6,sqrt(state_new.fluid(2).varq(k)));
-        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k);
+        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k) + 0*factor1(k);
         A12 = -M12bar(k) - (relabel.qhat12(k) - q1(k))*detfac;
         A21 = -M21bar(k);
-        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.qhat12(k) - q2(k))*detfac;
+        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.qhat12(k) - q2(k))*detfac + 0*factor2(k);
         
         % And solve the linear system
         rdet = 1/(A11*A22 - A12*A21);
@@ -981,31 +996,14 @@ save_res_convergence
                              - A21*tend.fluid(1).mvarq.tot(k));
                          
     end
-    
-%     % New method
-%     build_etavar_system
-%     
-%     rhsvar(1:2:2*nzp-1) = tend.fluid(1).mvareta.tot;
-%     rhsvar(2:2:2*nzp  ) = tend.fluid(2).mvareta.tot;
-%     inc_var = Ndiagsolveb(cc,rhsvar);
-%     inc_vareta1 = inc_var(1:2:2*nzp-1);
-%     inc_vareta2 = inc_var(2:2:2*nzp  );
-%     
-%     disp(['inc vareta1 = ',num2str(inc_vareta1(1:4))])
-%     disp(['inc vareta2 = ',num2str(inc_vareta2(1:4))])
-    
-    % And increment
-%     state_new.fluid(1).vareta = max(0,state_new.fluid(1).vareta + inc_vareta1);
-%     state_new.fluid(2).vareta = max(0,state_new.fluid(2).vareta + inc_vareta2);
-%     state_new.fluid(1).varq   = max(0,state_new.fluid(1).varq   + inc_varq1  );
-%     state_new.fluid(2).varq   = max(0,state_new.fluid(2).varq   + inc_varq2  );
-    
+        
 % disp('*** bounded var decrements ***')
-%disp('*** frozen variances ***')
+% disp('*** frozen variances ***')
     state_new.fluid(1).vareta = max(0.1*state_new.fluid(1).vareta,state_new.fluid(1).vareta + inc_vareta1);
     state_new.fluid(2).vareta = max(0.1*state_new.fluid(2).vareta,state_new.fluid(2).vareta + inc_vareta2);
     state_new.fluid(1).varq   = max(0.1*state_new.fluid(1).varq,state_new.fluid(1).varq   + inc_varq1  );
     state_new.fluid(2).varq   = max(0.1*state_new.fluid(2).varq,state_new.fluid(2).varq   + inc_varq2  );
+
 
 % disp('*** simple diagnostic variance ***')
 % deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
