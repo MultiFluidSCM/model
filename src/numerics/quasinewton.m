@@ -948,10 +948,10 @@ save_res_convergence
         
         % Set up 2x2 linear system for eta variance
         detfac = 0*M12bar(k)*relabel.f_sort_chi_hat(k)/max(0.001,sqrt(state_new.fluid(2).vareta(k)));
-        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k) + factor1(k);
+        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k) + settings.buoy_correl_eta*factor1(k);
         A12 = -M12bar(k) - (relabel.etahat12(k) - eta1(k))*detfac;
         A21 = -M21bar(k);
-        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.etahat12(k) - eta2(k))*detfac + factor2(k);
+        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.etahat12(k) - eta2(k))*detfac + settings.buoy_correl_eta*factor2(k);
     
         % And solve the linear system
         rdet = 1/(A11*A22 - A12*A21);
@@ -977,16 +977,15 @@ save_res_convergence
     factor2(1) = 0;
     factor2(1:nz) = factor2(1:nz) + abover(1:nz).*belowp.*temp;
     factor2 = -factor2.*eos.rho_deriv_q2;
-    disp('** No bq term in linearization **')
 
     for k = 1:nzp
         
         % Set up 2x2 linear system for q variance
         detfac = M12bar(k)*relabel.f_sort_chi_hat(k)/max(1e-6,sqrt(state_new.fluid(2).varq(k)));
-        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k) + 0*factor1(k);
+        A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k) + settings.buoy_correl_q*factor1(k);
         A12 = -M12bar(k) - (relabel.qhat12(k) - q1(k))*detfac;
         A21 = -M21bar(k);
-        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.qhat12(k) - q2(k))*detfac + 0*factor2(k);
+        A22 =  M21bar(k) + m2bar(k)/T_turb2_bar(k) + (relabel.qhat12(k) - q2(k))*detfac + settings.buoy_correl_q*factor2(k);
         
         % And solve the linear system
         rdet = 1/(A11*A22 - A12*A21);

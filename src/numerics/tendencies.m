@@ -209,11 +209,10 @@ Bterm = eos.rho_deriv_eta2.*vareta2 + eos.rho_deriv_q2.*covaretaq2;
 Deta2bc = - gravity*t_scale2.*eos.sigma2.*(abovep.*Bterm(2:nzp) + belowp.*Bterm(1:nz));
 
 % Include buoyancy correlation in total SG flux
-% disp('** No b eta correl term **')
-% Deta1bc = 0;
-% Deta2bc = 0;
-Deta1 = Deta1 + Deta1bc;
-Deta2 = Deta2 + Deta2bc;
+if settings.buoy_correl_eta
+    Deta1 = Deta1 + Deta1bc;
+    Deta2 = Deta2 + Deta2bc;
+end
 
 % Diffusive tendencies of mass times entropy
 tend.fluid(1).meta.diffuse(1:nz ) = - Deta1./dzw(1:nz);
@@ -307,11 +306,10 @@ Bterm = eos.rho_deriv_eta2.*covaretaq2 + eos.rho_deriv_q2.*varq2;
 Dq2bc = - gravity*t_scale2.*eos.sigma2.*(abovep.*Bterm(2:nzp) + belowp.*Bterm(1:nz));
 
 % Include buoyancy correlation in total SG flux
-disp('*** No bq correl term')
-Dq1bc = 0;
-Dq2bc = 0;
-Dq1 = Dq1 + Dq1bc;
-Dq2 = Dq2 + Dq2bc;
+if settings.buoy_correl_q
+    Dq1 = Dq1 + Dq1bc;
+    Dq2 = Dq2 + Dq2bc;
+end
 
 % Tendencies of mass times q
 tend.fluid(1).mq.diffuse(1:nz ) = - Dq1./dzw(1:nz);
@@ -751,7 +749,6 @@ dwsq = (relabel.what21 - w2).^2;
 du21_2_sq = (relabel.uhat21 - u2).^2 ...
           + (relabel.vhat21 - v2).^2 ...
           + grid.aboves.*dwsq(2:nzp) + grid.belows.*dwsq(1:nz);
-disp('*** Alternative TKE relabelling ***')
 % TKE tendencies due to entrainment/detrainment
 tend.fluid(1).mtke.relabel = M12.*(tkehat12 + 0.5*du12_1_sq) ...
                            - M21.*(tkehat21 + 0.5*du21_1_sq);
