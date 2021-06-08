@@ -949,7 +949,7 @@ save_res_convergence
     for k = 1:nzp
         
         % Set up 2x2 linear system for eta variance
-        detfac = 0*M12bar(k)*relabel.f_sort_chi_hat(k)/max(0.001,sqrt(state_new.fluid(2).vareta(k)));
+        detfac = M12bar(k)*relabel.f_sort_chi_hat(k)/max(0.001,sqrt(state_new.fluid(2).vareta(k)));
         A11 =  M12bar(k) + m1bar(k)/T_turb1_bar(k); % + factor1(k);
         A12 = -M12bar(k) - (relabel.etahat12(k) - eta1(k))*detfac;
         A21 = -M21bar(k);
@@ -1046,6 +1046,7 @@ save_res_convergence
         pause
     end
     % pause
+
     
 end
     

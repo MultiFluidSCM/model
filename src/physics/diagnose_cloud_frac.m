@@ -83,8 +83,8 @@ tot_cld_frac = cld_frac1 + cld_frac2;
 tot_cld_cov = max(tot_cld_frac);
 
 % Threshold for defining base and top
-% cld_thresh = 0.01;
-cld_thresh = 0.001;
+cld_thresh = 0.01;
+% cld_thresh = 0.001;
 z_cld_top = 0;
 z_cld_base = 0;
 for k = 1:nzp
