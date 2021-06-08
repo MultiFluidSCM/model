@@ -3,7 +3,7 @@
 % Compatibility corrections to ensure older scripts can still run the model
 compatibility
 
-if (settings.restart_simulation)
+if (~settings.restart_simulation)
     % Either set up model for an initial run
     initial_run
 else
