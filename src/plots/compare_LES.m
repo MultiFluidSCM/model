@@ -1,7 +1,7 @@
 % Save data for direct comparison with LES results
 
 % List of times at which to compare with LES
-SCM_times = [14000, 21800, 32600, 42800];
+SCM_times = [14000, 21800, 32600, 42800] + settings.time.tstart;
 % SCM_times = [14000:600:42800];
 nst = numel(SCM_times); 
 

@@ -11,14 +11,8 @@ if ischeme == 0
 elseif ischeme == 1
     r2 = min(0.5*sqrt(tke2)./scales.L_plume,rdt);
 elseif ischeme == 3 | ischeme == 4
-    r2 = min(0.25*sqrt(tke2)./scales.L_plume,rdt);
-    % r2 = min(mix.tke_factor*sqrt(tke1)./scales.L_plume,rdt);
-    % r2 = min(0.25*sqrt(tke2)./grid.zp,rdt);
-    % r2 = min(0.25*sqrt(sigma2.*tke2)./scales.L_plume,rdt);
-    % r2 = min(0.25*sqrt(tke1)./scales.L_plume,rdt);
-    % r2 = min(0.25*sqrt(tke2)./scales.L_turb2,rdt);
-    % r2 = min(0.25*sqrt(tke2)./(sigma1.*scales.L_turb1+sigma2.*scales.L_turb2),rdt);
-    % r2 = min(0.25*sqrt(tke1+tke2)./(scales.L_turb1+scales.L_turb2),rdt);
+    velocity_scale = mix.tke1_factor*sqrt(tke1) + mix.tke2_factor*sqrt(tke2);
+    r2 = min(velocity_scale./scales.L_plume, rdt);
     
     % Caltech mixing formulation
     % zFluid2Max = 100;

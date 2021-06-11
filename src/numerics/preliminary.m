@@ -3,7 +3,7 @@
 % Compatibility corrections to ensure older scripts can still run the model
 compatibility
 
-if (~settings.restart_simulation)
+if not(settings.restart_simulation)
     % Either set up model for an initial run
     initial_run
 else
@@ -15,6 +15,7 @@ end
 
 % Set up timing information
 time = settings.time;
+settings.time.tstart = current_time;
 
 % First guess for next time step is the current state
 state_new = state_old;
