@@ -83,8 +83,7 @@ tot_cld_frac = cld_frac1 + cld_frac2;
 tot_cld_cov = max(tot_cld_frac);
 
 % Threshold for defining base and top
-% cld_thresh = 0.01;
-cld_thresh = 0.001;
+cld_thresh = settings.constants.param.cld_thresh;
 z_cld_top = 0;
 z_cld_base = 0;
 for k = 1:nzp
@@ -96,13 +95,4 @@ for k = 1:nzp
         z_cld_base = grid.zw(rk);
     end
 end
-% for k = 1:nzp
-    % if eos.cldfrac1(k) > cld_thresh | eos.cldfrac2(k) > cld_thresh
-        % z_cld_top = grid.zw(k);
-    % end
-    % rk = nz+2-k;
-    % if eos.cldfrac1(rk) > cld_thresh | eos.cldfrac2(rk) > cld_thresh
-        % z_cld_base = grid.zw(rk);
-    % end
-% end
 
