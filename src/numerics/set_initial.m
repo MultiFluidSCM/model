@@ -66,8 +66,8 @@ state.fluid(1).w(1:nzp) = 0;
 state.fluid(1).u(1:nz) = force.ug;
 state.fluid(1).v(1:nz) = force.vg;
 state.fluid(1).tke = ones(1,nz)*constants.param.tke_min;
-state.fluid(1).vareta(1:nzp) = 0;
-state.fluid(1).varq(1:nzp)   = 0;
+state.fluid(1).vareta(1:nz) = 0;
+state.fluid(1).varq(1:nz)   = 0;
 state.p            = p;
 % Fluid 2 is the same as fluid 1 except for m
 state.fluid(2)     = state.fluid(1);
