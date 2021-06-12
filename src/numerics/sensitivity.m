@@ -536,19 +536,6 @@ disp(['tend_mvareta1  ' num2str(rr_vareta1(krange_sens))])
 disp(['tend_mvareta2  ' num2str(rr_vareta2(krange_sens))])
 
 
-% Alternatively
-build_etavar_system
-
-pp_var(1:2:2*nzp-1) = pp_vareta1;
-pp_var(2:2:2*nzp  ) = pp_vareta2;
-rr = -Ndiagmult(cc,pp_var);
-rr_vareta1 = rr(1:2:2*nzp-1);
-rr_vareta2 = rr(2:2:2*nzp  );
-disp('or...')
-disp(['tend_mvareta1  ' num2str(rr_vareta1(krange_sens))])
-disp(['tend_mvareta2  ' num2str(rr_vareta2(krange_sens))])
-
-
 pause
 
 % --------
