@@ -83,3 +83,65 @@ plot(irange,maxres1Vq(irange)/norm1,'bo',irange,maxres2Vq(irange)/norm2,'ro')
 title('Res Vq')
 xlim([0,qn_iter_max])
 set(gca,'fontsize',fz)
+
+    
+figure(31)
+fz = 16;
+irange = [1:qn_iter];
+
+subplot(3,3,1)
+plot(irange,ixres1w(irange),'bo',irange,ixres2w(irange),'ro')
+title('Res w')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,2)
+plot(irange,ixres1m(irange),'bo',irange,ixres2m(irange),'ro')
+title('Res m')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,3)
+plot(irange,ixres1eta(irange),'bo',irange,ixres2eta(irange),'ro')
+title('Res eta')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,4)
+plot(irange,ixres1q(irange),'bo',irange,ixres2q(irange),'ro')
+title('Res q')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,5)
+plot(irange,ixres1u(irange),'bo',irange,ixres2u(irange),'ro',...
+     irange,ixres1v(irange),'b+',irange,ixres2v(irange),'r+')
+title('Res u, v')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,6)
+plot(irange,ixres1eosetap(irange),'bo',irange,ixres2eosetap(irange),'ro',...
+     irange,ixres1eoseta(irange),'b+',irange,ixres2eoseta(irange),'r+',...
+     irange,ixressigma(irange),'ko')
+title('Res eos')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,7)
+plot(irange,ixres1tke(irange),'bo',irange,ixres2tke(irange),'ro')
+title('Res tke')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,8)
+plot(irange,ixres1Veta(irange),'bo',irange,ixres2Veta(irange),'ro')
+title('Res Veta')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
+
+subplot(3,3,9)
+plot(irange,ixres1Vq(irange),'bo',irange,ixres2Vq(irange),'ro')
+title('Res Vq')
+xlim([0,qn_iter_max])
+set(gca,'fontsize',fz)
