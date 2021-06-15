@@ -83,12 +83,7 @@ if switches.a
     eos = find_eos_a(grid, state, constants);
 else
     % Use fluid 1 and fluid 2 thermodynamic equations
-    %eos = find_eos(grid, state, constants);
-    %work.nsq1 = eos.nsq1;
-    %work.nsq2 = eos.nsq2;
     eos = find_eos_sg(grid, state, constants);
-    %disp('*** using old find_eos_sg ***')
-    %eos = find_eos_sg_with_bugs(grid, state, constants);
 end
 
 % ------

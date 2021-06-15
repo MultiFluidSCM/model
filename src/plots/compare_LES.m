@@ -52,6 +52,7 @@ if lsave
     Cpd = constants.therm.Cpd;
     
     % Determine liquid water
+    disp('compare_LES: use eos.ql1, eos.ql2 for liquid water')
     for k = 1:nzp
         if k == 1
             pbar = grid.extrapb1*p(1) + grid.extrapb2*p(2);
