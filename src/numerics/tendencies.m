@@ -569,7 +569,7 @@ kesinkuv      = m2.*(grid.aboves.*Kdudzsq(2:nzp) + grid.belows.*Kdudzsq(1:nz)) .
               + eos.sigma2.*(corrdeu + corrdev);
 tend.fluid(2).mtke.shear = kesinkw + kesinkuv;
 
-% Buoyancy generation
+% Buoyancy flux generation
 % Limit to prevent tke sink when there isn't enough tke
 bflux1 = dpdzbar.*(eos.drdetap1.*Deta1 + eos.drdqp1.*Dq1);
 tend.fluid(1).mtke.bflux = max(bflux1,m1.*(constants.param.tke_min - tke1)/dt);
@@ -608,40 +608,34 @@ tend.fluid(2).meta.dissn = -m2bar.*esource./state.fluid(2).Tw;
 % ------
 
 % Turbulence time scales at w-levels
-T_turb1_bar = weight_to_w(grid,scales.T_turb1);
-T_turb2_bar = weight_to_w(grid,scales.T_turb2);
+% T_turb1_bar = weight_to_w(grid,scales.T_turb1);
+% T_turb2_bar = weight_to_w(grid,scales.T_turb2);
 
 % ------
 
 % eta variance
 % Neglect transport terms (MYNN level 2.5)
-% ?? Would it be better to store variances at p levels ??
 
 % SG flux source terms ...
 % *** Only include buoyancy correlation contribution if deta/dz > 0 ***
 deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
 deta2dz = (eta2(2:nzp) - eta2(1:nz))./grid.dzp;
-dg1 = -2*(Deta1 - (deta1dz < 0).*Deta1bc).*deta1dz;
-dg2 = -2*(Deta2 - (deta2dz < 0).*Deta2bc).*deta2dz;
-% ... mapped to w levels
-tend.fluid(1).mvareta.diffuse = weight_to_w(grid,dg1);
-tend.fluid(2).mvareta.diffuse = weight_to_w(grid,dg2);
+tend.fluid(1).mvareta.diffuse = -2*(Deta1 - (deta1dz < 0).*Deta1bc).*deta1dz;
+tend.fluid(2).mvareta.diffuse = -2*(Deta2 - (deta2dz < 0).*Deta2bc).*deta2dz;
 
 % Just for testing
-dg1 = -2*Deta1bc.*deta1dz;
-dg2 = -2*Deta2bc.*deta2dz;
-% ... mapped to w levels
-tend.fluid(1).mvareta.bc = weight_to_w(grid,dg1);
-tend.fluid(2).mvareta.bc = weight_to_w(grid,dg2);
+tend.fluid(1).mvareta.bc = -2*Deta1bc.*deta1dz;
+tend.fluid(2).mvareta.bc = -2*Deta2bc.*deta2dz;
 
 % `diffent' source terms
 corrde = (eta2 - eta1).*tend.fluid(1).meta.diffent;
-tend.fluid(1).mvareta.diffent = m1bar.*corrde./rhobar;
-tend.fluid(2).mvareta.diffent = m2bar.*corrde./rhobar;
+corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
+tend.fluid(1).mvareta.diffent = eos.sigma1.*corrde;
+tend.fluid(2).mvareta.diffent = eos.sigma2.*corrde;
 
 % Dissipation terms
-tend.fluid(1).mvareta.dissn = - m1bar.*vareta1./T_turb1_bar;
-tend.fluid(2).mvareta.dissn = - m2bar.*vareta2./T_turb2_bar;
+tend.fluid(1).mvareta.dissn = - m1.*vareta1./scales.T_turb1;
+tend.fluid(2).mvareta.dissn = - m2.*vareta2./scales.T_turb2;
 
 % ------
 
@@ -651,20 +645,18 @@ tend.fluid(2).mvareta.dissn = - m2bar.*vareta2./T_turb2_bar;
 % SG flux source terms ...
 dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
 dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
-dg1 = -2*Dq1.*dq1dz;
-dg2 = -2*Dq2.*dq2dz;
-% ... mapped to w levels
-tend.fluid(1).mvarq.diffuse = weight_to_w(grid,dg1);
-tend.fluid(2).mvarq.diffuse = weight_to_w(grid,dg2);
+tend.fluid(1).mvarq.diffuse = -2*Dq1.*dq1dz;
+tend.fluid(2).mvarq.diffuse = -2*Dq2.*dq2dz;
 
 % `diffent' source terms
 corrde = (q2 - q1).*tend.fluid(1).mq.diffent;
-tend.fluid(1).mvarq.diffent = m1bar.*corrde./rhobar;
-tend.fluid(2).mvarq.diffent = m2bar.*corrde./rhobar;
+corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
+tend.fluid(1).mvarq.diffent = eos.sigma1.*corrde;
+tend.fluid(2).mvarq.diffent = eos.sigma2.*corrde;
 
 % Dissipation terms
-tend.fluid(1).mvarq.dissn = - m1bar.*varq1./T_turb1_bar;
-tend.fluid(2).mvarq.dissn = - m2bar.*varq2./T_turb2_bar;
+tend.fluid(1).mvarq.dissn = - m1.*varq1./scales.T_turb1;
+tend.fluid(2).mvarq.dissn = - m2.*varq2./scales.T_turb2;
 
 % ------
 
@@ -719,25 +711,6 @@ tend.fluid(2).mv.relabel = (M21.*relabel.vhat21 - M12.*relabel.vhat12);
 % transferred tke
 tkehat12 = tke2;
 tkehat21 = tke1;
-% % Resolved KE per unit mass
-% wsq = w1.*w1;
-% RKE1 = 0.5*(u1.*u1 + v1.*v1 + grid.aboves.*wsq(2:nzp) + grid.belows.*wsq(1:nz));
-% wsq = w2.*w2;
-% RKE2 = 0.5*(u2.*u2 + v2.*v2 + grid.aboves.*wsq(2:nzp) + grid.belows.*wsq(1:nz));
-% % u dot transferred u
-% wwhat = w1.*relabel.what12;
-% u1uhat12 = u1.*relabel.uhat12 + v1.*relabel.vhat12 + grid.aboves.*wwhat(2:nzp) + grid.belows.*wwhat(1:nz);
-% wwhat = w2.*relabel.what12;
-% u2uhat12 = u2.*relabel.uhat12 + v2.*relabel.vhat12 + grid.aboves.*wwhat(2:nzp) + grid.belows.*wwhat(1:nz);
-% wwhat = w2.*relabel.what21;
-% u2uhat21 = u2.*relabel.uhat21 + v2.*relabel.vhat21 + grid.aboves.*wwhat(2:nzp) + grid.belows.*wwhat(1:nz);
-% wwhat = w1.*relabel.what21;
-% u1uhat21 = u1.*relabel.uhat21 + v1.*relabel.vhat21 + grid.aboves.*wwhat(2:nzp) + grid.belows.*wwhat(1:nz);
-% % TKE tendencies due to entrainment/detrainment
-% tend.fluid(1).mtke.relabel = M12.*(tkehat12 +   RKE1 + RKE2 - u1uhat12) ...
-%                            - M21.*(tkehat21 + 2*RKE1        - u1uhat21);
-% tend.fluid(2).mtke.relabel = M21.*(tkehat21 +   RKE2 + RKE1 - u2uhat21) ...
-%                            - M12.*(tkehat12 + 2*RKE2        - u2uhat12);
 dwsq = (relabel.what12 - w1).^2;
 du12_1_sq = (relabel.uhat12 - u1).^2 ...
           + (relabel.vhat12 - v1).^2 ...
@@ -762,57 +735,35 @@ tend.fluid(2).mtke.relabel = M21.*(tkehat21 + 0.5*du21_2_sq) ...
 
 % Entrained and detrained values of eta variance
 % Note these are quasi-advective form tendencies
-% Resolved variance
-Rvareta1 = eta1.*eta1;
-Rvareta2 = eta2.*eta2;
-% `Upwind' approximation for Transferred variances
-% etavarhat12 = vareta1;
-% etavarhat21 = vareta2;
-% eta times transferred eta
-%eta1etahat12 = eta1.*relabel.etahat12;
-%eta2etahat12 = eta2.*relabel.etahat12;
-%eta2etahat21 = eta2.*relabel.etahat21;
-%eta1etahat21 = eta1.*relabel.etahat21;
-% eta variance tendencies due to entrainment/detrainment
-% tend.fluid(1).mvareta.relabel = M12bar.*(vareta2 - vareta1 ...
-%                                        + Rvareta1 + Rvareta2 - 2*eta1etahat12) ...
-%                               - M21bar.*(2*Rvareta1 - 2*eta1etahat21);
-% tend.fluid(2).mvareta.relabel = M21bar.*(vareta1 - vareta2 ...
-%                                        + Rvareta2 + Rvareta1 - 2*eta2etahat21) ...
-%                               - M12bar.*(2*Rvareta2 - 2*eta2etahat12);
-tend.fluid(1).mvareta.relabel = M12bar.*(vareta2 - vareta1 ...
-                                      + (relabel.etahat12 - eta1).^2) ...
-                              - M21bar.*(relabel.etahat21 - eta1).^2;
-tend.fluid(2).mvareta.relabel = M21bar.*(vareta1 - vareta2 ...
-                                      + (relabel.etahat21 - eta2).^2) ...
-                              - M12bar.*(relabel.etahat12 - eta2).^2;
+% `Upwind' approximation for transferred variances
+temp = (relabel.etahat12 - eta1).^2;
+deta12_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.etahat21 - eta1).^2;
+deta21_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.etahat21 - eta2).^2;
+deta21_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.etahat12 - eta2).^2;
+deta12_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+tend.fluid(1).mvareta.relabel = M12.*(vareta2 - vareta1 + deta12_1_sq) ...
+                              - M21.*(                    deta21_1_sq);
+tend.fluid(2).mvareta.relabel = M21.*(vareta1 - vareta2 + deta21_2_sq) ...
+                              - M12.*(                  + deta12_2_sq);
 
 % Entrained and detrained values of q variance
 % Note these are quasi-advective form tendencies
-% Resolved variance
-Rvarq1 = q1.*q1;
-Rvarq2 = q2.*q2;
 % 'Upwind' approximation for transferred variances
-% qvarhat12 = varq1;
-% qvarhat21 = varq2;
-% q times transferred q
-%q1qhat12 = q1.*relabel.qhat12;
-%q2qhat12 = q2.*relabel.qhat12;
-%q2qhat21 = q2.*relabel.qhat21;
-%q1qhat21 = q1.*relabel.qhat21;
-% q variance tendencies due to entrainment/detrainment                       
-% tend.fluid(1).mvarq.relabel = M12bar.*(varq2 - varq1 ...
-%                                      + Rvarq1 + Rvarq2 - 2*q1qhat12) ...
-%                             - M21bar.*(2*Rvarq1 - 2*q1qhat21);
-% tend.fluid(2).mvarq.relabel = M21bar.*(varq1 - varq2 ...
-%                                      + Rvarq2 + Rvarq1 - 2*q2qhat21) ...
-%                             - M12bar.*(2*Rvarq2 - 2*q2qhat12);
-tend.fluid(1).mvarq.relabel = M12bar.*(varq2 - varq1 ...
-                                      + (relabel.qhat12 - q1).^2) ...
-                              - M21bar.*(relabel.qhat21 - q1).^2;
-tend.fluid(2).mvarq.relabel = M21bar.*(varq1 - varq2 ...
-                                      + (relabel.qhat21 - q2).^2) ...
-                              - M12bar.*(relabel.qhat12 - q2).^2;
+temp = (relabel.qhat12 - q1).^2;
+dq12_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.qhat21 - q1).^2;
+dq21_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.qhat21 - q2).^2;
+dq21_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.qhat12 - q2).^2;
+dq12_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+tend.fluid(1).mvarq.relabel = M12.*(varq2 - varq1 + dq12_1_sq) ...
+                            - M21.*(                dq21_1_sq);
+tend.fluid(2).mvarq.relabel = M21.*(varq1 - varq2 + dq21_2_sq) ...
+                            - M12.*(              + dq12_2_sq);
 
 % ------
 
