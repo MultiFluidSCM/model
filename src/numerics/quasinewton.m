@@ -949,12 +949,12 @@ save_res_convergence
 %     factor2(1) = 0;
 %     factor2(1:nz) = factor2(1:nz) + abover(1:nz).*belowp.*temp;
 %     factor2 = -factor2.*eos.rho_deriv_eta2;
-    factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdeta1.*deta1dz;
-    factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdeta2.*deta2dz;
+    factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdetap1.*deta1dz;
+    factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdetap2.*deta2dz;
         
     % Find increment towards local equilibrium solution for
     % eta variance 1 and 2 and for q variance 1 and 2
-    for k = 1:nzp
+    for k = 1:nz
         
         % Set up 2x2 linear system for eta variance
         % *** detfac = 0*M12bar(k)*relabel.f_sort_chi_hat(k)/max(0.001,sqrt(state_new.fluid(2).vareta(k)));
@@ -987,10 +987,10 @@ save_res_convergence
 %     factor2(1) = 0;
 %     factor2(1:nz) = factor2(1:nz) + abover(1:nz).*belowp.*temp;
 %     factor2 = -factor2.*eos.rho_deriv_q2;
-    factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdq1.*dq1dz;
-    factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdq2.*dq2dz;
+    factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdqp1.*dq1dz;
+    factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdqp2.*dq2dz;
 
-    for k = 1:nzp
+    for k = 1:nz
         
         % Set up 2x2 linear system for q variance
         % detfac = M12bar(k)*relabel.f_sort_chi_hat(k)/max(1e-6,sqrt(state_new.fluid(2).varq(k)));
