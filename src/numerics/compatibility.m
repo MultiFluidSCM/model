@@ -31,6 +31,14 @@ if not(isfield(settings, 'restart_simulation'))
     settings.restart_simulation_name = 'restart_00001740';
 end
 
+% June 2021: Backward compatibility for buoyancy correlation term switches
+if not(isfield(settings, 'buoy_correl_eta'))
+    settings.buoy_correl_eta = 0;
+end
+if not(isfield(settings, 'buoy_correl_q'))
+    settings.buoy_correl_q   = 0;
+end
+
 % June 2021: Added parameter to control cloud threshold for cloud base and cloud height diagnostic
 if not(isfield(settings.constants.param, 'cld_thresh'))
     disp("Cloud threshold not detected");
@@ -42,4 +50,3 @@ if not(isfield(settings.constants.param, 'sigma_weighted_tke'))
     settings.constants.param.sigma_weighted_tke = false;
 end
 
-pause(1);

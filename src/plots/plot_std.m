@@ -18,10 +18,10 @@ figure(20)
 % qstd0 = sqrt(term1.^2 + term2.^2);
 
 % Values from more complete calculation
-etastd1 = sqrt(state_new.fluid(1).vareta);
-qstd1   = sqrt(state_new.fluid(1).varq  );
-etastd2 = sqrt(state_new.fluid(2).vareta);
-qstd2   = sqrt(state_new.fluid(2).varq  );
+etastd1 = weight_to_w(grid,sqrt(state_new.fluid(1).vareta));
+qstd1   = weight_to_w(grid,sqrt(state_new.fluid(1).varq  ));
+etastd2 = weight_to_w(grid,sqrt(state_new.fluid(2).vareta));
+qstd2   = weight_to_w(grid,sqrt(state_new.fluid(2).varq  ));
 qlstd1  = sqrt(max(0,eos.Varql1));
 qlstd2  = sqrt(max(0,eos.Varql2));
 bstd    = constants.phys.gravity*sqrt(eos.Varrhow2)./eos.rhow2;

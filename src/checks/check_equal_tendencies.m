@@ -230,46 +230,46 @@ xxx2(kkk) - xxx1(kkk)
 disp(' ')
 disp('diff varetadot')
 disp('relabel')
-xxx1 = tend.fluid(1).mvareta.relabel./m1bar;
-xxx2 = tend.fluid(2).mvareta.relabel./m2bar;
+xxx1 = tend.fluid(1).mvareta.relabel./m1;
+xxx2 = tend.fluid(2).mvareta.relabel./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('diffuse')
-xxx1 = tend.fluid(1).mvareta.diffuse./m1bar;
-xxx2 = tend.fluid(2).mvareta.diffuse./m2bar;
+xxx1 = tend.fluid(1).mvareta.diffuse./m1;
+xxx2 = tend.fluid(2).mvareta.diffuse./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('diffent')
-xxx1 = tend.fluid(1).mvareta.diffent./m1bar;
-xxx2 = tend.fluid(2).mvareta.diffent./m2bar;
+xxx1 = tend.fluid(1).mvareta.diffent./m1;
+xxx2 = tend.fluid(2).mvareta.diffent./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('dissn')
-xxx1 = tend.fluid(1).mvareta.dissn./m1bar;
-xxx2 = tend.fluid(2).mvareta.dissn./m2bar;
+xxx1 = tend.fluid(1).mvareta.dissn./m1;
+xxx2 = tend.fluid(2).mvareta.dissn./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('tot')
-xxx1 = tend.fluid(1).mvareta.tot./m1bar;
-xxx2 = tend.fluid(2).mvareta.tot./m2bar;
+xxx1 = tend.fluid(1).mvareta.tot./m1;
+xxx2 = tend.fluid(2).mvareta.tot./m2;
 xxx2(kkk) - xxx1(kkk)
 
 % q variance (advective form)
 disp(' ')
 disp('diff varqdot')
 disp('relabel')
-xxx1 = tend.fluid(1).mvarq.relabel./m1bar;
-xxx2 = tend.fluid(2).mvarq.relabel./m2bar;
+xxx1 = tend.fluid(1).mvarq.relabel./m1;
+xxx2 = tend.fluid(2).mvarq.relabel./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('diffuse')
-xxx1 = tend.fluid(1).mvarq.diffuse./m1bar;
-xxx2 = tend.fluid(2).mvarq.diffuse./m2bar;
+xxx1 = tend.fluid(1).mvarq.diffuse./m1;
+xxx2 = tend.fluid(2).mvarq.diffuse./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('diffent')
-xxx1 = tend.fluid(1).mvarq.diffent./m1bar;
-xxx2 = tend.fluid(2).mvarq.diffent./m2bar;
+xxx1 = tend.fluid(1).mvarq.diffent./m1;
+xxx2 = tend.fluid(2).mvarq.diffent./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('dissn')
-xxx1 = tend.fluid(1).mvarq.dissn./m1bar;
-xxx2 = tend.fluid(2).mvarq.dissn./m2bar;
+xxx1 = tend.fluid(1).mvarq.dissn./m1;
+xxx2 = tend.fluid(2).mvarq.dissn./m2;
 xxx2(kkk) - xxx1(kkk)
 disp('tot')
-xxx1 = tend.fluid(1).mvarq.tot./m1bar;
-xxx2 = tend.fluid(2).mvarq.tot./m2bar;
+xxx1 = tend.fluid(1).mvarq.tot./m1;
+xxx2 = tend.fluid(2).mvarq.tot./m2;
 xxx2(kkk) - xxx1(kkk)

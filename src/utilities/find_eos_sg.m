@@ -36,9 +36,13 @@ for k = 1:nz
     eos.res_rho1(k) = 0.0;
     eos.sigma1(k) = state.fluid(1).m(k)*gp;
     eos.res_etap1(k) = etabar + gt;
-    eos.drdp1(k)    = (gpt*gpt/gtt - gpp);
-    eos.drdetap1(k) =  gpt/gtt;
-    eos.drdqp1(k)   = (gpt*gtw/gtt - gpw);
+    % eos.drdp1(k)    = (gpt*gpt/gtt - gpp);
+    % eos.drdetap1(k) =  gpt/gtt;
+    % eos.drdqp1(k)   = (gpt*gtw/gtt - gpw);
+    eos.theta1p(k) = eta2thetal( etabar, ...
+                                 qbar, ...
+                                 state.fluid(1).T(k), ...
+                                 constants.therm, constants.phys.p00);
     
     % Fluid 2
     qbar   = grid.aboves(k)*state.fluid(2).q(k+1) ...
@@ -53,9 +57,13 @@ for k = 1:nz
     eos.res_rho2(k) = 0.0;
     eos.sigma2(k) = state.fluid(2).m(k)*gp;
     eos.res_etap2(k) = etabar + gt;
-    eos.drdp2(k)    = (gpt*gpt/gtt - gpp);
-    eos.drdetap2(k) =  gpt/gtt;
-    eos.drdqp2(k)   = (gpt*gtw/gtt - gpw);
+    % eos.drdp2(k)    = (gpt*gpt/gtt - gpp);
+    % eos.drdetap2(k) =  gpt/gtt;
+    % eos.drdqp2(k)   = (gpt*gtw/gtt - gpw);
+    eos.theta2p(k) = eta2thetal( etabar, ...
+                                 qbar, ...
+                                 state.fluid(2).T(k), ...
+                                 constants.therm, constants.phys.p00);
 
     % Residual in sigma equation
     eos.res_sigma(k) = 1 - eos.sigma1(k) - eos.sigma2(k);
@@ -64,6 +72,12 @@ end
 
 
 % On w levels
+% Standard deviations
+etastd1 = weight_to_w(grid,sqrt(state.fluid(1).vareta));
+qstd1   = weight_to_w(grid,sqrt(state.fluid(1).varq));
+etastd2 = weight_to_w(grid,sqrt(state.fluid(2).vareta));
+qstd2   = weight_to_w(grid,sqrt(state.fluid(2).varq));
+
 for k = 1:nzp
     
     if k == 1
@@ -128,9 +142,9 @@ for k = 1:nzp
         ddrhodql_alt = (rhomean - rhogas)/qlmean;
     end
     
-     % Standard deviation parameter
-    etastd = sqrt(state.fluid(1).vareta(k));
-    qstd   = sqrt(state.fluid(1).varq(k));
+    % Standard deviation parameter
+    etastd = etastd1(k);
+    qstd   = qstd1(k);
     sq2 = qstd*qstd ...
         - 2*rr*qstd*etastd*dqsatdeta ...
         + etastd*etastd*dqsatdeta*dqsatdeta;
@@ -231,9 +245,9 @@ for k = 1:nzp
         ddrhodql_alt = (rhomean - rhogas)/qlmean;
     end
     
-     % Standard deviation parameter
-    etastd = sqrt(state.fluid(2).vareta(k));
-    qstd   = sqrt(state.fluid(2).varq(k));
+    % Standard deviation parameter
+    etastd = etastd2(k);
+    qstd   = qstd2(k);
     sq2 = qstd*qstd ...
         - 2*rr*qstd*etastd*dqsatdeta ...
         + etastd*etastd*dqsatdeta*dqsatdeta;
@@ -321,6 +335,14 @@ for k = 1:nzp
     
 end
 
+% Improved estimates of derivatives of density wrt p, eta, and q
+% At p levels
+eos.drdp1    = grid.abovep.*eos.drdpbar1(2:nzp) + grid.belowp.*eos.drdpbar1(1:nz);
+eos.drdetap1 = grid.abovep.*eos.drdeta1(2:nzp)  + grid.belowp.*eos.drdeta1(1:nz);
+eos.drdqp1   = grid.abovep.*eos.drdq1(2:nzp)    + grid.belowp.*eos.drdq1(1:nz);
+eos.drdp2    = grid.abovep.*eos.drdpbar2(2:nzp) + grid.belowp.*eos.drdpbar2(1:nz);
+eos.drdetap2 = grid.abovep.*eos.drdeta2(2:nzp)  + grid.belowp.*eos.drdeta2(1:nz);
+eos.drdqp2   = grid.abovep.*eos.drdq2(2:nzp)    + grid.belowp.*eos.drdq2(1:nz);
 
 % Vertical pressure gradient
 dpdz(2:nz)   = (state.p(2:nz) - state.p(1:nz-1))./grid.dzw(2:nz);

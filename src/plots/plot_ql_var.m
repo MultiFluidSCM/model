@@ -7,8 +7,8 @@
 figure(28)
 
 subplot(2,3,1)
-plot(state_new.fluid(1).varq,zunitsw,'b',...
-     state_new.fluid(2).varq,zunitsw,'r')
+plot(state_new.fluid(1).varq,zunitsp,'b',...
+     state_new.fluid(2).varq,zunitsp,'r')
 ylim([0,zplottop])
 title('Var q')
 xlabel('Var q')
@@ -16,8 +16,8 @@ ylabel(labelz)
 set(gca,'FontSize',fs)
 
 subplot(2,3,4)
-plot(state_new.fluid(1).vareta,zunitsw,'b',...
-     state_new.fluid(2).vareta,zunitsw,'r')
+plot(state_new.fluid(1).vareta,zunitsp,'b',...
+     state_new.fluid(2).vareta,zunitsp,'r')
 ylim([0,zplottop])
 title('Var eta')
 xlabel('Var eta')

@@ -1,6 +1,8 @@
 % APDF-based formulation for detrainment, sorting pdf
 relabel.w2bar = w2bar;
 relabel.wstd = wstd;
+dw1dz = (w1(2:nzp) - w1(1:nz))./grid.dzp;
+dw2dz = (w2(2:nzp) - w2(1:nz))./grid.dzp;
 
 % 1/sqrt(2) * normalized variable at cut of pdf on p-levels
 chi_cut = - rroot2*w2bar./wstd;
@@ -26,11 +28,11 @@ elseif ischeme == 3 | ischeme == 4
     bnorm = weight_to_w(grid,tke2./scales.L_turb2);
     ss3 = 0.5*(1 - tanh( 3*buoy./bnorm + 1.2));  % Smooth switch 10e
     relabel.ss3bar = abovep.*ss3(2:nzp) + belowp.*ss3(1:nz);
-    rate_sort = relabel.ss3bar.*min(10*rate_mix,rdt);  % 
+    % rate_sort = relabel.ss3bar.*min(10*rate_mix,rdt);  % 
     % rate_buoy = max(-buoybar,0)./wstd;
     % rate_sort = min(20*rate_buoy,rdt);
     
-    % rate_sort = rate_sort + max(0,-dw2dz);
+    rate_sort = min(1.5*max(0,-dw2dz),rdt);
     % rate_sort = min(rate_sort,rdt);
     
     % [temp, cbase_index] = min(abs(grid.zw-2200));
@@ -43,7 +45,7 @@ end
 % rate_sort = 0;
 
 % Resulting detrainment rate
-relabel.M12_sort = sort.detrain * rate_sort.*m2.*relabel.frac;
+relabel.M12_sort = sort.detrain * rate_sort.*m2; %.*relabel.frac;
 relabel.M21_sort = sort.entrain * 0 * m1;
 
 
@@ -57,7 +59,7 @@ end
 relabel.uhat12_sort   = u2;
 relabel.vhat12_sort   = v2;
 relabel.what12_sort   = w2   + wstdw .*chi_hat;
-relabel.etahat12_sort = eta2 + etastd.*chi_hat;
+relabel.etahat12_sort = eta2; % + etastd.*chi_hat;
 relabel.qhat12_sort   = q2   + qstd  .*chi_hat;
 
 % Entrained fluid properties

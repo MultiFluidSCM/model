@@ -29,6 +29,7 @@ for k0 = kstart
     eta_parcel = state_new.fluid(2).eta(k0);
     q_parcel   = state_new.fluid(2).q(k0);
 %     if count == 2 | count == 4
+%     *** Modify this code to allow vor variances at p-levels ***
 %         eta_parcel = eta_parcel + sqrt(state_new.fluid(2).vareta(k0));
 %     end
 %     if count > 2

@@ -101,8 +101,8 @@ wstdw(2:nz) = grid.abovew(2:nz).*wstd(2:nz) + grid.beloww(2:nz).*wstd(1:nz-1);
 wstdw(1) = wstdw(2);
 wstdw(nzp) = wstdw(nz);
 % And subfilter standard deviations of eta, q, and buoyancy
-etastd = sqrt(state.fluid(2).vareta);
-qstd   = sqrt(state.fluid(2).varq);
+etastd = weight_to_w(grid,sqrt(state.fluid(2).vareta));
+qstd   = weight_to_w(grid,sqrt(state.fluid(2).varq));
 bstd = constants.phys.gravity*sqrt(eos.Varrhow2)./eos.rhow2;
 
 
