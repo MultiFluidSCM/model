@@ -128,40 +128,22 @@ title('b spread')
 xlabel('b')
 ylabel(labelz)
 
-% % Candidate smooth switches
-% ss1 = 0.5*(1 - tanh(   work.buoy./bnorm + 2));
-% ss2 = 0.5*(1 - tanh( 2*work.buoy./bnorm + 2));
-% ss3 = 0.5*(1 - tanh( 5*work.buoy./bnorm + 2));
-% ss4 = 0.5*(1 - tanh(10*work.buoy./bnorm + 2));
-% 
-% subplot(3,4,11)
-% plot(ss1,zunitsw,'k--',...
-%      ss2,zunitsw,'b',...
-%      ss3,zunitsw,'k',...
-%      ss4,zunitsw,'r',...
-%      relabel.ss3bar,zunitsp,'o')
-% set(gca,'FontSize',fs)
-% ylim([0,zplottop])
-% title('Smooth switches')
-% xlabel('Smooth switches')
-% ylabel(labelz)
+% Candidate smooth switches
+ss1 = 0.5*(1 - tanh(   work.buoy./bnorm + 2));
+ss2 = 0.5*(1 - tanh( 2*work.buoy./bnorm + 2));
+ss3 = 0.5*(1 - tanh( 5*work.buoy./bnorm + 2));
+ss4 = 0.5*(1 - tanh(10*work.buoy./bnorm + 2));
 
 subplot(3,4,11)
-plot(state_new.fluid(1).vareta.*(eos.theta1p/constants.therm.Cpd).^2,zunitsp,'k',...
-     eos.Vartheta1,zunitsw,'r',...
-     eos.Vartheta1_alt,zunitsw,'b')
+plot(ss1,zunitsw,'k--',...
+     ss2,zunitsw,'b',...
+     ss3,zunitsw,'k',...
+     ss4,zunitsw,'r',...
+     relabel.ss3bar,zunitsp,'o')
 set(gca,'FontSize',fs)
 ylim([0,zplottop])
-title('Theta1 variance')
-xlabel('Theta variance')
+title('Smooth switches')
+xlabel('Smooth switches')
 ylabel(labelz)
 
-subplot(3,4,12)
-plot(state_new.fluid(2).vareta.*(eos.theta2p/constants.therm.Cpd).^2,zunitsp,'k',...
-     eos.Vartheta2,zunitsw,'r',...
-     eos.Vartheta2_alt,zunitsw,'b')
-set(gca,'FontSize',fs)
-ylim([0,zplottop])
-title('Theta2 variance')
-xlabel('Theta variance')
-ylabel(labelz)
+
