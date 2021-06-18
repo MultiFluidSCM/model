@@ -90,9 +90,6 @@ sigma2w = weight_to_w(grid,sigma2);
 
 % ----------
 
-% Diagnose cloud fractions
-diagnose_cloud_frac
-
 % Append current time to array for plotting time series
 if exist('ts')
     plotstep = numel(ts.time) + 1;
@@ -100,6 +97,10 @@ else
     plotstep = 1;
 end
 ts.time(plotstep) = time.t;
+
+% Diagnose cloud fractions
+% diagnose_cloud_frac
+update_timeseries_cloud
 
 if settings.switches.plot
 

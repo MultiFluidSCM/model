@@ -20,7 +20,6 @@ for istep = 1:time.nstop
         gdiags = global_diags(grid,state_new,constants);
         plottype = 0;
         plot_diagnostics
-        update_timeseries_cloud
     end
     
     % Save a restart file if needed

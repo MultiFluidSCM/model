@@ -1,4 +1,5 @@
 % Plot snap shot profiles and various time series
+% update_timeseries_cloud should be called first
 
 % Figure 2
 
@@ -66,7 +67,7 @@ end
 if plottype == 0
     figure(2)
     subplot(2,3,4)
-    plot(ts.time/3600,ts.zstar,'k')
+    plot(ts.time_high_res/3600,ts.zstar,'k')
     axis([0,time.tstop/3600,0,grid.zw(nzp)])
     title(['t = ',num2str(time.t),'  z* = ',num2str(zstar,'%6.1f')])
     xlabel('time')
@@ -75,7 +76,7 @@ if plottype == 0
 else
     figure(6)
     subplot(3,1,2)
-    plot(ts.time/3600,ts.zstar,'k','linewidth',1.5)
+    plot(ts.time_high_res/3600,ts.zstar,'k','linewidth',1.5)
     xlim([0,52240/3600])
     title(['t = ',num2str(time.t)])
     xlabel('time')
@@ -112,16 +113,16 @@ if plottype == 0
     hold on
     %plot(ts.time/3600,ts.zcbase,'r--')
     %plot(ts.time/3600,ts.zctop, 'b--')
-    plot(ts.time/3600,ts.zcbaseSG,'r')
-    plot(ts.time/3600,ts.zctopSG ,'b')
+    plot(ts.time_high_res/3600,ts.zcbaseSG,'r')
+    plot(ts.time_high_res/3600,ts.zctopSG ,'b')
     % plot(ts.time/3600,ts.lnbgas,'g')
     hold off
 else
     figure(6)
     subplot(3,1,2)
     hold on
-    plot(ts.time/3600,ts.zcbaseSG,'r','linewidth',1.5)
-    plot(ts.time/3600,ts.zctopSG ,'b','linewidth',1.5)
+    plot(ts.time_high_res/3600,ts.zcbaseSG,'r','linewidth',1.5)
+    plot(ts.time_high_res/3600,ts.zctopSG ,'b','linewidth',1.5)
     % plot(ts.time/3600,ts.lnbgas,'g','linewidth',1.5)
     hold off
     pause
@@ -130,7 +131,7 @@ end
 
 figure(21)
 subplot(1,3,3)
-plot(ts.time/3600,ts.totcldcov,'k','linewidth',1.2)
+plot(ts.time_high_res/3600,ts.totcldcov,'k','linewidth',1.2)
 %xlim([0,time.tstop/3600])
 axis([0,time.tstop/3600,0,0.4])
 set(gca,'FontSize',fs)

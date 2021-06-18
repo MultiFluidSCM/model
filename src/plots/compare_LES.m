@@ -148,8 +148,10 @@ if lsave
     SCM_thth1(:,ist) = Rthth1;
     SCM_thth2(:,ist) = Rthth2;
     % Approximate conversion from eta variance to theta variance
-    SCM_thth_sg1(:,ist) = state_new.fluid(1).vareta.*(eos.theta1p/Cpd).^2;
-    SCM_thth_sg2(:,ist) = state_new.fluid(2).vareta.*(eos.theta2p/Cpd).^2;
+    % SCM_thth_sg1(:,ist) = state_new.fluid(1).vareta.*(eos.theta1p/Cpd).^2;
+    % SCM_thth_sg2(:,ist) = state_new.fluid(2).vareta.*(eos.theta2p/Cpd).^2;
+    SCM_thth_sg1(:,ist) = eos.Vartheta1;
+    SCM_thth_sg2(:,ist) = eos.Vartheta2;
     
 end
 
