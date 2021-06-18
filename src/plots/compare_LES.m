@@ -167,6 +167,9 @@ if istep == time.nstop
     SCM_zcbase = ts.zcbaseSG;
     SCM_zctop = ts.zctopSG;
     SCM_cldcov = ts.totcldcov;
+    SCM_cloud_fraction  = ts.cloud_fraction;
+    SCM_cloud_fraction1 = ts.cloud_fraction1;
+    SCM_cloud_fraction2 = ts.cloud_fraction2;
 
     % Write to file
     filename = fullfile(settings.folders.data_scm, 'SCM_results.mat');
