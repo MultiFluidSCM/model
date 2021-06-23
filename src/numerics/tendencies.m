@@ -620,8 +620,8 @@ tend.fluid(2).meta.dissn = -m2bar.*esource./state.fluid(2).Tw;
 % *** Only include buoyancy correlation contribution if deta/dz > 0 ***
 deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
 deta2dz = (eta2(2:nzp) - eta2(1:nz))./grid.dzp;
-tend.fluid(1).mvareta.diffuse = -2*(Deta1 - (deta1dz < 0).*Deta1bc).*deta1dz;
-tend.fluid(2).mvareta.diffuse = -2*(Deta2 - (deta2dz < 0).*Deta2bc).*deta2dz;
+tend.fluid(1).mvareta.diffuse = -2*(Deta1 - settings.buoy_correl_eta*(deta1dz < 0).*Deta1bc).*deta1dz;
+tend.fluid(2).mvareta.diffuse = -2*(Deta2 - settings.buoy_correl_eta*(deta2dz < 0).*Deta2bc).*deta2dz;
 
 % Just for testing
 tend.fluid(1).mvareta.bc = -2*Deta1bc.*deta1dz;
