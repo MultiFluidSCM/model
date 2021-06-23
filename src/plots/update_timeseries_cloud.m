@@ -15,4 +15,6 @@ if exist('ts')
     ts.cloud_fraction(:,index) = tot_cld_frac;
     ts.cloud_fraction1(:,index) = eos.cldfrac1;
     ts.cloud_fraction2(:,index) = eos.cldfrac2;
+    ts.cloud_fraction1_sigma1(:,index) = eos.cldfrac1.*sigma1w;
+    ts.cloud_fraction2_sigma2(:,index) = eos.cldfrac2.*sigma2w;
 end
