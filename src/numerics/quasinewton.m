@@ -291,9 +291,9 @@ for qn_iter = 1:qn_iter_max
 
 % Plots of max residuals vs iteration for checking convergence
 save_res_convergence
-% if (qn_iter == qn_iter_max)
-%     plot_res_convergence
-% end
+if (qn_iter == qn_iter_max)
+    plot_res_convergence
+end
 
     if conv_diag
         fs = 15;
