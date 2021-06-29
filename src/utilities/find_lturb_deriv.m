@@ -1,4 +1,4 @@
-function [ L_turb, dLdtke ] = find_lturb_deriv( grid, nsq, tke, tke_min )
+function [ L_turb, dLdtke ] = find_lturb_deriv( grid, nsq, tke, tke_min, Lfactor )
 
 % Compute a turbulence length scale
 % Also estimate its local derivative wrt tke. This is complicated because
@@ -34,7 +34,9 @@ L_turb = (RL1.^power + RL2.^power).^(-1/power);
 % Compute derivative
 dLdtke = 0.5*(L_turb.*(L_turb.*RL20).^power)./tkex;
 
-
+% Finally weight by Lfactor
+L_turb = L_turb*Lfactor;
+dLdtke = dLdtke*Lfactor;
 
 end
 
