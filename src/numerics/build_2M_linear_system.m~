@@ -102,20 +102,15 @@ ix =  5:10:10*nz-5;
 % Diagonal term
 dd(11,ix) = dd(11,ix) + 1.0;
 % Downgradient diffusion
-dd( 7,ix) = dd( 7,ix) + m1.*dq1dz.*dKdtke1;
+dd( 7,ix) = dd( 7,ix) + m1.*deta1dz.*dKdtke1;
 % Buoyancy correlation term
 dd(15,ix) = dd(15,ix) - m1.*dpdzbar.*eos.drdqp1.*t_scale1;
 dd( 7,ix) = dd( 7,ix) - m1.*dpdzbar.*eos.drdqp1.*state_new.fluid(1).varq.*dTdtke1;
 
 % Fluid 2 SG eta flux
 ix =  6:10:10*nz-4;
-% Diagonal term
+% Tendency term
 dd(11,ix) = dd(11,ix) + 1.0;
-% Downgradient diffusion
-dd( 7,ix) = dd( 7,ix) + m2.*dq2dz.*dKdtke2;
-% Buoyancy correlation term
-dd(15,ix) = dd(15,ix) - m2.*dpdzbar.*eos.drdqp2.*t_scale2;
-dd( 7,ix) = dd( 7,ix) - m2.*dpdzbar.*eos.drdqp2.*state_new.fluid(2).varq.*dTdtke2;
 
 
 % Some quantities needed for variance equations
