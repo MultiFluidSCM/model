@@ -51,6 +51,9 @@ dd(21,ix) = dd(21,ix) + adt*work.dFtke1dtkea(ikb)./dzp;
 dd( 1,ix) = dd( 1,ix) - adt*work.dDtke1dtkeb(ikt)./dzp;
 dd(11,ix) = dd(11,ix) - adt*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./dzp;
 dd(21,ix) = dd(21,ix) + adt*work.dDtke1dtkea(ikb)./dzp;
+% Buoyancy flux term
+dd(13,ix) = dd(13,ix) - adt*dpdzbar.*eos.drdetap1;
+dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdqp1;
 % Dissipation term
 dd(11,ix) = dd(11,ix) + adt*m1.*(1.5./scales.L_turb1).*sqrt(tke1);
 % Relabelling terms - only keep dependence on tke1
@@ -71,6 +74,9 @@ dd(21,ix) = dd(21,ix) + adt*work.dFtke2dtkea(ikb)./dzp;
 dd( 1,ix) = dd( 1,ix) - adt*work.dDtke2dtkeb(ikt)./dzp;
 dd(11,ix) = dd(11,ix) - adt*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./dzp;
 dd(21,ix) = dd(21,ix) + adt*work.dDtke2dtkea(ikb)./dzp;
+% Buoyancy flux term
+dd(13,ix) = dd(13,ix) - adt*dpdzbar.*eos.drdetap2;
+dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdqp2;
 % Dissipation term
 dd(11,ix) = dd(11,ix) + adt*m2.*(1.5./scales.L_turb2).*sqrt(tke2);
 % Relabelling terms - only keep dependence on tke2
@@ -84,8 +90,10 @@ dd(11,ix) = dd(11,ix) + 1.0;
 % Downgradient diffusion
 dd( 9,ix) = dd( 9,ix) + m1.*deta1dz.*dKdtke1;
 % Buoyancy correlation term
-dd(15,ix) = dd(15,ix) - m1.*dpdzbar.*eos.drdetap1.*t_scale1;
-dd( 9,ix) = dd( 9,ix) - m1.*dpdzbar.*eos.drdetap1.*state_new.fluid(1).vareta.*dTdtke1;
+if settings.buoy_correl_eta
+    dd(15,ix) = dd(15,ix) - m1.*dpdzbar.*eos.drdetap1.*t_scale1;
+    dd( 9,ix) = dd( 9,ix) - m1.*dpdzbar.*eos.drdetap1.*state_new.fluid(1).vareta.*dTdtke1;
+end
 
 % Fluid 2 SG eta flux
 ix =  4:10:10*nz-6;
@@ -94,8 +102,10 @@ dd(11,ix) = dd(11,ix) + 1.0;
 % Downgradient diffusion
 dd( 9,ix) = dd( 9,ix) + m2.*deta2dz.*dKdtke2;
 % Buoyancy correlation term
-dd(15,ix) = dd(15,ix) - m2.*dpdzbar.*eos.drdetap2.*t_scale2;
-dd( 9,ix) = dd( 9,ix) - m2.*dpdzbar.*eos.drdetap2.*state_new.fluid(2).vareta.*dTdtke2;
+if settings.buoy_correl_eta
+    dd(15,ix) = dd(15,ix) - m2.*dpdzbar.*eos.drdetap2.*t_scale2;
+    dd( 9,ix) = dd( 9,ix) - m2.*dpdzbar.*eos.drdetap2.*state_new.fluid(2).vareta.*dTdtke2;
+end
 
 % Fluid 1 SG q flux
 ix =  5:10:10*nz-5;
@@ -104,8 +114,10 @@ dd(11,ix) = dd(11,ix) + 1.0;
 % Downgradient diffusion
 dd( 7,ix) = dd( 7,ix) + m1.*dq1dz.*dKdtke1;
 % Buoyancy correlation term
-dd(15,ix) = dd(15,ix) - m1.*dpdzbar.*eos.drdqp1.*t_scale1;
-dd( 7,ix) = dd( 7,ix) - m1.*dpdzbar.*eos.drdqp1.*state_new.fluid(1).varq.*dTdtke1;
+if settings.buoy_correl_q
+    dd(15,ix) = dd(15,ix) - m1.*dpdzbar.*eos.drdqp1.*t_scale1;
+    dd( 7,ix) = dd( 7,ix) - m1.*dpdzbar.*eos.drdqp1.*state_new.fluid(1).varq.*dTdtke1;
+end
 
 % Fluid 2 SG eta flux
 ix =  6:10:10*nz-4;
@@ -114,8 +126,10 @@ dd(11,ix) = dd(11,ix) + 1.0;
 % Downgradient diffusion
 dd( 7,ix) = dd( 7,ix) + m2.*dq2dz.*dKdtke2;
 % Buoyancy correlation term
-dd(15,ix) = dd(15,ix) - m2.*dpdzbar.*eos.drdqp2.*t_scale2;
-dd( 7,ix) = dd( 7,ix) - m2.*dpdzbar.*eos.drdqp2.*state_new.fluid(2).varq.*dTdtke2;
+if settings.buoy_correl_q
+    dd(15,ix) = dd(15,ix) - m2.*dpdzbar.*eos.drdqp2.*t_scale2;
+    dd( 7,ix) = dd( 7,ix) - m2.*dpdzbar.*eos.drdqp2.*state_new.fluid(2).varq.*dTdtke2;
+end
 
 
 % Some quantities needed for variance equations
