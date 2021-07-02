@@ -181,6 +181,12 @@ if settings.switches.plot
         plot_ql_var
     end
 
+    % Figure 29: 
+    if settings.switches.plot_theta_flux
+        plot_theta_flux
+        plot_eta_flux
+    end
+    
 end
 
 % fig = figure(6);

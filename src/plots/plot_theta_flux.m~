@@ -1,0 +1,52 @@
+% Plot contributions to theta flux
+
+% In the compressible case there can be a non-trivial contribution
+% from mean ascent due to warming and expansion of the boundary layer
+% air; we should be careful to separate this out.
+
+% ----------
+
+% Figure 29: contributions to theta flux
+
+figure(29)
+
+% Mean density on w-levels
+rhow = m1bar + m2bar;
+
+% Mass weighted mean w
+w_bar_star = (work.F1 + work.F2)./rhow;
+
+% Mass weighted mean theta
+theta_bar_star = (m1bar.*eos.theta1 + m2bar.*eos.theta2)./rhow;
+
+% Deviation mass fluxes
+F1_pert = work.F1 - m1bar.*w_bar_star;
+F2_pert = work.F2 - m2bar.*w_bar_star;
+
+% Mean ascent contribution
+HF_mean = rhow.*w_bar_star.*theta_bar_star;
+
+% Resolved contributions in fluids 1 and 2
+HF_res1 = F1_pert.*(eos.theta1 - theta_bar_star);
+HF_res2 = F2_pert.*(eos.theta2 - theta_bar_star);
+
+% Subfilter-scale contributions
+HF_sf1 = work.bflux1.*eos.theta1/settings.constants.phys.gravity;
+HF_sf2 = work.bflux2.*eos.theta2/settings.constants.phys.gravity;
+
+
+
+subplot(1,1,1)
+
+plot(work.Deta1,zunitsp,'b',...
+     work.Deta2,zunitsp,'r',...
+     work.Deta1 + work.Deta2,'k',...
+     work.Deta1bc,zunitsp,'b--',...
+     work.Deta2bc,zunitsp,'r--',...
+     work.Deta1bc + work.Deta2bc,'k--')
+ylim([0,zplottop])
+title('SG eta flux')
+xlabel('w \eta')
+ylabel(labelz)
+set(gca,'FontSize',fs)
+
