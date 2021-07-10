@@ -621,13 +621,11 @@ tsq_dbdeta = scales.T_turb1.*scales.T_turb1.*dpdzbar.*eos.drdetap1;
 % deta1dz_modified = 0.5*(deta1dz + sqrt(deta1dz.^2 + 1./tsq_dbdeta.^2));
 deta1dz_modified = max(deta1dz,0);
 tsq_dbdeta = scales.T_turb2.*scales.T_turb2.*dpdzbar.*eos.drdetap2;
-% deta2dz_modified = 0.5*(deta2dz + sqrt(deta2dz.^2 + 1./tsq_dbdeta.^2));
-deta2dz_modified = max(deta2dz,0);
-tend.fluid(1).mvareta.diffuse = -2*(Deta1ed.*deta1dz + settings.buoy_correl_eta*Deta1bc.*deta1dz_modified);
-tend.fluid(2).mvareta.diffuse = -2*(Deta2ed.*deta2dz + settings.buoy_correl_eta*Deta2bc.*deta2dz_modified);
+deta2dz_modified = 0.5*(deta2dz + sqrt(deta2dz.^2 + 1./tsq_dbdeta.^2));
+tend.fluid(1).mvareta.diffuse = -2*(Deta1ed.*deta1dz + Deta1bc.*deta1dz_modified);
+tend.fluid(2).mvareta.diffuse = -2*(Deta2ed.*deta2dz + Deta2bc.*deta2dz_modified);
 
-%plot_detadz
-%plot_dbdz
+plot_detadz
 
 % Just for testing
 tend.fluid(1).mvareta.bc = -2*Deta1bc.*deta1dz_modified;
@@ -996,12 +994,8 @@ work.dw2udz = dw2udz;
 work.w2ubar = w2ubar;
 work.Deta1 = Deta1;
 work.Deta2 = Deta2;
-work.Deta1ed = Deta1ed;
-work.Deta2ed = Deta2ed;
 work.Deta1bc = Deta1bc;
 work.Deta2bc = Deta2bc;
-work.deta1dz_modified = deta1dz_modified;
-work.deta2dz_modified = deta2dz_modified;
 work.Dq1 = Dq1;
 work.Dq2 = Dq2;
 work.Fu1 = Fu1;

@@ -35,8 +35,8 @@ HF_sf1 = Deta1;
 HF_sf2 = Deta2;
 HF_sf1_bc = work.Deta1bc;
 HF_sf2_bc = work.Deta2bc;
-HF_sf1_ed = work.Deta1ed;
-HF_sf2_ed = work.Deta2ed;
+HF_sf1_ed = work.Deta1bc;
+HF_sf2_ed = work.Deta2bc;
 
 % Total
 HF_tot = HF_mean + HF_res1 + HF_res2 + weight_to_w(grid,HF_sf1 + HF_sf2);
@@ -62,10 +62,8 @@ ylabel(labelz)
 set(gca,'FontSize',fs)
 
 subplot(1,3,3)
-plot(HF_sf1_ed,zunitsp,'b',...
-     HF_sf2_ed,zunitsp,'r',...
-     HF_sf1_bc,zunitsp,'b--',...
-     HF_sf2_bc,zunitsp,'r--')
+plot(HF_sf1,zunitsp,'b',...
+     HF_sf2,zunitsp,'r')
 ylim([0,zplottop])
 title('Subfilter')
 xlabel('w \eta')

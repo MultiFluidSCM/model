@@ -79,6 +79,9 @@ for qn_iter = 1:qn_iter_max
     [tend,relabel,eos,force,scales,surface_flux,budgets,work] = ...
               tendencies(grid,state_new,settings,t_new,dt,switches,old_diff);
     
+    % For debugging
+    % dump_tend
+    
     % Check for nans and infs in tendencies
     %check_this = 'tend';
     %check_for_nans
@@ -453,7 +456,7 @@ save_res_convergence
     
     % and unpack the increments
     
-    %disp('*** zero increments ***')
+    % disp('*** zero eta increments ***')
     inc_w1   = xx(1:9:9*nz+1);
     inc_w2   = xx(2:9:9*nz+2);
     inc_eta1 = xx(3:9:9*nz+3);
@@ -865,6 +868,7 @@ save_res_convergence
 %     end
  
     % Increment tke1
+    % disp('*** no tke1 inc ***')
     state_new.fluid(1).tke = state_new.fluid(1).tke + inc_tke1;
     inc_fix = max(constants.param.tke_min - state_new.fluid(1).tke,0);
     state_new.fluid(1).tke = state_new.fluid(1).tke + inc_fix;
@@ -886,7 +890,7 @@ save_res_convergence
        
     % Increment variances
 % disp('*** bounded var decrements ***')
-% disp('*** frozen variances ***')
+% disp('*** frozen eta variances ***')
     state_new.fluid(1).vareta = max(0.1*state_new.fluid(1).vareta,state_new.fluid(1).vareta + inc_vareta1);
     state_new.fluid(2).vareta = max(0.1*state_new.fluid(2).vareta,state_new.fluid(2).vareta + inc_vareta2);
     state_new.fluid(1).varq   = max(0.1*state_new.fluid(1).varq,state_new.fluid(1).varq     + inc_varq1  );
