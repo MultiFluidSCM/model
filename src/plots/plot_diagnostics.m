@@ -181,11 +181,17 @@ if settings.switches.plot
         plot_ql_var
     end
 
-    % Figure 29: 
+    % Figure 29 and 32: 
     if settings.switches.plot_theta_flux
         plot_theta_flux
         plot_eta_flux
     end
+    
+    % Figure 33: 
+    if settings.switches.plot_q_flux
+        plot_q_flux
+    end
+
     
 end
 

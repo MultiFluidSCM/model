@@ -281,19 +281,19 @@ tend.fluid(1).mq.transport(1) = tend.fluid(1).mq.transport(1) + surface_flux.q1/
 tend.fluid(2).mq.transport(1) = tend.fluid(2).mq.transport(1) + surface_flux.q2/dzw(1);
 
 % Diffusive water flux
-[Dq2ed, dDq2dqa, dDq2dqb, dDq2dm ] = diff_flux( grid, kdiffq2, q2 , m2, surface_flux.q2);
+[Dq2, dDq2dqa, dDq2dqb, dDq2dm ] = diff_flux( grid, kdiffq2, q2 , m2, surface_flux.q2);
 if switches.b
-    [Dq1ed, dDq1dqa, dDq1dqb, dDq1dm ] = diff_flux( grid, kdiffq1, q  , rho, surface_flux.q);
-    Dq1ed = Dq1ed - Dq2ed;
+    [Dq1, dDq1dqa, dDq1dqb, dDq1dm ] = diff_flux( grid, kdiffq1, q  , rho, surface_flux.q);
+    Dq1 = Dq1 - Dq2;
     dDq1dqa = dDq1dqa.*m1bar(2:nzp)./rhobar(2:nzp);
     dDq1dqb = dDq1dqb.*m1bar(1:nz )./rhobar(1:nz );
     % dDq1dm  = dDq1dm;
 else
-    [Dq1ed, dDq1dqa, dDq1dqb, dDq1dm ] = diff_flux( grid, kdiffq1, q1 , m1, surface_flux.q1);
+    [Dq1, dDq1dqa, dDq1dqb, dDq1dm ] = diff_flux( grid, kdiffq1, q1 , m1, surface_flux.q1);
 end
 % Include contribution from surface flux to first interior level
-Dq1ed(1) = Dq1ed(1) + surface_flux.L1q1;
-Dq2ed(1) = Dq2ed(1) + surface_flux.L1q2;
+Dq1(1) = Dq1(1) + surface_flux.L1q1;
+Dq2(1) = Dq2(1) + surface_flux.L1q2;
 
 % Include buoyancy correlation term
 % Correlations and timescales are computed above
@@ -302,19 +302,20 @@ covaretaq1 = rr*sqrt(vareta1.*varq1);
 covaretaq2 = rr*sqrt(vareta2.*varq2);
 t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
+% Bterm = eos.rho_deriv_eta1.*covaretaq1 + eos.rho_deriv_q1.*varq1;
+% Dq1bc = - gravity*t_scale1.*eos.sigma1.*(abovep.*Bterm(2:nzp) + belowp.*Bterm(1:nz));
+% Bterm = eos.rho_deriv_eta2.*covaretaq2 + eos.rho_deriv_q2.*varq2;
+% Dq2bc = - gravity*t_scale2.*eos.sigma2.*(abovep.*Bterm(2:nzp) + belowp.*Bterm(1:nz));
 Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*t_scale1;
 Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*t_scale2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_q
-    Dq1 = Dq1ed + Dq1bc;
-    Dq2 = Dq2ed + Dq2bc;
-else
-    Dq1 = Dq1ed;
-    Dq2 = Dq2ed;
+    Dq1 = Dq1 + Dq1bc;
+    Dq2 = Dq2 + Dq2bc;
 end
 
-% Total SF flux contribution to tendencies of mass times q
+% Tendencies of mass times q
 tend.fluid(1).mq.diffuse(1:nz ) = - Dq1./dzw(1:nz);
 tend.fluid(1).mq.diffuse(nzp) = 0;
 tend.fluid(1).mq.diffuse(2:nzp) = tend.fluid(1).mq.diffuse(2:nzp) ...
@@ -646,16 +647,8 @@ tend.fluid(2).mvareta.dissn = - m2.*vareta2./scales.T_turb2;
 % SG flux source terms ...
 dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
 dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
-
-% Use a modified dqdz to ensure it remains >= 0 and varies smoothly
-tsq_dbdq = scales.T_turb1.*scales.T_turb1.*dpdzbar.*eos.drdqp1;
-% dq1dz_modified = 0.5*(dq1dz + sqrt(dq1dz.^2 + 1./tsq_dbdq.^2));
-dq1dz_modified = max(dq1dz,0);
-tsq_dbdq = scales.T_turb2.*scales.T_turb2.*dpdzbar.*eos.drdqp2;
-% dq2dz_modified = 0.5*(dq2dz + sqrt(dq2dz.^2 + 1./tsq_dbdq.^2));
-dq2dz_modified = max(dq2dz,0);
-tend.fluid(1).mvarq.diffuse = -2*(Dq1ed.*dq1dz + settings.buoy_correl_q*Dq1bc.*dq1dz_modified);
-tend.fluid(2).mvarq.diffuse = -2*(Dq2ed.*dq2dz + settings.buoy_correl_q*Dq2bc.*dq2dz_modified);
+tend.fluid(1).mvarq.diffuse = -2*Dq1.*dq1dz;
+tend.fluid(2).mvarq.diffuse = -2*Dq2.*dq2dz;
 
 % `diffent' source terms
 corrde = (q2 - q1).*tend.fluid(1).mq.diffent;
@@ -1007,12 +1000,6 @@ work.deta1dz_modified = deta1dz_modified;
 work.deta2dz_modified = deta2dz_modified;
 work.Dq1 = Dq1;
 work.Dq2 = Dq2;
-work.Dq1ed = Dq1ed;
-work.Dq2ed = Dq2ed;
-work.Dq1bc = Dq1bc;
-work.Dq2bc = Dq2bc;
-work.dq1dz_modified = dq1dz_modified;
-work.dq2dz_modified = dq2dz_modified;
 work.Fu1 = Fu1;
 work.dFu1dua = dFu1dua;
 work.dFu1dub = dFu1dub;
@@ -1069,6 +1056,8 @@ work.dDw1dm = dDw1dm;
 work.dDw2dm = dDw2dm;
 work.nhpg1 = nhpg1;
 work.nhpg2 = nhpg2;
+% work.L_turb1 = scales.L_turb1;
+% work.L_turb2 = scales.L_turb2;
 work.dFtke1dtkea = dFtke1dtkea;
 work.dFtke1dtkeb = dFtke1dtkeb;
 work.dtke1udz = dtke1udz;
@@ -1084,6 +1073,7 @@ work.dDtke2dtkeb = dDtke2dtkeb;
 %work.dLdtke1 = dLdtke1;
 %work.dLdtke2 = dLdtke2;
 work.buoy = buoy;
+%work.buoyx = buoyx;
 work.bflux1 = bflux1;
 work.bflux2 = bflux2;
 work.bflux_res = buoy_flux_res;
