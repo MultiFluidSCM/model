@@ -390,4 +390,3 @@ eos.nsq1 = constants.phys.gravity*(drho_parceldz - drhoenvdz)./eos.rho1;
 temp = drho_parceldp2.*dpdz;
 drho_parceldz = grid.abovep.*temp(2:nzp) + grid.belowp.*temp(1:nz);
 eos.nsq2 = constants.phys.gravity*(drho_parceldz - drhoenvdz)./eos.rho2;
-

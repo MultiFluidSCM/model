@@ -190,8 +190,8 @@ dd(10,ix) = dd(10,ix) - M21(ik);
 % Factors needed to allow for buoyancy correlation terms in
 % linearization
 % Assume zero correlation between eta and q
-factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdqp1.*dq1dz;
-factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdqp2.*dq2dz;
+factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdqp1.*work.dq1dz_modified;
+factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdqp2.*work.dq2dz_modified;
 
 % q variance1 equation
 ix =  9:10:10*nz-1;

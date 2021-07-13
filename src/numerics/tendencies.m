@@ -621,9 +621,6 @@ deta2dz_modified = max(deta2dz,0);
 tend.fluid(1).mvareta.diffuse = -2*(Deta1ed.*deta1dz + settings.buoy_correl_eta*Deta1bc.*deta1dz_modified);
 tend.fluid(2).mvareta.diffuse = -2*(Deta2ed.*deta2dz + settings.buoy_correl_eta*Deta2bc.*deta2dz_modified);
 
-%plot_detadz
-%plot_dbdz
-
 % Just for testing
 tend.fluid(1).mvareta.bc = -2*Deta1bc.*deta1dz_modified;
 tend.fluid(2).mvareta.bc = -2*Deta2bc.*deta2dz_modified;
@@ -667,6 +664,10 @@ tend.fluid(2).mvarq.diffent = eos.sigma2.*corrde;
 tend.fluid(1).mvarq.dissn = - m1.*varq1./scales.T_turb1;
 tend.fluid(2).mvarq.dissn = - m2.*varq2./scales.T_turb2;
 
+%plot_detadz
+%plot_dqdz
+%plot_dbdz
+
 % ------
 
 % Now include entrainment/detrainment contributions
@@ -677,7 +678,6 @@ sigma1bar(2:nz) = grid.abovew(2:nz).*sigma1(2:nz) + grid.beloww(2:nz).*sigma1(1:
 sigma1bar(1)   = sigma1bar(2);
 sigma1bar(nzp) = sigma1bar(nz);
 buoy = gravity*sigma1bar.*(eos.rhow1 - eos.rhow2)./eos.rhow2;
-%buoyx = gravity*sigma1bar.*(eosx.rhow1 - eosx.rhow2)./eosx.rhow2;
 % Calculate resolved buoyancy flux while we're here
 buoy_flux_res = F2.*buoy./sigma1bar;
 
