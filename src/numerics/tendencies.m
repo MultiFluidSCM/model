@@ -33,6 +33,8 @@ vareta1 = state.fluid(1).vareta;
 vareta2 = state.fluid(2).vareta;
 varq1   = state.fluid(1).varq;
 varq2   = state.fluid(2).varq;
+covaretaq1 = state.fluid(1).covaretaq;
+covaretaq2 = state.fluid(2).covaretaq;
 constants = settings.constants;
 gravity = constants.phys.gravity;
 bentraint = constants.param.bentraint;
@@ -643,7 +645,6 @@ tend.fluid(2).mvareta.dissn = - m2.*vareta2./scales.T_turb2;
 % SG flux source terms ...
 dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
 dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
-
 % Use a modified dqdz to ensure it remains >= 0 and varies smoothly
 tsq_dbdq = scales.T_turb1.*scales.T_turb1.*dpdzbar.*eos.drdqp1;
 % dq1dz_modified = 0.5*(dq1dz + sqrt(dq1dz.^2 + 1./tsq_dbdq.^2));
@@ -667,6 +668,35 @@ tend.fluid(2).mvarq.dissn = - m2.*varq2./scales.T_turb2;
 %plot_detadz
 %plot_dqdz
 %plot_dbdz
+
+% ------
+
+% eta-q covariance
+% Neglect transport terms (MYNN level 2.5)
+
+% SG flux source terms
+tend.fluid(1).mcovaretaq.diffuse = -(Dq1ed.*deta1dz + Deta1ed.*dq1dz ...
+                                   + settings.buoy_correl_q  *Dq1bc  .*deta1dz_modified ...
+                                   + settings.buoy_correl_eta*Deta1bc.*dq1dz_modified);
+tend.fluid(2).mcovaretaq.diffuse = -(Dq2ed.*deta2dz + Deta2ed.*dq2dz ...
+                                   + settings.buoy_correl_q  *Dq2bc  .*deta2dz_modified ...
+                                   + settings.buoy_correl_eta*Deta2bc.*dq2dz_modified);
+% Just for testing
+tend.fluid(1).mcovaretaq.bc = - (Dq1bc  .*deta1dz_modified ...
+                               + Deta1bc.*dq1dz_modified);
+tend.fluid(2).mcovaretaq.bc = - (Dq2bc  .*deta2dz_modified ...
+                               + Deta2bc.*dq2dz_modified);
+
+% `diffent' source terms
+corrde = (eta2 - eta1).*tend.fluid(1).mq.diffent ...
+       + (q2   - q1  ).*tend.fluid(1).meta.diffent;
+corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
+tend.fluid(1).mcovaretaq.diffent = eos.sigma1.*corrde;
+tend.fluid(2).mcovaretaq.diffent = eos.sigma2.*corrde;
+
+% Dissipation terms
+tend.fluid(1).mcovaretaq.dissn = - m1.*covaretaq1./scales.T_turb1;
+tend.fluid(2).mcovaretaq.dissn = - m2.*covaretaq2./scales.T_turb2;
 
 % ------
 
@@ -756,7 +786,7 @@ deta12_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
 tend.fluid(1).mvareta.relabel = M12.*(vareta2 - vareta1 + deta12_1_sq) ...
                               - M21.*(                    deta21_1_sq);
 tend.fluid(2).mvareta.relabel = M21.*(vareta1 - vareta2 + deta21_2_sq) ...
-                              - M12.*(                  + deta12_2_sq);
+                              - M12.*(                    deta12_2_sq);
 
 % Entrained and detrained values of q variance
 % Note these are quasi-advective form tendencies
@@ -772,7 +802,24 @@ dq12_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
 tend.fluid(1).mvarq.relabel = M12.*(varq2 - varq1 + dq12_1_sq) ...
                             - M21.*(                dq21_1_sq);
 tend.fluid(2).mvarq.relabel = M21.*(varq1 - varq2 + dq21_2_sq) ...
-                            - M12.*(              + dq12_2_sq);
+                            - M12.*(                dq12_2_sq);
+
+                        
+% Entrained and detrained values of eta-q covariance
+% Note these are quasi-advective form tendencies
+% `Upwind' approximation for transferred variances
+temp = (relabel.qhat12 - q1).*(relabel.etahat12 - eta1);
+dqdeta12_1 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.qhat21 - q1).*(relabel.etahat21 - eta1);
+dqdeta21_1 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.qhat21 - q2).*(relabel.etahat21 - eta2);
+dqdeta21_2 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+temp = (relabel.qhat12 - q2).*(relabel.etahat12 - eta2);
+dqdeta12_2 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+tend.fluid(1).mcovaretaq.relabel = M12.*(covaretaq2 - covaretaq1 + dqdeta12_1) ...
+                                 - M21.*(                          dqdeta21_1);
+tend.fluid(2).mcovaretaq.relabel = M21.*(covaretaq1 - covaretaq2 + dqdeta21_2) ...
+                                 - M12.*(                          dqdeta12_2);
 
 % ------
 
@@ -887,6 +934,16 @@ tend.fluid(2).mvarq.tot = tend.fluid(2).mvarq.diffuse ...
                         + tend.fluid(2).mvarq.dissn ...
                         + tend.fluid(2).mvarq.relabel;
                     
+% eta-q covariance
+tend.fluid(1).mcovaretaq.tot = tend.fluid(1).mcovaretaq.diffuse ...
+                             + tend.fluid(1).mcovaretaq.diffent ...
+                             + tend.fluid(1).mcovaretaq.dissn ...
+                             + tend.fluid(1).mcovaretaq.relabel;
+tend.fluid(2).mcovaretaq.tot = tend.fluid(2).mcovaretaq.diffuse ...
+                             + tend.fluid(2).mcovaretaq.diffent ...
+                             + tend.fluid(2).mcovaretaq.dissn ...
+                             + tend.fluid(2).mcovaretaq.relabel;
+
 % For testing:
 % check_equal_tendencies
 
