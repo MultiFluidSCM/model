@@ -628,7 +628,7 @@ tend.fluid(1).mvareta.bc = -2*Deta1bc.*deta1dz_modified;
 tend.fluid(2).mvareta.bc = -2*Deta2bc.*deta2dz_modified;
 
 % `diffent' source terms
-corrde = (eta2 - eta1).*tend.fluid(1).meta.diffent;
+corrde = 2*(eta2 - eta1).*tend.fluid(1).meta.diffent;
 corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
 tend.fluid(1).mvareta.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvareta.diffent = eos.sigma2.*corrde;
@@ -656,7 +656,7 @@ tend.fluid(1).mvarq.diffuse = -2*(Dq1ed.*dq1dz + settings.buoy_correl_q*Dq1bc.*d
 tend.fluid(2).mvarq.diffuse = -2*(Dq2ed.*dq2dz + settings.buoy_correl_q*Dq2bc.*dq2dz_modified);
 
 % `diffent' source terms
-corrde = (q2 - q1).*tend.fluid(1).mq.diffent;
+corrde = 2*(q2 - q1).*tend.fluid(1).mq.diffent;
 corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
 tend.fluid(1).mvarq.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvarq.diffent = eos.sigma2.*corrde;
