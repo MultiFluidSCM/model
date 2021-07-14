@@ -538,10 +538,10 @@ tend.fluid(2).mtke.diffent = - corrde;
 
 % Shear generation
 % Consistent with free slip at top boundary
-corrdew       = (w2 - w1).*tend.fluid(1).mw.diffent;
+corrdew       = 2*(w2 - w1).*tend.fluid(1).mw.diffent;
 corrdew       = grid.aboves.*corrdew(2:nzp) + grid.belows.*corrdew(1:nz);
-corrdeu       = (u2 - u1).*tend.fluid(1).mu.diffent;
-corrdev       = (v2 - v1).*tend.fluid(1).mv.diffent;
+corrdeu       = 2*(u2 - u1).*tend.fluid(1).mu.diffent;
+corrdev       = 2*(v2 - v1).*tend.fluid(1).mv.diffent;
 dudz(1)       =  u1(1)/dzw(1);
 dudz(2:nz)    = (u1(2:nz) - u1(1:nz-1))./dzw(2:nz);
 dudz(nzp)     =  0;
@@ -628,7 +628,7 @@ tend.fluid(1).mvareta.bc = -2*Deta1bc.*deta1dz;
 tend.fluid(2).mvareta.bc = -2*Deta2bc.*deta2dz;
 
 % `diffent' source terms
-corrde = (eta2 - eta1).*tend.fluid(1).meta.diffent;
+corrde = 2*(eta2 - eta1).*tend.fluid(1).meta.diffent;
 corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
 tend.fluid(1).mvareta.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvareta.diffent = eos.sigma2.*corrde;
@@ -649,7 +649,7 @@ tend.fluid(1).mvarq.diffuse = -2*Dq1.*dq1dz;
 tend.fluid(2).mvarq.diffuse = -2*Dq2.*dq2dz;
 
 % `diffent' source terms
-corrde = (q2 - q1).*tend.fluid(1).mq.diffent;
+corrde = 2*(q2 - q1).*tend.fluid(1).mq.diffent;
 corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
 tend.fluid(1).mvarq.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvarq.diffent = eos.sigma2.*corrde;

@@ -121,9 +121,9 @@ if (dwdz.entrain | dwdz.detrain) & ischeme == 4
             bdetraint_dwdz = (etahat12_dwdz - eta1)./deltaeta;
             
             % Precaution to prevent too-extreme values
-            bdetrainw_dwdz = min(3, max(-2, bdetrainw_dwdz));
-            bdetrainq_dwdz = min(3, max(-2, bdetrainq_dwdz));
-            bdetraint_dwdz = min(3, max(-2, bdetraint_dwdz));
+            bdetrainw_dwdz = min(2, max(-1, bdetrainw_dwdz));
+            bdetrainq_dwdz = min(2, max(-1, bdetrainq_dwdz));
+            bdetraint_dwdz = min(2, max(-1, bdetraint_dwdz));
             
             % Remove noise from the b-coefficients in places where no transfer is occuring.
             % If the transfer from dw/dz detrainment is very small, set the coefficient to 1.
@@ -138,17 +138,52 @@ if (dwdz.entrain | dwdz.detrain) & ischeme == 4
         
         % Entrainment
         if dwdz.entrain
-            w1std = sqrt(tke1*2/3) + 1e-8*(tke1 == 0);
+            w1std   = sqrt(tke1*2/3);
+            q1std   = sqrt(state.fluid(1).varq);
+            eta1std = sqrt(state.fluid(1).vareta);
+            
+            % Avoid division by zero
+            w1std   = w1std   + 1e-8*(w1std   == 0);
+            q1std   = q1std   + 1e-8*(q1std   == 0);
+            eta1std = eta1std + 1e-8*(eta1std == 0);
+            
+            % Standard deviation at w-levels
+            w1stdw   = weight_to_w(grid, w1std);
+            q1stdw   = weight_to_w(grid, q1std);
+            eta1stdw = weight_to_w(grid, eta1std);
             
             % Quantity which described how much of a pdf is transferred based on the transfer rate
             % See McIntyre 2020 Thesis, chapter 4.2
             pdf_factor21 = sqrt(2)*erfinv(2*dt*rate_sort21 - 1);
             
-            wcutoff21 = w1 - w1std.*pdf_factor21;
+            % Part of PDF transferred is -infinity to cutoff below
+            wcutoff21   = w1   - weight_to_w(grid, w1std   .* pdf_factor21);
+            qcutoff21   = q1   - weight_to_w(grid, q1std   .* pdf_factor21);
+            etacutoff21 = eta1 - weight_to_w(grid, eta1std .* pdf_factor21);
             
-            what21_dwdz = w1 - w1std .* exp(-0.5 * ((w1-wcutoff21)./w1std).^2) / sqrt(2*pi);
-        
+            % Mean of part of PDF transferred
+            what21_dwdz = w1 + w1stdw .* exp(-0.5 * ((w1-wcutoff21)./w1stdw).^2) / sqrt(2*pi);
+            qhat21_dwdz = q1 + q1stdw .* exp(-0.5 * ((q1-qcutoff21)./q1stdw).^2) / sqrt(2*pi);
+            etahat21_dwdz = eta1 + eta1stdw .* exp(-0.5 * ((eta1-etacutoff21)./eta1stdw).^2) / sqrt(2*pi);
+            
             bentrainw_dwdz = (what21_dwdz - w2)./-deltaw;
+            bentrainq_dwdz = (qhat21_dwdz - q2)./-deltaq;
+            bentraint_dwdz = (etahat21_dwdz - eta2)./-deltaeta;
+            
+            % Precaution to prevent too-extreme values
+            bentrainw_dwdz = min(2, max(-1, bentrainw_dwdz));
+            bentrainq_dwdz = min(2, max(-1, bentrainq_dwdz));
+            bentraint_dwdz = min(2, max(-1, bentraint_dwdz));
+            
+            % Remove noise from the b-coefficients in places where no transfer is occuring.
+            % If the transfer from dw/dz detrainment is very small, set the coefficient to 1.
+            % If this is not done, the noise/spikes can be interpolated onto regions where transfer
+            % is occuring which can cause the simulation to crash.
+            filter = weight_to_w(grid, relabel.M21_dwdz) > 1e-5;
+            % filter = weight_to_w(grid, relabel.M12_dwdz/(relabel.M12_dwdz + 1e-8*(relabel.M12_dwdz == 0)));
+            bentrainw_dwdz = bentrainw_dwdz .* filter + (1-filter);
+            bentrainq_dwdz = bentrainq_dwdz .* filter + (1-filter);
+            bentraint_dwdz = bentraint_dwdz .* filter + (1-filter);
         end
     end
 

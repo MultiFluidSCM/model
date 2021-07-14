@@ -62,6 +62,135 @@ dM21dm2_mix = mix.entrain * (case1.*zeros(1,nz) + case2.*rate_mix.*(2*mf1.*mf1 -
 dM12dm1_mix = mix.detrain * (case1.*rate_mix    + case2.*rate_mix.*(2*mf2.*mf2 - sigma20) + case3.*zeros(1,nz));
 dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1            + case3.*zeros(1,nz));
 
+% Default transfer coefficients
+bdetrainw_mix = mix.bdetrainw;
+bentrainw_mix = mix.bentrainw;
+bdetrainq_mix = mix.bdetrainq;
+bentrainq_mix = mix.bentrainq;
+bdetraint_mix = mix.bdetraint;
+bentraint_mix = mix.bentraint;
+bdetrainw_mix_cloud = mix_cloud.bdetrainw;
+bentrainw_mix_cloud = mix_cloud.bentrainw;
+bdetrainq_mix_cloud = mix_cloud.bdetrainq;
+bentrainq_mix_cloud = mix_cloud.bentrainq;
+bdetraint_mix_cloud = mix_cloud.bdetraint;
+bentraint_mix_cloud = mix_cloud.bentraint;
+
+% Calculate the transfer (b) coefficients based on the transfer rate and the PDFs
+if constants.param.mix.use_pdf
+    deltaw   = w2-w1 + 1e-8*(abs(w2-w1) == 0);
+    deltaq   = q2-q1 + 1e-8*(abs(q2-q1) == 0);
+    deltaeta = eta2-eta1 + 1e-8*(abs(eta2-eta1) == 0);
+    
+    % Detrainment
+    if mix.detrain
+        w2std   = sqrt(tke2*2/3);
+        q2std   = sqrt(state.fluid(2).varq);
+        eta2std = sqrt(state.fluid(2).vareta);
+        
+        % Avoid division by zero
+        w2std   = w2std   + 1e-8*(w2std   == 0);
+        q2std   = q2std   + 1e-8*(q2std   == 0);
+        eta2std = eta2std + 1e-8*(eta2std == 0);
+        
+        % Standard deviation at w-levels
+        w2stdw   = weight_to_w(grid, w2std);
+        q2stdw   = weight_to_w(grid, q2std);
+        eta2stdw = weight_to_w(grid, eta2std);
+        
+        % Quantity which described how much of a pdf is transferred based on the transfer rate
+        % See McIntyre 2020 Thesis, chapter 4.2
+        pdf_factor12 = sqrt(2)*erfinv(2*dt*dM12dm2_mix - 1);
+        
+        % Part of PDF transferred is -infinity to cutoff below
+        wcutoff12   = w2   + weight_to_w(grid, w2std   .* pdf_factor12);
+        qcutoff12   = q2   + weight_to_w(grid, q2std   .* pdf_factor12);
+        etacutoff12 = eta2 + weight_to_w(grid, eta2std .* pdf_factor12);
+        
+        % Mean of part of PDF transferred
+        what12_mix = w2 - w2stdw .* exp(-0.5 * ((w2-wcutoff12)./w2stdw).^2) / sqrt(2*pi);
+        qhat12_mix = q2 - q2stdw .* exp(-0.5 * ((q2-qcutoff12)./q2stdw).^2) / sqrt(2*pi);
+        etahat12_mix = eta2 - eta2stdw .* exp(-0.5 * ((eta2-etacutoff12)./eta2stdw).^2) / sqrt(2*pi);
+        
+        bdetrainw_mix = (what12_mix - w1)./deltaw;
+        bdetrainq_mix = (qhat12_mix - q1)./deltaq;
+        bdetraint_mix = (etahat12_mix - eta1)./deltaeta;
+        
+        % Precaution to prevent too-extreme values
+        bdetrainw_mix = min(2, max(-1, bdetrainw_mix));
+        bdetrainq_mix = min(2, max(-1, bdetrainq_mix));
+        bdetraint_mix = min(2, max(-1, bdetraint_mix));
+        
+        % Remove noise from the b-coefficients in places where no transfer is occuring.
+        % If the transfer from dw/dz detrainment is very small, set the coefficient to 1.
+        % If this is not done, the noise/spikes can be interpolated onto regions where transfer
+        % is occuring which can cause the simulation to crash.
+        filter = weight_to_w(grid, relabel.M12_mix) > 1e-4;
+        % filter = weight_to_w(grid, relabel.M12_mix/(relabel.M12_mix + 1e-8*(relabel.M12_mix == 0)));
+        bdetrainw_mix = bdetrainw_mix .* filter + (1-filter);
+        bdetrainq_mix = bdetrainq_mix .* filter + (1-filter);
+        bdetraint_mix = bdetraint_mix .* filter + (1-filter);
+        
+        bdetrainw_mix_cloud = bdetrainw_mix;
+        bdetrainq_mix_cloud = bdetrainq_mix;
+        bdetraint_mix_cloud = bdetraint_mix;
+    end
+    
+    % Entrainment
+    if mix.entrain
+        w1std   = sqrt(tke1*2/3);
+        q1std   = sqrt(state.fluid(1).varq);
+        eta1std = sqrt(state.fluid(1).vareta);
+        
+        % Avoid division by zero
+        w1std   = w1std   + 1e-8*(w1std   == 0);
+        q1std   = q1std   + 1e-8*(q1std   == 0);
+        eta1std = eta1std + 1e-8*(eta1std == 0);
+        
+        % Standard deviation at w-levels
+        w1stdw   = weight_to_w(grid, w1std);
+        q1stdw   = weight_to_w(grid, q1std);
+        eta1stdw = weight_to_w(grid, eta1std);
+        
+        % Quantity which described how much of a pdf is transferred based on the transfer rate
+        % See McIntyre 2020 Thesis, chapter 4.2
+        pdf_factor21 = sqrt(2)*erfinv(2*dt*dM21dm1_mix - 1);
+        
+        % Part of PDF transferred is -infinity to cutoff below
+        wcutoff21   = w1   - weight_to_w(grid, w1std   .* pdf_factor21);
+        qcutoff21   = q1   - weight_to_w(grid, q1std   .* pdf_factor21);
+        etacutoff21 = eta1 - weight_to_w(grid, eta1std .* pdf_factor21);
+        
+        % Mean of part of PDF transferred
+        what21_mix = w1 + w1stdw .* exp(-0.5 * ((w1-wcutoff21)./w1stdw).^2) / sqrt(2*pi);
+        qhat21_mix = q1 + q1stdw .* exp(-0.5 * ((q1-qcutoff21)./q1stdw).^2) / sqrt(2*pi);
+        etahat21_mix = eta1 + eta1stdw .* exp(-0.5 * ((eta1-etacutoff21)./eta1stdw).^2) / sqrt(2*pi);
+        
+        bentrainw_mix = (what21_mix - w2)./-deltaw;
+        bentrainq_mix = (qhat21_mix - q2)./-deltaq;
+        bentraint_mix = (etahat21_mix - eta2)./-deltaeta;
+        
+        % Precaution to prevent too-extreme values
+        bentrainw_mix = min(2, max(-1, bentrainw_mix));
+        bentrainq_mix = min(2, max(-1, bentrainq_mix));
+        bentraint_mix = min(2, max(-1, bentraint_mix));
+        
+        % Remove noise from the b-coefficients in places where no transfer is occuring.
+        % If the transfer from dw/dz detrainment is very small, set the coefficient to 1.
+        % If this is not done, the noise/spikes can be interpolated onto regions where transfer
+        % is occuring which can cause the simulation to crash.
+        filter = weight_to_w(grid, relabel.M21_mix) > 1e-4;
+        % filter = weight_to_w(grid, relabel.M12_mix/(relabel.M12_mix + 1e-8*(relabel.M12_mix == 0)));
+        bentrainw_mix = bentrainw_mix .* filter + (1-filter);
+        bentrainq_mix = bentrainq_mix .* filter + (1-filter);
+        bentraint_mix = bentraint_mix .* filter + (1-filter);
+        
+        bentrainw_mix_cloud = bentrainw_mix;
+        bentrainq_mix_cloud = bentrainq_mix;
+        bentraint_mix_cloud = bentraint_mix;
+    end
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Transfer coefficients in the boundary layer
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,12 +198,12 @@ dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1  
 % Entrained and detrained values of eta
 [relabel.etahat12_mix_dry,relabel.detahat12deta1_mix_dry,relabel.detahat12deta2_mix_dry,...
  relabel.etahat21_mix_dry,relabel.detahat21deta1_mix_dry,relabel.detahat21deta2_mix_dry] ...
-    = findqhat(eta1, eta2, mix.bentraint, mix.bdetraint);
+    = findqhat(eta1, eta2, bentraint_mix, bdetraint_mix);
 
 % Entrained and detrained values of q
 [relabel.qhat12_mix_dry,relabel.dqhat12dq1_mix_dry,relabel.dqhat12dq2_mix_dry,...
  relabel.qhat21_mix_dry,relabel.dqhat21dq1_mix_dry,relabel.dqhat21dq2_mix_dry] ...
-    = findqhat(q1, q2, mix.bentrainq, mix.bdetrainq);
+    = findqhat(q1, q2, bentrainq_mix, bdetrainq_mix);
 
 % Entrained and detrained values of velocities u, v and w
 [relabel.uhat12_mix_dry,relabel.duhat12du1_mix_dry,relabel.duhat12du2_mix_dry,...
@@ -87,7 +216,7 @@ dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1  
 
 [relabel.what12_mix_dry,relabel.dwhat12dw1_mix_dry,relabel.dwhat12dw2_mix_dry,...
  relabel.what21_mix_dry,relabel.dwhat21dw1_mix_dry,relabel.dwhat21dw2_mix_dry] ...
-    = findqhat(w1, w2, mix.bentrainw, mix.bdetrainw);
+    = findqhat(w1, w2, bentrainw_mix, bdetrainw_mix);
     
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,12 +226,12 @@ dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1  
 % Entrained and detrained values of eta
 [relabel.etahat12_mix_cloud,relabel.detahat12deta1_mix_cloud,relabel.detahat12deta2_mix_cloud,...
  relabel.etahat21_mix_cloud,relabel.detahat21deta1_mix_cloud,relabel.detahat21deta2_mix_cloud] ...
-    = findqhat(eta1, eta2, mix_cloud.bentraint, mix_cloud.bdetraint);
+    = findqhat(eta1, eta2, bentraint_mix_cloud, bdetraint_mix_cloud);
 
 % Entrained and detrained values of q
 [relabel.qhat12_mix_cloud,relabel.dqhat12dq1_mix_cloud,relabel.dqhat12dq2_mix_cloud,...
  relabel.qhat21_mix_cloud,relabel.dqhat21dq1_mix_cloud,relabel.dqhat21dq2_mix_cloud] ...
-    = findqhat(q1, q2, mix_cloud.bentrainq, mix_cloud.bdetrainq);
+    = findqhat(q1, q2, bentrainq_mix_cloud, bdetrainq_mix_cloud);
 
 % Entrained and detrained values of velocities u, v and w
 [relabel.uhat12_mix_cloud,relabel.duhat12du1_mix_cloud,relabel.duhat12du2_mix_cloud,...
@@ -115,7 +244,7 @@ dM12dm2_mix = mix.detrain * (case1.*zeros(1,nz) + case2.*2.*rate_mix.*mf1.*mf1  
 
 [relabel.what12_mix_cloud,relabel.dwhat12dw1_mix_cloud,relabel.dwhat12dw2_mix_cloud,...
  relabel.what21_mix_cloud,relabel.dwhat21dw1_mix_cloud,relabel.dwhat21dw2_mix_cloud] ...
-    = findqhat(w1, w2, mix_cloud.bentrainw, mix_cloud.bdetrainw);
+    = findqhat(w1, w2, bentrainw_mix_cloud, bdetrainw_mix_cloud);
 
 
 % Determine liquid water

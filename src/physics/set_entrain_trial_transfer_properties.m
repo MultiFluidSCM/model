@@ -69,40 +69,40 @@ relabel.etahat21 = frac21w_instab.*relabel.etahat21_instab ...
                  + frac21w_mix   .*relabel.etahat21_mix;
 
 % Calculate detrained transfer coefficients
-relabel.bw12 = frac12w_instab.* instab.bdetrainw ...
-             + frac12w_dwdz  .* bdetrainw_dwdz ...
-             + frac12w_mix   .* (1-cloud).*mix.bdetrainw ...
-             + frac12w_mix   .*    cloud .*mix_cloud.bdetrainw;
-relabel.bu12 = frac12_instab .*instab.bdetrainu ...
-             + frac12_dwdz   .*dwdz.bdetrainu ...
-             + frac12_mix    .*(1-cloudp)*mix.bdetrainu ...
-             + frac12_mix    .*   cloudp *mix_cloud.bdetrainu;
-relabel.bq12 = frac12w_instab.*instab.bdetrainq ...
-             + frac12w_dwdz  .*bdetrainq_dwdz ...
-             + frac12w_mix   .*(1-cloud)*mix.bdetrainq ...
-             + frac12w_mix   .*   cloud *mix_cloud.bdetrainq;
-relabel.bt12 = frac12w_instab.*instab.bdetraint ...
-             + frac12w_dwdz  .*bdetraint_dwdz ...
-             + frac12w_mix   .*(1-cloud).*mix.bdetraint ...
-             + frac12w_mix   .*   cloud .*mix_cloud.bdetraint;
+relabel.bw12 = frac12w_instab.*           bdetrainw_instab ...
+             + frac12w_dwdz  .*           bdetrainw_dwdz ...
+             + frac12w_mix   .*(1-cloud).*bdetrainw_mix ...
+             + frac12w_mix   .*   cloud .*bdetrainw_mix_cloud;
+relabel.bu12 = frac12_instab .*           instab.bdetrainu ...
+             + frac12_dwdz   .*           dwdz.bdetrainu ...
+             + frac12_mix    .*(1-cloudp).*mix.bdetrainu ...
+             + frac12_mix    .*   cloudp .*mix_cloud.bdetrainu;
+relabel.bq12 = frac12w_instab.*           bdetrainq_instab ...
+             + frac12w_dwdz  .*           bdetrainq_dwdz ...
+             + frac12w_mix   .*(1-cloud).*bdetrainq_mix ...
+             + frac12w_mix   .*   cloud .*bdetrainq_mix_cloud;
+relabel.bt12 = frac12w_instab.*           bdetraint_instab ...
+             + frac12w_dwdz  .*           bdetraint_dwdz ...
+             + frac12w_mix   .*(1-cloud).*bdetraint_mix ...
+             + frac12w_mix   .*   cloud .*bdetraint_mix_cloud;
 
 % Calculate entrained transfer coefficients
-relabel.bw21 = frac21w_instab.* instab.bentrainw ...
-             + frac21w_dwdz  .* bentrainw_dwdz ...
-             + frac21w_mix   .* (1-cloud).*mix.bentrainw ...
-             + frac21w_mix   .*    cloud .*mix_cloud.bentrainw;
-relabel.bu21 = frac21_instab .*instab.bentrainu ...
-             + frac21_dwdz   .*dwdz.bentrainu ...
+relabel.bw21 = frac21w_instab.*           bentrainw_instab ...
+             + frac21w_dwdz  .*           bentrainw_dwdz ...
+             + frac21w_mix   .*(1-cloud).*bentrainw_mix ...
+             + frac21w_mix   .*   cloud .*bentrainw_mix_cloud;
+relabel.bu21 = frac21_instab .*           instab.bentrainu ...
+             + frac21_dwdz   .*           dwdz.bentrainu ...
              + frac21_mix    .*(1-cloudp).*mix.bentrainu ...
              + frac21_mix    .*   cloudp .*mix_cloud.bentrainu;
-relabel.bq21 = frac21w_instab.*instab.bentrainq ...
-             + frac21w_dwdz  .*bentrainq_dwdz ...
-             + frac21w_mix   .*(1-cloud).*mix.bentrainq ...
-             + frac21w_mix   .*   cloud .*mix_cloud.bentrainq;
-relabel.bt21 = frac21w_instab.*instab.bentraint ...
-             + frac21w_dwdz  .*bentraint_dwdz ...
-             + frac21w_mix   .*(1-cloud).*mix.bentraint ...
-             + frac21w_mix   .*   cloud .*mix_cloud.bentraint;
+relabel.bq21 = frac21w_instab.*           bentrainq_instab ...
+             + frac21w_dwdz  .*           bentrainq_dwdz ...
+             + frac21w_mix   .*(1-cloud).*bentrainq_mix ...
+             + frac21w_mix   .*   cloud .*bentrainq_mix_cloud;
+relabel.bt21 = frac21w_instab.*           bentraint_instab ...
+             + frac21w_dwdz  .*           bentraint_dwdz ...
+             + frac21w_mix   .*(1-cloud).*bentraint_mix ...
+             + frac21w_mix   .*   cloud .*bentraint_mix_cloud;
 
 % Temporary diagnostic to see what b is doing for dwdz only.
 % relabel.bw12 = bdetrainw_dwdz .* (weight_to_w(grid, relabel.M12_dwdz) > 1e-5);
@@ -225,3 +225,110 @@ relabel.detahat21deta2 = frac21w_instab.*relabel.detahat21deta2_instab ...
 % relabel.dqhat21dq2 = relabel.dqhat21dq2_mix;
 % relabel.detahat21deta1 = relabel.detahat21deta1_mix;
 % relabel.detahat21deta2 = relabel.detahat21deta2_mix;
+
+% Calculate the transfer (b) coefficients based on the transfer rate and the PDFs
+if constants.param.use_pdf
+    deltaw   = w2-w1 + 1e-8*(abs(w2-w1) == 0);
+    deltaq   = q2-q1 + 1e-8*(abs(q2-q1) == 0);
+    deltaeta = eta2-eta1 + 1e-8*(abs(eta2-eta1) == 0);
+    
+    % Detrainment
+    if true
+        w2std   = sqrt(tke2*2/3);
+        q2std   = sqrt(state.fluid(2).varq);
+        eta2std = sqrt(state.fluid(2).vareta);
+        
+        % Avoid division by zero
+        w2std   = w2std   + 1e-8*(w2std   == 0);
+        q2std   = q2std   + 1e-8*(q2std   == 0);
+        eta2std = eta2std + 1e-8*(eta2std == 0);
+        
+        % Standard deviation at w-levels
+        w2stdw   = weight_to_w(grid, w2std);
+        q2stdw   = weight_to_w(grid, q2std);
+        eta2stdw = weight_to_w(grid, eta2std);
+        
+        % Quantity which described how much of a pdf is transferred based on the transfer rate
+        % See McIntyre 2020 Thesis, chapter 4.2
+        pdf_factor12 = sqrt(2)*erfinv(2*dt*relabel.dM12dm2 - 1);
+        
+        % Part of PDF transferred is -infinity to cutoff below
+        wcutoff12   = w2   + weight_to_w(grid, w2std   .* pdf_factor12);
+        qcutoff12   = q2   + weight_to_w(grid, q2std   .* pdf_factor12);
+        etacutoff12 = eta2 + weight_to_w(grid, eta2std .* pdf_factor12);
+        
+        % Mean of part of PDF transferred
+        relabel.what12 = w2 - w2stdw .* exp(-0.5 * ((w2-wcutoff12)./w2stdw).^2) / sqrt(2*pi);
+        relabel.qhat12 = q2 - q2stdw .* exp(-0.5 * ((q2-qcutoff12)./q2stdw).^2) / sqrt(2*pi);
+        relabel.etahat12 = eta2 - eta2stdw .* exp(-0.5 * ((eta2-etacutoff12)./eta2stdw).^2) / sqrt(2*pi);
+        
+        bdetrainw = (relabel.what12 - w1)./deltaw;
+        bdetrainq = (relabel.qhat12 - q1)./deltaq;
+        bdetraint = (relabel.etahat12 - eta1)./deltaeta;
+        
+        % Precaution to prevent too-extreme values
+        bdetrainw = min(2, max(-1, bdetrainw));
+        bdetrainq = min(2, max(-1, bdetrainq));
+        bdetraint = min(2, max(-1, bdetraint));
+        
+        % Remove noise from the b-coefficients in places where no transfer is occuring.
+        % If the transfer from dw/dz detrainment is very small, set the coefficient to 1.
+        % If this is not done, the noise/spikes can be interpolated onto regions where transfer
+        % is occuring which can cause the simulation to crash.
+        filter = weight_to_w(grid, relabel.M12) > 1e-4;
+        % filter = weight_to_w(grid, relabel.M12/(relabel.M12 + 1e-8*(relabel.M12 == 0)));
+        relabel.bw12 = bdetrainw .* filter + (1-filter);
+        relabel.bq12 = bdetrainq .* filter + (1-filter);
+        relabel.bt12 = bdetraint .* filter + (1-filter);
+    end
+    
+    % Entrainment
+    if true
+        w1std   = sqrt(tke1*2/3);
+        q1std   = sqrt(state.fluid(1).varq);
+        eta1std = sqrt(state.fluid(1).vareta);
+        
+        % Avoid division by zero
+        w1std   = w1std   + 1e-8*(w1std   == 0);
+        q1std   = q1std   + 1e-8*(q1std   == 0);
+        eta1std = eta1std + 1e-8*(eta1std == 0);
+        
+        % Standard deviation at w-levels
+        w1stdw   = weight_to_w(grid, w1std);
+        q1stdw   = weight_to_w(grid, q1std);
+        eta1stdw = weight_to_w(grid, eta1std);
+        
+        % Quantity which described how much of a pdf is transferred based on the transfer rate
+        % See McIntyre 2020 Thesis, chapter 4.2
+        pdf_factor21 = sqrt(2)*erfinv(2*dt*relabel.dM21dm1 - 1);
+        
+        % Part of PDF transferred is -infinity to cutoff below
+        wcutoff21   = w1   - weight_to_w(grid, w1std   .* pdf_factor21);
+        qcutoff21   = q1   - weight_to_w(grid, q1std   .* pdf_factor21);
+        etacutoff21 = eta1 - weight_to_w(grid, eta1std .* pdf_factor21);
+        
+        % Mean of part of PDF transferred
+        relabel.what21 = w1 + w1stdw .* exp(-0.5 * ((w1-wcutoff21)./w1stdw).^2) / sqrt(2*pi);
+        relabel.qhat21 = q1 + q1stdw .* exp(-0.5 * ((q1-qcutoff21)./q1stdw).^2) / sqrt(2*pi);
+        relabel.etahat21 = eta1 + eta1stdw .* exp(-0.5 * ((eta1-etacutoff21)./eta1stdw).^2) / sqrt(2*pi);
+        
+        bentrainw = (relabel.what21 - w2)./-deltaw;
+        bentrainq = (relabel.qhat21 - q2)./-deltaq;
+        bentraint = (relabel.etahat21 - eta2)./-deltaeta;
+        
+        % Precaution to prevent too-extreme values
+        bentrainw = min(2, max(-1, bentrainw));
+        bentrainq = min(2, max(-1, bentrainq));
+        bentraint = min(2, max(-1, bentraint));
+        
+        % Remove noise from the b-coefficients in places where no transfer is occuring.
+        % If the transfer from dw/dz detrainment is very small, set the coefficient to 1.
+        % If this is not done, the noise/spikes can be interpolated onto regions where transfer
+        % is occuring which can cause the simulation to crash.
+        filter = weight_to_w(grid, relabel.M21) > 1e-4;
+        % filter = weight_to_w(grid, relabel.M12/(relabel.M12 + 1e-8*(relabel.M12 == 0)));
+        relabel.bw21 = bentrainw .* filter + (1-filter);
+        relabel.bq21 = bentrainq .* filter + (1-filter);
+        relabel.bt21 = bentraint .* filter + (1-filter);
+    end
+end

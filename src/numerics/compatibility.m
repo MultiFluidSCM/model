@@ -50,9 +50,20 @@ if not(isfield(settings.constants.param, 'sigma_weighted_tke'))
     settings.constants.param.sigma_weighted_tke = false;
 end
 
-% June 2021: Added option for dw/dz transfer to use pdf properties instead of b-coefficients
+% June 2021: Added option for transfers to use pdf properties instead of b-coefficients
+if not(isfield(settings.constants.param, 'use_pdf'))
+    settings.constants.param.use_pdf = false;
+end
 if not(isfield(settings.constants.param.dwdz, 'use_pdf'))
     disp("Using b-coefficients for dw/dz transfer (if dw/dz transfer enabled)");
     settings.constants.param.dwdz.use_pdf = false;
+end
+if not(isfield(settings.constants.param.instab, 'use_pdf'))
+    disp("Using b-coefficients for instability transfer (if instability transfer enabled)");
+    settings.constants.param.instab.use_pdf = false;
+end
+if not(isfield(settings.constants.param.mix, 'use_pdf'))
+    disp("Using b-coefficients for mixing transfer (if mixing transfer enabled)");
+    settings.constants.param.mix.use_pdf = false;
 end
 

@@ -138,6 +138,25 @@ end
 relabel.M12 = relabel.M12_instab + relabel.M12_mix + relabel.M12_sort + relabel.M12_dwdz;
 relabel.M21 = relabel.M21_instab + relabel.M21_mix + relabel.M21_sort + relabel.M21_dwdz;
 
+% Derivatives
+relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab + dM21dm1_dwdz;% + dM21dm1_sort; % Is sort contribution already included in Newton solver separately?
+relabel.dM21dm2   = dM21dm2_mix + dM21dm2_instab + dM21dm2_dwdz;% + dM21dm2_sort;
+relabel.dM21dw1   = zeros(1,nz);
+relabel.dM21dw2   = zeros(1,nz);
+relabel.dM21deta1 = zeros(1,nz);
+relabel.dM21deta2 = zeros(1,nz);
+relabel.dM21dq1   = zeros(1,nz);
+relabel.dM21dq2   = zeros(1,nz);
+
+relabel.dM12dm1   = dM12dm1_mix + dM12dm1_instab + dM12dm1_dwdz;% + dM12dm1_sort;
+relabel.dM12dm2   = dM12dm2_mix + dM12dm2_instab + dM12dm2_dwdz;% + dM12dm2_sort;
+relabel.dM12dw1   = zeros(1,nz);
+relabel.dM12dw2   = zeros(1,nz);
+relabel.dM12deta1 = zeros(1,nz);
+relabel.dM12deta2 = zeros(1,nz);
+relabel.dM12dq1   = zeros(1,nz);
+relabel.dM12dq2   = zeros(1,nz);
+
 % Get the properties of the entrained and detrained fluids
 set_entrain_trial_transfer_properties
 
@@ -166,26 +185,6 @@ relabel.what12(nzp)   = 0;
 relabel.what21(1  )   = 0;
 relabel.what21(nzp)   = 0;
     
-% Derivatives
-relabel.dM21dm1   = dM21dm1_mix + dM21dm1_instab + dM21dm1_dwdz;% + dM21dm1_sort; % Is sort contribution already included in Newton solver separately?
-relabel.dM21dm2   = dM21dm2_mix + dM21dm2_instab + dM21dm2_dwdz;% + dM21dm2_sort;
-relabel.dM21dw1   = zeros(1,nz);
-relabel.dM21dw2   = zeros(1,nz);
-relabel.dM21deta1 = zeros(1,nz);
-relabel.dM21deta2 = zeros(1,nz);
-relabel.dM21dq1   = zeros(1,nz);
-relabel.dM21dq2   = zeros(1,nz);
-
-relabel.dM12dm1   = dM12dm1_mix + dM12dm1_instab + dM12dm1_dwdz;% + dM12dm1_sort;
-relabel.dM12dm2   = dM12dm2_mix + dM12dm2_instab + dM12dm2_dwdz;% + dM12dm2_sort;
-relabel.dM12dw1   = zeros(1,nz);
-relabel.dM12dw2   = zeros(1,nz);
-relabel.dM12deta1 = zeros(1,nz);
-relabel.dM12deta2 = zeros(1,nz);
-relabel.dM12dq1   = zeros(1,nz);
-relabel.dM12dq2   = zeros(1,nz);
-    
-
 
 % Interpolate entrainment and detrainment to w levels
 % using `reversed' weighting for conservation
