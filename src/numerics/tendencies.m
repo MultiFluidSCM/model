@@ -538,10 +538,10 @@ tend.fluid(2).mtke.diffent = - corrde;
 
 % Shear generation
 % Consistent with free slip at top boundary
-corrdew       = 2*(w2 - w1).*tend.fluid(1).mw.diffent;
+corrdew       = (w2 - w1).*tend.fluid(1).mw.diffent;
 corrdew       = grid.aboves.*corrdew(2:nzp) + grid.belows.*corrdew(1:nz);
-corrdeu       = 2*(u2 - u1).*tend.fluid(1).mu.diffent;
-corrdev       = 2*(v2 - v1).*tend.fluid(1).mv.diffent;
+corrdeu       = (u2 - u1).*tend.fluid(1).mu.diffent;
+corrdev       = (v2 - v1).*tend.fluid(1).mv.diffent;
 dudz(1)       =  u1(1)/dzw(1);
 dudz(2:nz)    = (u1(2:nz) - u1(1:nz-1))./dzw(2:nz);
 dudz(nzp)     =  0;
