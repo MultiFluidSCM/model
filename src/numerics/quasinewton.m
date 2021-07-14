@@ -823,7 +823,7 @@ save_res_convergence
     build_2M_linear_system
 
     % Now build the right hand side
-    ix = 1:10:10*nz-9;
+    ix = 1:12:12*nz-11;
     rhs2M(ix) = res1tke;
     ix = ix + 1;
     rhs2M(ix) = res2tke;
@@ -843,22 +843,28 @@ save_res_convergence
     rhs2M(ix) = tend.fluid(1).mvarq.tot;
     ix = ix + 1;
     rhs2M(ix) = tend.fluid(2).mvarq.tot;
+    ix = ix + 1;
+    rhs2M(ix) = tend.fluid(1).mcovaretaq.tot;
+    ix = ix + 1;
+    rhs2M(ix) = tend.fluid(2).mcovaretaq.tot;
     
     % Now solve the linear system    
     xx = Ndiagsolveb(dd,rhs2M);
     %xx = Ndiagsolvex(dd,rhs2M);
     
     % and unpack the increments
-    inc_tke1     = xx( 1:10:10*nz-9);
-    inc_tke2     = xx( 2:10:10*nz-8);
-    inc_weta1    = xx( 3:10:10*nz-7);
-    inc_weta2    = xx( 4:10:10*nz-6);
-    inc_wq1      = xx( 5:10:10*nz-5);
-    inc_wq2      = xx( 6:10:10*nz-4);
-    inc_vareta1  = xx( 7:10:10*nz-3);
-    inc_vareta2  = xx( 8:10:10*nz-2);
-    inc_varq1    = xx( 9:10:10*nz-1);
-    inc_varq2    = xx(10:10:10*nz);
+    inc_tke1       = xx( 1:12:12*nz-11);
+    inc_tke2       = xx( 2:12:12*nz-10);
+    inc_weta1      = xx( 3:12:12*nz- 9);
+    inc_weta2      = xx( 4:12:12*nz- 8);
+    inc_wq1        = xx( 5:12:12*nz- 7);
+    inc_wq2        = xx( 6:12:12*nz- 6);
+    inc_vareta1    = xx( 7:12:12*nz- 5);
+    inc_vareta2    = xx( 8:12:12*nz- 4);
+    inc_varq1      = xx( 9:12:12*nz- 3);
+    inc_varq2      = xx(10:12:12*nz- 2);
+    inc_covaretaq1 = xx(11:12:12*nz- 1);
+    inc_covaretaq2 = xx(12:12:12*nz);
     
 %     if conv_diag
 %         % For testing, compute predicted residuals using linearization
@@ -889,13 +895,15 @@ save_res_convergence
         disp(['inc_fix  = ',num2str(inc_fix(krange))])
     end
        
-    % Increment variances
+    % Increment variances and covariances
 % disp('*** bounded var decrements ***')
 % disp('*** frozen eta variances ***')
-    state_new.fluid(1).vareta = max(0.1*state_new.fluid(1).vareta,state_new.fluid(1).vareta + inc_vareta1);
-    state_new.fluid(2).vareta = max(0.1*state_new.fluid(2).vareta,state_new.fluid(2).vareta + inc_vareta2);
-    state_new.fluid(1).varq   = max(0.1*state_new.fluid(1).varq,state_new.fluid(1).varq     + inc_varq1  );
-    state_new.fluid(2).varq   = max(0.1*state_new.fluid(2).varq,state_new.fluid(2).varq     + inc_varq2  );
+    state_new.fluid(1).vareta    = max(0.1*state_new.fluid(1).vareta,state_new.fluid(1).vareta + inc_vareta1);
+    state_new.fluid(2).vareta    = max(0.1*state_new.fluid(2).vareta,state_new.fluid(2).vareta + inc_vareta2);
+    state_new.fluid(1).varq      = max(0.1*state_new.fluid(1).varq,state_new.fluid(1).varq     + inc_varq1  );
+    state_new.fluid(2).varq      = max(0.1*state_new.fluid(2).varq,state_new.fluid(2).varq     + inc_varq2  );
+    state_new.fluid(1).covaretaq = state_new.fluid(1).covaretaq + inc_covaretaq1;
+    state_new.fluid(2).covaretaq = state_new.fluid(2).covaretaq + inc_covaretaq2;
     
     % --------
     
