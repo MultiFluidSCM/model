@@ -202,12 +202,12 @@ Deta2ed(1) = Deta2ed(1) + surface_flux.L1eta2;
 
 % Include buoyancy correlation term
 rr = 0.0;
-covaretaq1 = rr*sqrt(vareta1.*varq1);
-covaretaq2 = rr*sqrt(vareta2.*varq2);
+xcovaretaq1 = rr*sqrt(vareta1.*varq1);
+xcovaretaq2 = rr*sqrt(vareta2.*varq2);
 t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*t_scale1;
-Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*t_scale2;
+Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*xcovaretaq1).*t_scale1;
+Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*xcovaretaq2).*t_scale2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_eta
@@ -300,12 +300,12 @@ Dq2ed(1) = Dq2ed(1) + surface_flux.L1q2;
 % Include buoyancy correlation term
 % Correlations and timescales are computed above
 rr = 0.0;
-covaretaq1 = rr*sqrt(vareta1.*varq1);
-covaretaq2 = rr*sqrt(vareta2.*varq2);
+xcovaretaq1 = rr*sqrt(vareta1.*varq1);
+xcovaretaq2 = rr*sqrt(vareta2.*varq2);
 t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*t_scale1;
-Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*t_scale2;
+Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*xcovaretaq1 + eos.drdqp1.*varq1).*t_scale1;
+Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*xcovaretaq2 + eos.drdqp2.*varq2).*t_scale2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_q

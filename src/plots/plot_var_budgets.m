@@ -84,4 +84,3 @@ xlabel('dmC/dt')
 ylabel(labelz)
 legend('Diff','Dife','Diss','R','Tot','Location','NorthEast')
 set(gca,'FontSize',fs)
-
