@@ -194,7 +194,7 @@ if settings.switches.plot
 
     % Figure 34: 
     if settings.switches.plot_covariances
-        plot_covariances
+        plot_
     end
     
 end
