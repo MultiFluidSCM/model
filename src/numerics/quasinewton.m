@@ -80,7 +80,9 @@ for qn_iter = 1:qn_iter_max
               tendencies(grid,state_new,settings,t_new,dt,switches,old_diff);
     
     % For debugging
-    % dump_tend
+    % if istep > 17
+      dump_tend
+    % end
     
     % Check for nans and infs in tendencies
     %check_this = 'tend';
@@ -294,10 +296,10 @@ for qn_iter = 1:qn_iter_max
 
 % Plots of max residuals vs iteration for checking convergence
 save_res_convergence
-% if (qn_iter == qn_iter_max)
-%     plot_res_convergence
-%     pause
-% end
+if (qn_iter == qn_iter_max)
+    plot_res_convergence
+    pause
+end
 
     if conv_diag
         fs = 15;

@@ -80,7 +80,9 @@ for qn_iter = 1:qn_iter_max
               tendencies(grid,state_new,settings,t_new,dt,switches,old_diff);
     
     % For debugging
-    % dump_tend
+    % if istep > 17
+      dump_tend
+    % end
     
     % Check for nans and infs in tendencies
     %check_this = 'tend';
@@ -294,10 +296,10 @@ for qn_iter = 1:qn_iter_max
 
 % Plots of max residuals vs iteration for checking convergence
 save_res_convergence
-% if (qn_iter == qn_iter_max)
-%     plot_res_convergence
-%     pause
-% end
+if (qn_iter == qn_iter_max)
+    plot_res_convergence
+    pause
+end
 
     if conv_diag
         fs = 15;
@@ -847,11 +849,6 @@ save_res_convergence
     rhs2M(ix) = tend.fluid(1).mcovaretaq.tot;
     ix = ix + 1;
     rhs2M(ix) = tend.fluid(2).mcovaretaq.tot;
-    disp(['tendencies: ',num2str(tend.fluid(1).mcovaretaq.diffuse(2)),' ',...
-                     num2str(tend.fluid(1).mcovaretaq.diffent(2)),' ',...
-                     num2str(tend.fluid(1).mcovaretaq.dissn(2)  ),' ',...
-                     num2str(tend.fluid(1).mcovaretaq.relabel(2)),' ',...
-                     num2str(tend.fluid(1).mcovaretaq.tot(2)    )])
     
     % Now solve the linear system    
     xx = Ndiagsolveb(dd,rhs2M);
@@ -870,7 +867,6 @@ save_res_convergence
     inc_varq2      = xx(10:12:12*nz- 2);
     inc_covaretaq1 = xx(11:12:12*nz- 1);
     inc_covaretaq2 = xx(12:12:12*nz);
-    disp(['increment: ',num2str(tend.fluid(1).mcovaretaq.diffuse(2)) )])
     
 %     if conv_diag
 %         % For testing, compute predicted residuals using linearization
@@ -910,7 +906,6 @@ save_res_convergence
     state_new.fluid(2).varq      = max(0.1*state_new.fluid(2).varq,state_new.fluid(2).varq     + inc_varq2  );
     state_new.fluid(1).covaretaq = state_new.fluid(1).covaretaq + inc_covaretaq1;
     state_new.fluid(2).covaretaq = state_new.fluid(2).covaretaq + inc_covaretaq2;
-    state_new.fluid(1).covaretaq(:)
     
     % --------
     

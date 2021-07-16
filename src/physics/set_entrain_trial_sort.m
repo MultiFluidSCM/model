@@ -56,6 +56,10 @@ for k = 1:nzp
 end
 
 % Detrained fluid properties
+% Note: for good convergence suitable linearizations of these sorting terms
+% should appear in build_linear_system.m and build_2M_linear_system.m.
+% If you change these terms you should make corresponding changes in
+% the linearizations
 relabel.uhat12_sort   = u2;
 relabel.vhat12_sort   = v2;
 relabel.what12_sort   = w2   + wstdw .*chi_hat;
