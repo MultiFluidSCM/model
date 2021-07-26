@@ -81,7 +81,7 @@ for qn_iter = 1:qn_iter_max
     
     % For debugging
     % if istep > 17
-      dump_tend
+    %  dump_tend
     % end
     
     % Check for nans and infs in tendencies
@@ -296,10 +296,10 @@ for qn_iter = 1:qn_iter_max
 
 % Plots of max residuals vs iteration for checking convergence
 save_res_convergence
-if (qn_iter == qn_iter_max)
-    plot_res_convergence
-    pause
-end
+% if (qn_iter == qn_iter_max)
+%     plot_res_convergence
+%     pause
+% end
 
     if conv_diag
         fs = 15;
@@ -459,7 +459,7 @@ end
     
     % and unpack the increments
     
-    % disp('*** zero eta increments ***')
+    % disp('*** half eta increments ***')
     inc_w1   = xx(1:9:9*nz+1);
     inc_w2   = xx(2:9:9*nz+2);
     inc_eta1 = xx(3:9:9*nz+3);
@@ -695,7 +695,7 @@ end
                         + adt*M12.*relabel.duhat12du2;
     
     % Now solve the linear system
-    % disp('*** zero increments ***')
+    % disp('*** zero u2 increments ***')
     inc_u2 = Ndiagsolveb(dd,rhsu);
     %inc_u2 = Ndiagsolvex(dd,rhsu);
     
@@ -793,7 +793,7 @@ end
                         + adt*M12.*relabel.dvhat12dv2;
           
     % Now solve the linear system
-    % disp('*** zero increments ***')
+    % disp('*** zero v2 increments ***')
     inc_v2 = Ndiagsolveb(dd,rhsu);
     %inc_v2 = Ndiagsolvex(dd,rhsu);
     
@@ -899,7 +899,7 @@ end
        
     % Increment variances and covariances
 % disp('*** bounded var decrements ***')
-% disp('*** frozen eta variances ***')
+% disp('*** frozen covariances ***')
     state_new.fluid(1).vareta    = max(0.1*state_new.fluid(1).vareta,state_new.fluid(1).vareta + inc_vareta1);
     state_new.fluid(2).vareta    = max(0.1*state_new.fluid(2).vareta,state_new.fluid(2).vareta + inc_vareta2);
     state_new.fluid(1).varq      = max(0.1*state_new.fluid(1).varq,state_new.fluid(1).varq     + inc_varq1  );
@@ -936,3 +936,4 @@ accdt = adt;
 accumulate
 accumulate_fix
 
+% diagnose_sg_flux

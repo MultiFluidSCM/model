@@ -61,7 +61,7 @@ dd(25,ix) = dd(25,ix) + adt*work.dDtke1dtkea(ikb)./dzp;
 dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap1;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp1;
 % Dissipation term
-dd(13,ix) = dd(13,ix) + adt*m1.*(1.5./scales.L_turb1).*sqrt(tke1);
+dd(13,ix) = dd(13,ix) + adt*m1.*work.dissn_rate1.*work.rate_lin_fac1; %adt*m1.*(1.5./scales.L_turb1).*sqrt(tke1);
 % Relabelling terms - only keep dependence on tke1
 dd(13,ix) = dd(13,ix) + adt*M21;
 
@@ -84,7 +84,7 @@ dd(25,ix) = dd(25,ix) + adt*work.dDtke2dtkea(ikb)./dzp;
 dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap2;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp2;
 % Dissipation term
-dd(13,ix) = dd(13,ix) + adt*m2.*(1.5./scales.L_turb2).*sqrt(tke2);
+dd(13,ix) = dd(13,ix) + adt*m2.*work.dissn_rate2.*work.rate_lin_fac2; %adt*m2.*(1.5./scales.L_turb2).*sqrt(tke2);
 % Relabelling terms - only keep dependence on tke2
 dd(13,ix) = dd(13,ix) + adt*M12;
 
@@ -143,15 +143,6 @@ end
 
 
 % Some quantities needed for variance equations
-
-
-% Factors needed to allow for buoyancy correlation terms in
-% linearization
-% Assume zero correlation between eta and q
-% deta1dz = max(0,deta1dz);
-% deta2dz = max(0,deta2dz);
-% factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdetap1.*work.deta1dz_modified;
-% factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdetap2.*work.deta2dz_modified;
     
 % eta variance1 equation
 ix =  7:12:12*nz-5;
@@ -167,7 +158,7 @@ if settings.buoy_correl_eta
     dd(25,ix) = dd(25,ix) + work.dDtke1dtkea(ikb)./(dzp.*scales.T_turb1);
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m1(ik)./scales.T_turb1(ik);
+dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1(ik); %m1(ik)./scales.T_turb1(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M12(ik);
 dd(14,ix) = dd(14,ix) - M12(ik);
@@ -186,23 +177,10 @@ if settings.buoy_correl_eta
     dd(25,ix) = dd(25,ix) + adt*work.dDtke2dtkea(ikb)./(dzp.*scales.T_turb2);
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m2(ik)./scales.T_turb2(ik);
+dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2(ik); %m2(ik)./scales.T_turb2(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M21(ik);
 dd(12,ix) = dd(12,ix) - M21(ik);
-
-
-% *** detfac = 0*M12bar(k)*relabel.f_sort_chi_hat(k)/max(0.001,sqrt(state_new.fluid(2).vareta(k)));
-% A11 =  M12(k) + m1(k)/scales.T_turb1(k) + settings.buoy_correl_eta*factor1(k);
-% A12 = -M12(k); % *** - (relabel.etahat12(k) - eta1(k))*detfac;
-% A21 = -M21(k);
-% A22 =  M21(k) + m2(k)/scales.T_turb2(k) + settings.buoy_correl_eta*factor2(k); % *** + (relabel.etahat12(k) - eta2(k))*detfac;
-
-% Factors needed to allow for buoyancy correlation terms in
-% linearization
-% Assume zero correlation between eta and q
-% factor1 = 2*t_scale1.*dpdzbar.*m1.*eos.drdqp1.*work.dq1dz_modified;
-% factor2 = 2*t_scale2.*dpdzbar.*m2.*eos.drdqp2.*work.dq2dz_modified;
 
 % Factors needed to account for effect of q2 variance on sorting detrainment
 rrootqvar2 = 1./max(1e-6,sqrt(state_new.fluid(2).varq));
@@ -223,7 +201,7 @@ if settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + work.dDtke1dtkea(ikb)./(dzp.*scales.T_turb1);
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m1(ik)./scales.T_turb1(ik);
+dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1(ik); %m1(ik)./scales.T_turb1(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M12(ik);
 dd(14,ix) = dd(14,ix) - M12(ik);
@@ -247,15 +225,15 @@ if settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + work.dDtke2dtkea(ikb)./(dzp.*scales.T_turb2);
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m2(ik)./scales.T_turb2(ik);
+dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2; %m2(ik)./scales.T_turb2(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M21(ik);
 dd(12,ix) = dd(12,ix) - M21(ik);
 % ... including effect of q2 variance on sorting
-dd( 1,ixb) = dd( 1,ixb) + detfac_dn(2:nz  ).*(relabel.qhat12(2:nz ) - q2(2:nz )).*grid.beloww(2:nz  ).*rrootqvar2(1:nz-1);
+% dd( 1,ixb) = dd( 1,ixb) + detfac_dn(2:nz  ).*(relabel.qhat12(2:nz ) - q2(2:nz )).*grid.beloww(2:nz  ).*rrootqvar2(1:nz-1);
 dd(13,ix ) = dd(13,ix ) + detfac_up        .*(relabel.qhat12(2:nzp) - q2(2:nzp)).*grid.beloww(2:nzp ).*rrootqvar2 ...
                         + detfac_dn        .*(relabel.qhat12(1:nz ) - q2(1:nz )).*grid.abovew(1:nz  ).*rrootqvar2;
-dd(25,ixt) = dd(25,ixt) + detfac_up(1:nz-1).*(relabel.qhat12(2:nz ) - q2(2:nz )).*grid.abovew(1:nz-1).*rrootqvar2(2:nz  );
+% dd(25,ixt) = dd(25,ixt) + detfac_up(1:nz-1).*(relabel.qhat12(2:nz ) - q2(2:nz )).*grid.abovew(1:nz-1).*rrootqvar2(2:nz  );
 
 % eta-q covariance1 equation
 ix =  11:12:12*nz-1;
@@ -277,7 +255,7 @@ if settings.buoy_correl_eta | settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + work.dDtke1dtkea(ikb)./(dzp.*scales.T_turb1);
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m1(ik)./scales.T_turb1(ik);
+dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1; %m1(ik)./scales.T_turb1(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M12(ik);
 dd(14,ix) = dd(14,ix) - M12(ik);
@@ -302,7 +280,7 @@ if settings.buoy_correl_eta | settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + work.dDtke2dtkea(ikb)./(dzp.*scales.T_turb2);
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m2(ik)./scales.T_turb2(ik);
+dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2(ik); %m2(ik)./scales.T_turb2(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M21(ik);
 dd(12,ix) = dd(12,ix) - M21(ik);

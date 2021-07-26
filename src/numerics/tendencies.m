@@ -508,6 +508,44 @@ tend.fluid(2).mv.diffent = - corrde;
 
 % ------
 
+% Dissipation rates for TKE and variances
+dissn_rate1 = 1./scales.T_turb1;
+dissn_rate2 = 1./scales.T_turb2;
+
+% Vertical derivatives of eta and q
+deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
+deta2dz = (eta2(2:nzp) - eta2(1:nz))./grid.dzp;
+dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
+dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
+
+% Bound dissipation rates if buoyancy correlation terms
+% are switched on.
+% Minimum denominator in theoretical formulas
+rmin = 0.5;
+% Stability parameter
+dbdz = dpdzbar.*(eos.drdetap1.*deta1dz + eos.drdqp1.*dq1dz);
+dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
+% Safe dissipation rate
+safe_rate1 = sqrt(-2*dbdz/(1 - rmin));
+% Apply bound
+rate_lin_fac1 = (dissn_rate1 >= safe_rate1)*0.5 + 1;
+dissn_rate1 = max(dissn_rate1,safe_rate1);
+% Stability parameter
+dbdz = dpdzbar.*(eos.drdetap2.*deta2dz + eos.drdqp2.*dq2dz);
+dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
+% Safe dissipation rate
+safe_rate2 = sqrt(-2*dbdz/(1 - rmin));
+% Apply bound
+rate_lin_fac2 = (dissn_rate2 >= safe_rate2)*0.5 + 1;
+dissn_rate2 = max(dissn_rate2,safe_rate2);
+
+%plot_detadz
+%plot_dqdz
+%plot_dbdz
+%plot_rates
+
+% ------
+
 % Advective tke fluxes
 [Ftke1,dFtke1dtkea,dFtke1dtkeb,dtke1udz,tke1ubar] = tracer_flux_p(grid,F1,tke1);
 [Ftke2,dFtke2dtkea,dFtke2dtkeb,dtke2udz,tke2ubar] = tracer_flux_p(grid,F2,tke2);
@@ -585,8 +623,8 @@ tend.fluid(1).mtke.drag = 0.5*tkesrc;
 tend.fluid(2).mtke.drag = 0.5*tkesrc;
 
 % Dissipation term
-tend.fluid(1).mtke.dissn = - m1.*tke1./scales.T_turb1;
-tend.fluid(2).mtke.dissn = - m2.*tke2./scales.T_turb2;
+tend.fluid(1).mtke.dissn = - m1.*tke1.*dissn_rate1;
+tend.fluid(2).mtke.dissn = - m2.*tke2.*dissn_rate2;
 
 % ------
 
@@ -611,16 +649,14 @@ tend.fluid(2).meta.dissn = -m2bar.*esource./state.fluid(2).Tw;
 % Neglect transport terms (MYNN level 2.5)
 
 % SG flux source terms ...
-deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;
-deta2dz = (eta2(2:nzp) - eta2(1:nz))./grid.dzp;
 % Use a modified detadz to ensure it remains >= 0 and varies smoothly
 % tsq_dbdeta = scales.T_turb1.*scales.T_turb1.*dpdzbar.*eos.drdetap1;
 % deta1dz_modified = 0.5*(deta1dz + sqrt(deta1dz.^2 + 1./tsq_dbdeta.^2));
-s = eos.drdetap1.*deta1dz < 0;
+s = 1; %s = eos.drdetap1.*deta1dz < 0;
 deta1dz_modified = s.*deta1dz;
 % tsq_dbdeta = scales.T_turb2.*scales.T_turb2.*dpdzbar.*eos.drdetap2;
 % deta2dz_modified = 0.5*(deta2dz + sqrt(deta2dz.^2 + 1./tsq_dbdeta.^2));
-s = eos.drdetap2.*deta2dz < 0;
+s = 1; %s = eos.drdetap2.*deta2dz < 0;
 deta2dz_modified = s.*deta2dz;
 tend.fluid(1).mvareta.diffuse = -2*(Deta1ed.*deta1dz + settings.buoy_correl_eta*Deta1bc.*deta1dz_modified);
 tend.fluid(2).mvareta.diffuse = -2*(Deta2ed.*deta2dz + settings.buoy_correl_eta*Deta2bc.*deta2dz_modified);
@@ -636,8 +672,8 @@ tend.fluid(1).mvareta.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvareta.diffent = eos.sigma2.*corrde;
 
 % Dissipation terms
-tend.fluid(1).mvareta.dissn = - m1.*vareta1./scales.T_turb1;
-tend.fluid(2).mvareta.dissn = - m2.*vareta2./scales.T_turb2;
+tend.fluid(1).mvareta.dissn = - m1.*vareta1.*dissn_rate1;
+tend.fluid(2).mvareta.dissn = - m2.*vareta2.*dissn_rate2;
 
 % ------
 
@@ -645,16 +681,14 @@ tend.fluid(2).mvareta.dissn = - m2.*vareta2./scales.T_turb2;
 % Neglect transport terms (MYNN level 2.5)
 
 % SG flux source terms ...
-dq1dz = (q1(2:nzp) - q1(1:nz))./grid.dzp;
-dq2dz = (q2(2:nzp) - q2(1:nz))./grid.dzp;
 % Use a modified dqdz to ensure it remains >= 0 and varies smoothly
 % tsq_dbdq = scales.T_turb1.*scales.T_turb1.*dpdzbar.*eos.drdqp1;
 % dq1dz_modified = 0.5*(dq1dz + sqrt(dq1dz.^2 + 1./tsq_dbdq.^2));
-s = eos.drdqp1.*dq1dz < 0;
+s = 1; %s = eos.drdqp1.*dq1dz < 0;
 dq1dz_modified = s.*dq1dz;
 % tsq_dbdq = scales.T_turb2.*scales.T_turb2.*dpdzbar.*eos.drdqp2;
 % dq2dz_modified = 0.5*(dq2dz + sqrt(dq2dz.^2 + 1./tsq_dbdq.^2));
-s = eos.drdqp2.*dq2dz < 0;
+s = 1; %s = eos.drdqp2.*dq2dz < 0;
 dq2dz_modified = s.*dq2dz;
 tend.fluid(1).mvarq.diffuse = -2*(Dq1ed.*dq1dz + settings.buoy_correl_q*Dq1bc.*dq1dz_modified);
 tend.fluid(2).mvarq.diffuse = -2*(Dq2ed.*dq2dz + settings.buoy_correl_q*Dq2bc.*dq2dz_modified);
@@ -666,12 +700,8 @@ tend.fluid(1).mvarq.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvarq.diffent = eos.sigma2.*corrde;
 
 % Dissipation terms
-tend.fluid(1).mvarq.dissn = - m1.*varq1./scales.T_turb1;
-tend.fluid(2).mvarq.dissn = - m2.*varq2./scales.T_turb2;
-
-%plot_detadz
-%plot_dqdz
-%plot_dbdz
+tend.fluid(1).mvarq.dissn = - m1.*varq1.*dissn_rate1;
+tend.fluid(2).mvarq.dissn = - m2.*varq2.*dissn_rate2;
 
 % ------
 
@@ -699,8 +729,8 @@ tend.fluid(1).mcovaretaq.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mcovaretaq.diffent = eos.sigma2.*corrde;
 
 % Dissipation terms
-tend.fluid(1).mcovaretaq.dissn = - m1.*covaretaq1./scales.T_turb1;
-tend.fluid(2).mcovaretaq.dissn = - m2.*covaretaq2./scales.T_turb2;
+tend.fluid(1).mcovaretaq.dissn = - m1.*covaretaq1.*dissn_rate1;
+tend.fluid(2).mcovaretaq.dissn = - m2.*covaretaq2.*dissn_rate2;
 
 % ------
 
@@ -1148,7 +1178,10 @@ work.buoy = buoy;
 work.bflux1 = bflux1;
 work.bflux2 = bflux2;
 work.bflux_res = buoy_flux_res;
-
+work.dissn_rate1 = dissn_rate1;
+work.dissn_rate2 = dissn_rate2;
+work.rate_lin_fac1 = rate_lin_fac1;
+work.rate_lin_fac2 = rate_lin_fac2;
 
 % ------
 
