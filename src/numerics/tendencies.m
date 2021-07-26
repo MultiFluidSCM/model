@@ -154,21 +154,25 @@ rmin = 0.5;
 % Stability parameter
 dbdz = dpdzbar.*(eos.drdetap1.*deta1dz + eos.drdqp1.*dq1dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
-% Safe dissipation rate
-safe_rate1 = sqrt(-2*dbdz/(1 - rmin));
+% Safety factor for fluid 1
+safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var1/T_flux1) );
 % Apply bound
-rate_lin_fac1 = (dissn_rate_var1 >= safe_rate1)*0.5 + 1;
-dissn_rate_tke1 = max(dissn_rate_tke1,safe_rate1);
-dissn_rate_var1 = max(dissn_rate_var1,safe_rate1);
+rate_lin_fac1 = (safety_factor >= 1)*0.5 + 1;
+safety_factor = max(safety_factor,1);
+% dissn_rate_tke1 = dissn_rate_tke1.*safety_factor;
+dissn_rate_var1 = dissn_rate_var1.*safety_factor;
+T_flux1 = T_flux1./safety_factor;
 % Stability parameter
 dbdz = dpdzbar.*(eos.drdetap2.*deta2dz + eos.drdqp2.*dq2dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
-% Safe dissipation rate
-safe_rate2 = sqrt(-2*dbdz/(1 - rmin));
+% Safety factor for fluid 2
+safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var2/T_flux2) );
 % Apply bound
-rate_lin_fac2 = (dissn_rate_var2 >= safe_rate2)*0.5 + 1;
-dissn_rate_tke2 = max(dissn_rate_tke2,safe_rate2);
-dissn_rate_var2 = max(dissn_rate_var2,safe_rate2);
+rate_lin_fac2 = (safety_factor >= 1)*0.5 + 1;
+safety_factor = max(safety_factor,1);
+% dissn_rate_tke2 = dissn_rate_tke2.*safety_factor;
+dissn_rate_var2 = dissn_rate_var2.*safety_factor;
+T_flux2 = T_flux2./safety_factor;
 
 %plot_detadz
 %plot_dqdz

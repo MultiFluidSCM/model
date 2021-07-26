@@ -130,7 +130,10 @@ scales = find_scales(grid,settings,state,eos,surface_flux,constants,switches);
 % ------
 
 % Determine various rates and time scales related to turbulence
-T_flux1 = 3*constants.param.MYNN.B1*scales.T_turb1
+
+% Time scales appearing in scalar fluc calculations
+T_flux1 = 3*constants.param.MYNN.A2*scales.T_turb1;
+T_flux2 = 3*constants.param.MYNN.A2*scales.T_turb2;
 
 % Dissipation rates for TKE and variances
 dissn_rate_tke1 = 2./(constants.param.MYNN.B1*scales.T_turb1);
@@ -152,18 +155,21 @@ rmin = 0.5;
 dbdz = dpdzbar.*(eos.drdetap1.*deta1dz + eos.drdqp1.*dq1dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 % Safe dissipation rate
-safe_rate1 = sqrt(-2*dbdz/(1 - rmin));
+safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var1/T_flux1) );
 % Apply bound
-rate_lin_fac1 = (dissn_rate1 >= safe_rate1)*0.5 + 1;
-dissn_rate1 = max(dissn_rate1,safe_rate1);
+rate_lin_fac1 = (safety_factor >= 1)*0.5 + 1;
+safety_factor = max(safety_factor,1);
+dissn_rate_tke1 = dissn_rate_tke1*safety_factor;
+dissn_rate_var1 = dissn_rate_var1*safety_factor;
 % Stability parameter
 dbdz = dpdzbar.*(eos.drdetap2.*deta2dz + eos.drdqp2.*dq2dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 % Safe dissipation rate
 safe_rate2 = sqrt(-2*dbdz/(1 - rmin));
 % Apply bound
-rate_lin_fac2 = (dissn_rate2 >= safe_rate2)*0.5 + 1;
-dissn_rate2 = max(dissn_rate2,safe_rate2);
+rate_lin_fac2 = (dissn_rate_var2 >= safe_rate2)*0.5 + 1;
+dissn_rate_tke2 = max(dissn_rate_tke2,safe_rate2);
+dissn_rate_var2 = max(dissn_rate_var2,safe_rate2);
 
 %plot_detadz
 %plot_dqdz
@@ -184,15 +190,18 @@ dissn_rate2 = max(dissn_rate2,safe_rate2);
                     
 % ... or diagnosed from tke and turbulent length scales
 if settings.constants.param.sigma_weighted_tke
+%     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
+%         set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
+%                              tke1.*m1./(m1+m2),tke2.*m2./(m1+m2),switches.d);
     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-        set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
-                             tke1.*m1./(m1+m2),tke2.*m2./(m1+m2),switches.d);
+        set_diffusion_2(grid,T_flux1,T_flux2, ...
+                             tke1.*sqrt(m1./(m1+m2)),tke2.*sqrt(m2./(m1+m2)),switches.d);
 else
 %     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
 %         set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
 %                         tke1,tke2,switches.d);
     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-        set_diffusion_2(grid,scales.T_flux1,T_turb2, ...
+        set_diffusion_2a(grid,T_flux1,T_flux2, ...
                         tke1,tke2,switches.d);
 end
 
@@ -256,10 +265,10 @@ Deta2ed(1) = Deta2ed(1) + surface_flux.L1eta2;
 rr = 0.0;
 xcovaretaq1 = rr*sqrt(vareta1.*varq1);
 xcovaretaq2 = rr*sqrt(vareta2.*varq2);
-t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
-t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*t_scale1;
-Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*t_scale2;
+% t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
+% t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
+Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*T_flux1;
+Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*T_flux2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_eta
@@ -354,10 +363,10 @@ Dq2ed(1) = Dq2ed(1) + surface_flux.L1q2;
 rr = 0.0;
 xcovaretaq1 = rr*sqrt(vareta1.*varq1);
 xcovaretaq2 = rr*sqrt(vareta2.*varq2);
-t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
-t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*t_scale1;
-Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*t_scale2;
+% t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
+% t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
+Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*T_flux1;
+Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*T_flux2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_q
@@ -687,7 +696,7 @@ tend.fluid(2).mvareta.diffent = eos.sigma2.*corrde;
 
 % Dissipation terms
 tend.fluid(1).mvareta.dissn = - m1.*vareta1.*dissn_rate_var1;
-tend.fluid(2).mvareta.dissn = - m2.*vareta2.*dissn_rate_Var2;
+tend.fluid(2).mvareta.dissn = - m2.*vareta2.*dissn_rate_var2;
 
 % ------
 
@@ -1198,6 +1207,8 @@ work.dissn_rate_var1 = dissn_rate_var1;
 work.dissn_rate_var2 = dissn_rate_var2;
 work.rate_lin_fac1 = rate_lin_fac1;
 work.rate_lin_fac2 = rate_lin_fac2;
+work.T_flux1 = T_flux1;
+work.T_flux2 = T_flux2;
 
 % ------
 

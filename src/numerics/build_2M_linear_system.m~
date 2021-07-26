@@ -18,23 +18,24 @@ dq1dz   = (q1(2:nzp)   - q1(1:nz)  )./grid.dzp;
 dq2dz   = (q2(2:nzp)   - q2(1:nz)  )./grid.dzp;
 
 % Timescale for dissipation of flux in buoyancy correlation terms
-t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
-t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
+% Now in work.T_flux
+% t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
+% t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
 
 % Factors appearing in buoyancy correlation terms
-factor1_eta = t_scale1.*dpdzbar.*m1.*eos.drdetap1;
-factor1_q   = t_scale1.*dpdzbar.*m1.*eos.drdqp1;
-factor2_eta = t_scale2.*dpdzbar.*m2.*eos.drdetap2;
-factor2_q   = t_scale2.*dpdzbar.*m2.*eos.drdqp2;
+factor1_eta = work.T_flux1.*dpdzbar.*m1.*eos.drdetap1;
+factor1_q   = work.T_flux1.*dpdzbar.*m1.*eos.drdqp1;
+factor2_eta = work.T_flux2.*dpdzbar.*m2.*eos.drdetap2;
+factor2_q   = work.T_flux2.*dpdzbar.*m2.*eos.drdqp2;
 
 % Derivative of diffusivity wrt tke at p levels.
 % Assumes all diffusivities are the same
 dKdtke1 = (scales.dLdtke1 + 0.5*scales.L_turb1./tke1).*sqrt(tke1);
 dKdtke2 = (scales.dLdtke2 + 0.5*scales.L_turb2./tke2).*sqrt(tke2);
 
-% Derivative of t_scale wrt tke at p levels.
-dTdtke1 = 1.5*(scales.dLdtke1 - 0.5*scales.L_turb1./tke1)./sqrt(tke1);
-dTdtke2 = 1.5*(scales.dLdtke2 - 0.5*scales.L_turb2./tke2)./sqrt(tke2);
+% Derivative of flux timescale wrt tke at p levels.
+dTdtke1 = 3*sqrt(0.5)*settings.constants.param.MYNN.A2*(scales.dLdtke1 - 0.5*scales.L_turb1./tke1)./sqrt(tke1);
+dTdtke2 = 3*sqrt(0.5)*settings.constants.param.MYNN.A2*(scales.dLdtke2 - 0.5*scales.L_turb2./tke2)./sqrt(tke2);
 
 % ----
 
@@ -61,7 +62,7 @@ dd(25,ix) = dd(25,ix) + adt*work.dDtke1dtkea(ikb)./dzp;
 dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap1;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp1;
 % Dissipation term
-dd(13,ix) = dd(13,ix) + adt*m1.*work.dissn_rate1.*work.rate_lin_fac1; %adt*m1.*(1.5./scales.L_turb1).*sqrt(tke1);
+dd(13,ix) = dd(13,ix) + adt*m1.*work.dissn_rate_tke1.*work.rate_lin_fac1;
 % Relabelling terms - only keep dependence on tke1
 dd(13,ix) = dd(13,ix) + adt*M21;
 
@@ -151,9 +152,9 @@ if settings.buoy_correl_eta
     dd(17,ix) = dd(17,ix) + 2*factor1_q  .*work.deta1dz_modified;
 % Quasi-diffusion terms to allow for feedback via deta/dz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate1.*work.dDtke1dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate1.*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate_var1.*work.dDtke1dtkeb(ikt)./dzp;
+    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate_var1.*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./dzp;
+    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate_var1.*work.dDtke1dtkea(ikb)./dzp;
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate_var1(ik);
@@ -170,9 +171,9 @@ if settings.buoy_correl_eta
     dd(17,ix) = dd(17,ix) + 2*factor2_q  .*work.deta2dz_modified;
     % Quasi-diffusion terms to allow for feedback via deta/dz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate2.*work.dDtke2dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate2.*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate_var2.*work.dDtke2dtkeb(ikt)./dzp;
+    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate_var2.*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./dzp;
+    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate_var2.*work.dDtke2dtkea(ikb)./dzp;
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate_var2(ik);
