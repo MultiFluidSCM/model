@@ -51,16 +51,20 @@ if not(isfield(settings.constants.param, 'sigma_weighted_tke'))
 end
 
 % July 2021: Mellor-Yamada-Nakanishi-Niino constants included in turbulence
-% modelling. The values required to reproduce the previous model behaviour
-% are as follows.
-if not(isfield(settings.constants.param, 'MYNN'))
-    settings.constants.param.MYNN.A1 = 1e20;
-    settings.constants.param.MYNN.A2 = sqrt(0.5);
-    settings.constants.param.MYNN.B1 = sqrt(8);
-    settings.constants.param.MYNN.B2 = sqrt(8);
-    settings.constants.param.MYNN.C1 = 0;
-    settings.constants.param.MYNN.C2 = 0;
-    settings.constants.param.MYNN.C3 = 0;
-    settings.constants.param.MYNN.C4 = 0;
-    settings.constants.param.MYNN.C5 = 0;
-end
+% M
+
+
+
+
+% SCM July 2021
+% Note that we do not model the deviatoric part of Mij, so
+% A1 is effectively infinite while C1 = C2 = C4 = 0.
+MYNN.A1 = 1e20;
+MYNN.A2 = sqrt(0.5);
+MYNN.B1 = sqrt(8);
+MYNN.B2 = sqrt(8);
+MYNN.C1 = 0;
+MYNN.C2 = 0;
+MYNN.C3 = 0;
+MYNN.C4 = 0;
+MYNN.C5 = 0;

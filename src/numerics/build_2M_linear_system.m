@@ -18,23 +18,24 @@ dq1dz   = (q1(2:nzp)   - q1(1:nz)  )./grid.dzp;
 dq2dz   = (q2(2:nzp)   - q2(1:nz)  )./grid.dzp;
 
 % Timescale for dissipation of flux in buoyancy correlation terms
-t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
-t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
+% Now in work.T_flux
+% t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
+% t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
 
 % Factors appearing in buoyancy correlation terms
-factor1_eta = t_scale1.*dpdzbar.*m1.*eos.drdetap1;
-factor1_q   = t_scale1.*dpdzbar.*m1.*eos.drdqp1;
-factor2_eta = t_scale2.*dpdzbar.*m2.*eos.drdetap2;
-factor2_q   = t_scale2.*dpdzbar.*m2.*eos.drdqp2;
+factor1_eta = work.T_flux1.*dpdzbar.*m1.*eos.drdetap1;
+factor1_q   = work.T_flux1.*dpdzbar.*m1.*eos.drdqp1;
+factor2_eta = work.T_flux2.*dpdzbar.*m2.*eos.drdetap2;
+factor2_q   = work.T_flux2.*dpdzbar.*m2.*eos.drdqp2;
 
 % Derivative of diffusivity wrt tke at p levels.
 % Assumes all diffusivities are the same
 dKdtke1 = (scales.dLdtke1 + 0.5*scales.L_turb1./tke1).*sqrt(tke1);
 dKdtke2 = (scales.dLdtke2 + 0.5*scales.L_turb2./tke2).*sqrt(tke2);
 
-% Derivative of t_scale wrt tke at p levels.
-dTdtke1 = 1.5*(scales.dLdtke1 - 0.5*scales.L_turb1./tke1)./sqrt(tke1);
-dTdtke2 = 1.5*(scales.dLdtke2 - 0.5*scales.L_turb2./tke2)./sqrt(tke2);
+% Derivative of flux timescale wrt tke at p levels.
+dTdtke1 = 3*sqrt(0.5)*settings.constants.param.MYNN.A2*(scales.dLdtke1 - 0.5*scales.L_turb1./tke1)./sqrt(tke1);
+dTdtke2 = 3*sqrt(0.5)*settings.constants.param.MYNN.A2*(scales.dLdtke2 - 0.5*scales.L_turb2./tke2)./sqrt(tke2);
 
 % ----
 
@@ -61,7 +62,7 @@ dd(25,ix) = dd(25,ix) + adt*work.dDtke1dtkea(ikb)./dzp;
 dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap1;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp1;
 % Dissipation term
-dd(13,ix) = dd(13,ix) + adt*m1.*work.dissn_rate1.*work.rate_lin_fac1; %adt*m1.*(1.5./scales.L_turb1).*sqrt(tke1);
+dd(13,ix) = dd(13,ix) + adt*m1.*work.dissn_rate_tke1.*work.rate_lin_fac1;
 % Relabelling terms - only keep dependence on tke1
 dd(13,ix) = dd(13,ix) + adt*M21;
 
@@ -84,7 +85,7 @@ dd(25,ix) = dd(25,ix) + adt*work.dDtke2dtkea(ikb)./dzp;
 dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap2;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp2;
 % Dissipation term
-dd(13,ix) = dd(13,ix) + adt*m2.*work.dissn_rate2.*work.rate_lin_fac2; %adt*m2.*(1.5./scales.L_turb2).*sqrt(tke2);
+dd(13,ix) = dd(13,ix) + adt*m2.*work.dissn_rate_tke2.*work.rate_lin_fac2;
 % Relabelling terms - only keep dependence on tke2
 dd(13,ix) = dd(13,ix) + adt*M12;
 
@@ -97,7 +98,7 @@ dd(13,ix) = dd(13,ix) + 1.0;
 dd(11,ix) = dd(11,ix) + m1.*deta1dz.*dKdtke1;
 % Buoyancy correlation term
 if settings.buoy_correl_eta
-    dd(17,ix) = dd(17,ix) - factor1_eta; % m1.*dpdzbar.*eos.drdetap1.*t_scale1;
+    dd(17,ix) = dd(17,ix) - factor1_eta;
     dd(11,ix) = dd(11,ix) - m1.*dpdzbar.*eos.drdetap1.*state_new.fluid(1).vareta.*dTdtke1;
     dd(21,ix) = dd(21,ix) - factor1_q;
 end
@@ -110,7 +111,7 @@ dd(13,ix) = dd(13,ix) + 1.0;
 dd(11,ix) = dd(11,ix) + m2.*deta2dz.*dKdtke2;
 % Buoyancy correlation term
 if settings.buoy_correl_eta
-    dd(17,ix) = dd(17,ix) - factor2_eta; % m2.*dpdzbar.*eos.drdetap2.*t_scale2;
+    dd(17,ix) = dd(17,ix) - factor2_eta;
     dd(11,ix) = dd(11,ix) - m2.*dpdzbar.*eos.drdetap2.*state_new.fluid(2).vareta.*dTdtke2;
     dd(21,ix) = dd(21,ix) - factor2_q;
 end
@@ -123,7 +124,7 @@ dd(13,ix) = dd(13,ix) + 1.0;
 dd( 9,ix) = dd( 9,ix) + m1.*dq1dz.*dKdtke1;
 % Buoyancy correlation term
 if settings.buoy_correl_q
-    dd(17,ix) = dd(17,ix) - factor1_q; % m1.*dpdzbar.*eos.drdqp1.*t_scale1;
+    dd(17,ix) = dd(17,ix) - factor1_q;
     dd( 9,ix) = dd( 9,ix) - m1.*dpdzbar.*eos.drdqp1.*state_new.fluid(1).varq.*dTdtke1;
     dd(19,ix) = dd(19,ix) - factor1_eta;
 end
@@ -136,7 +137,7 @@ dd(13,ix) = dd(13,ix) + 1.0;
 dd( 9,ix) = dd( 9,ix) + m2.*dq2dz.*dKdtke2;
 % Buoyancy correlation term
 if settings.buoy_correl_q
-    dd(17,ix) = dd(17,ix) - factor2_q; % m2.*dpdzbar.*eos.drdqp2.*t_scale2;
+    dd(17,ix) = dd(17,ix) - factor2_q;
     dd( 9,ix) = dd( 9,ix) - m2.*dpdzbar.*eos.drdqp2.*state_new.fluid(2).varq.*dTdtke2;
     dd(19,ix) = dd(19,ix) - factor2_eta;
 end
@@ -156,7 +157,7 @@ if settings.buoy_correl_eta
     dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1(ik); %m1(ik)./scales.T_turb1(ik);
+dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate_var1(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M12(ik);
 dd(14,ix) = dd(14,ix) - M12(ik);
@@ -175,7 +176,7 @@ if settings.buoy_correl_eta
     dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2(ik); %m2(ik)./scales.T_turb2(ik);
+dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate_var2(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M21(ik);
 dd(12,ix) = dd(12,ix) - M21(ik);
@@ -199,7 +200,7 @@ if settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1(ik); %m1(ik)./scales.T_turb1(ik);
+dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate_var1(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M12(ik);
 dd(14,ix) = dd(14,ix) - M12(ik);
@@ -223,7 +224,7 @@ if settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2; %m2(ik)./scales.T_turb2(ik);
+dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate_var2;
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M21(ik);
 dd(12,ix) = dd(12,ix) - M21(ik);
@@ -253,7 +254,7 @@ if settings.buoy_correl_eta | settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1; %m1(ik)./scales.T_turb1(ik);
+dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate_var1;
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M12(ik);
 dd(14,ix) = dd(14,ix) - M12(ik);
@@ -278,7 +279,7 @@ if settings.buoy_correl_eta | settings.buoy_correl_q
     dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
 end
 % Dissipation term
-dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2(ik); %m2(ik)./scales.T_turb2(ik);
+dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate_var2(ik);
 % Relabelling terms
 dd(13,ix) = dd(13,ix) + M21(ik);
 dd(12,ix) = dd(12,ix) - M21(ik);
