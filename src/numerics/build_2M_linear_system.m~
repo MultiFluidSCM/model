@@ -141,6 +141,7 @@ if settings.buoy_correl_q
     dd(19,ix) = dd(19,ix) - factor2_eta;
 end
 
+
     
 % eta variance1 equation
 ix =  7:12:12*nz-5;
@@ -151,9 +152,9 @@ if settings.buoy_correl_eta
     dd(17,ix) = dd(17,ix) + 2*factor1_q  .*work.deta1dz_modified;
 % Quasi-diffusion terms to allow for feedback via deta/dz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate1.*work.dDtke1dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate1.*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*work.dDtke1dtkeb(ikt)./(dzp.*scales.T_turb1*root2);
+    dd(13,ix) = dd(13,ix) - adt*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./(dzp.*scales.T_turb1*root2);
+    dd(25,ix) = dd(25,ix) + work.dDtke1dtkea(ikb)./(dzp.*scales.T_turb1*root2);
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1(ik); %m1(ik)./scales.T_turb1(ik);
@@ -170,9 +171,9 @@ if settings.buoy_correl_eta
     dd(17,ix) = dd(17,ix) + 2*factor2_q  .*work.deta2dz_modified;
     % Quasi-diffusion terms to allow for feedback via deta/dz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate2.*work.dDtke2dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate2.*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*work.dDtke2dtkeb(ikt)./(dzp.*scales.T_turb2*root2);
+    dd(13,ix) = dd(13,ix) - adt*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./(dzp.*scales.T_turb2*root2);
+    dd(25,ix) = dd(25,ix) + adt*work.dDtke2dtkea(ikb)./(dzp.*scales.T_turb2*root2);
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2(ik); %m2(ik)./scales.T_turb2(ik);
@@ -194,9 +195,9 @@ if settings.buoy_correl_q
     dd(15,ix) = dd(15,ix) + 2*factor1_eta.*work.dq1dz_modified;
     % Quasi-diffusion terms to allow for feedback via dq/dz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate1.*work.dDtke1dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate1.*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*work.dDtke1dtkeb(ikt)./(dzp.*scales.T_turb1*root2);
+    dd(13,ix) = dd(13,ix) - adt*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./(dzp.*scales.T_turb1*root2);
+    dd(25,ix) = dd(25,ix) + work.dDtke1dtkea(ikb)./(dzp.*scales.T_turb1*root2);
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1(ik); %m1(ik)./scales.T_turb1(ik);
@@ -218,9 +219,9 @@ if settings.buoy_correl_q
     dd(15,ix) = dd(15,ix) + 2*factor2_eta.*work.dq2dz_modified;
     % Quasi-diffusion terms to allow for feedback via dq/dz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate2.*work.dDtke2dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate2.*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*work.dDtke2dtkeb(ikt)./(dzp.*scales.T_turb2*root2);
+    dd(13,ix) = dd(13,ix) - adt*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./(dzp.*scales.T_turb2*root2);
+    dd(25,ix) = dd(25,ix) + work.dDtke2dtkea(ikb)./(dzp.*scales.T_turb2);
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2; %m2(ik)./scales.T_turb2(ik);
@@ -248,9 +249,9 @@ end
 if settings.buoy_correl_eta | settings.buoy_correl_q
     % Quasi-diffusion terms to allow for feedback via dq/dz, detadz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate1.*work.dDtke1dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate1.*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate1.*work.dDtke1dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*work.dDtke1dtkeb(ikt)./(dzp.*scales.T_turb1);
+    dd(13,ix) = dd(13,ix) - adt*(work.dDtke1dtkea(ikt) - work.dDtke1dtkeb(ikb))./(dzp.*scales.T_turb1);
+    dd(25,ix) = dd(25,ix) + work.dDtke1dtkea(ikb)./(dzp.*scales.T_turb1);
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m1(ik).*work.dissn_rate1; %m1(ik)./scales.T_turb1(ik);
@@ -273,9 +274,9 @@ end
 if settings.buoy_correl_eta | settings.buoy_correl_q
     % Quasi-diffusion terms to allow for feedback via dq/dz, detadz
     % - *** Borrow tke coefficients for testing ***
-    dd( 1,ix) = dd( 1,ix) - adt*scales.dissn_rate2.*work.dDtke2dtkeb(ikt)./dzp;
-    dd(13,ix) = dd(13,ix) - adt*scales.dissn_rate2.*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./dzp;
-    dd(25,ix) = dd(25,ix) + adt*scales.dissn_rate2.*work.dDtke2dtkea(ikb)./dzp;
+    dd( 1,ix) = dd( 1,ix) - adt*work.dDtke2dtkeb(ikt)./(dzp.*scales.T_turb2);
+    dd(13,ix) = dd(13,ix) - adt*(work.dDtke2dtkea(ikt) - work.dDtke2dtkeb(ikb))./(dzp.*scales.T_turb2);
+    dd(25,ix) = dd(25,ix) + work.dDtke2dtkea(ikb)./(dzp.*scales.T_turb2);
 end
 % Dissipation term
 dd(13,ix) = dd(13,ix) + m2(ik).*work.dissn_rate2(ik); %m2(ik)./scales.T_turb2(ik);

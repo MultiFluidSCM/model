@@ -5,6 +5,12 @@ function [ tend, relabel, eos, force, scales, surface_flux, budgets, work ] ...
 
 % ------
 
+% Useful constants
+root2 = sqrt(2);
+rroot2 = 1/root2;
+
+% ------
+
 % Unpack fields to improve code clarity
 nz = grid.nz;
 nzp = nz + 1;
@@ -509,8 +515,8 @@ tend.fluid(2).mv.diffent = - corrde;
 % ------
 
 % Dissipation rates for TKE and variances
-dissn_rate1 = 1./scales.T_turb1;
-dissn_rate2 = 1./scales.T_turb2;
+dissn_rate1 = rroot2./scales.T_turb1;
+dissn_rate2 = rroot2./scales.T_turb2;
 
 % Vertical derivatives of eta and q
 deta1dz = (eta1(2:nzp) - eta1(1:nz))./grid.dzp;

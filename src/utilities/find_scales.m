@@ -124,8 +124,8 @@ if settings.constants.param.sigma_weighted_tke
         find_lturb_deriv(grid,eos.nsq2,sigma2.*state.fluid(2).tke,constants.param.tke_min,constants.param.Lfactor2);
     scales.dLdtke2 = scales.dLdtke2.*sigma2;
     
-    scales.T_turb1 = scales.L_turb1./sqrt(sigma1.*state.fluid(1).tke);
-    scales.T_turb2 = scales.L_turb2./sqrt(sigma2.*state.fluid(2).tke);
+    scales.T_turb1 = scales.L_turb1./sqrt(2*sigma1.*state.fluid(1).tke);
+    scales.T_turb2 = scales.L_turb2./sqrt(2*sigma2.*state.fluid(2).tke);
     
     scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,sigma2.*state.fluid(2).tke,constants.param.tke_min);
 else
@@ -134,8 +134,8 @@ else
     [scales.L_turb2,scales.dLdtke2] = ...
         find_lturb_deriv(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min,constants.param.Lfactor2);
     
-    scales.T_turb1 = scales.L_turb1./sqrt(state.fluid(1).tke);
-    scales.T_turb2 = scales.L_turb2./sqrt(state.fluid(2).tke);
+    scales.T_turb1 = scales.L_turb1./sqrt(2*state.fluid(1).tke);
+    scales.T_turb2 = scales.L_turb2./sqrt(2*state.fluid(2).tke);
     
     scales.L_plume = constants.param.Lfactor2 * find_lplume(grid,eos.nsq2,state.fluid(2).tke,constants.param.tke_min);
 end
