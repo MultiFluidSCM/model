@@ -5,12 +5,6 @@ function [ tend, relabel, eos, force, scales, surface_flux, budgets, work ] ...
 
 % ------
 
-% Useful constants
-root2 = sqrt(2);
-rroot2 = 1/root2;
-
-% ------
-
 % Unpack fields to improve code clarity
 nz = grid.nz;
 nzp = nz + 1;
