@@ -39,10 +39,10 @@ for k = 1:nz
     % eos.drdp1(k)    = (gpt*gpt/gtt - gpp);
     % eos.drdetap1(k) =  gpt/gtt;
     % eos.drdqp1(k)   = (gpt*gtw/gtt - gpw);
-    eos.theta1p(k) = eta2thetal( etabar, ...
-                                 qbar, ...
-                                 state.fluid(1).T(k), ...
-                                 constants.therm, constants.phys.p00);
+%     eos.theta1p(k) = eta2thetal( etabar, ...
+%                                  qbar, ...
+%                                  state.fluid(1).T(k), ...
+%                                  constants.therm, constants.phys.p00);
     
     % Fluid 2
     qbar   = grid.aboves(k)*state.fluid(2).q(k+1) ...
@@ -60,10 +60,10 @@ for k = 1:nz
     % eos.drdp2(k)    = (gpt*gpt/gtt - gpp);
     % eos.drdetap2(k) =  gpt/gtt;
     % eos.drdqp2(k)   = (gpt*gtw/gtt - gpw);
-    eos.theta2p(k) = eta2thetal( etabar, ...
-                                 qbar, ...
-                                 state.fluid(2).T(k), ...
-                                 constants.therm, constants.phys.p00);
+%     eos.theta2p(k) = eta2thetal( etabar, ...
+%                                  qbar, ...
+%                                  state.fluid(2).T(k), ...
+%                                  constants.therm, constants.phys.p00);
 
     % Residual in sigma equation
     eos.res_sigma(k) = 1 - eos.sigma1(k) - eos.sigma2(k);
@@ -353,6 +353,10 @@ for k = 1:nzp
                                     
 end
 
+% Improved estimate of theta at p levels
+eos.theta1p = grid.abovep.*eos.theta1(2:nzp) + grid.belowp.*eos.theta1(1:nz);
+eos.theta2p = grid.abovep.*eos.theta2(2:nzp) + grid.belowp.*eos.theta2(1:nz);
+
 % Improved estimates of derivatives of density wrt p, eta, and q
 % At p levels
 eos.drdp1    = grid.abovep.*eos.drdpbar1(2:nzp) + grid.belowp.*eos.drdpbar1(1:nz);
@@ -386,4 +390,3 @@ eos.nsq1 = constants.phys.gravity*(drho_parceldz - drhoenvdz)./eos.rho1;
 temp = drho_parceldp2.*dpdz;
 drho_parceldz = grid.abovep.*temp(2:nzp) + grid.belowp.*temp(1:nz);
 eos.nsq2 = constants.phys.gravity*(drho_parceldz - drhoenvdz)./eos.rho2;
-

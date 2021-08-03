@@ -181,6 +181,22 @@ if settings.switches.plot
         plot_ql_var
     end
 
+    % Figure 29 and 32: 
+    if settings.switches.plot_theta_flux
+        plot_theta_flux
+        plot_eta_flux
+    end
+    
+    % Figure 33: 
+    if settings.switches.plot_q_flux
+        plot_q_flux
+    end
+
+    % Figure 34: 
+    if settings.switches.plot_covariances
+        plot_covariances
+    end
+    
 end
 
 % fig = figure(6);
@@ -223,6 +239,5 @@ end
         % join(["profiles_L_turb_",num2str(plotstep),".png"], "")...
     % )...
 % );
-
 
 pause(0.01)
