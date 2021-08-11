@@ -81,3 +81,8 @@ if not(isfield(settings.constants.param, 'MYNN'))
     settings.constants.param.MYNN.C4 = 0;
     settings.constants.param.MYNN.C5 = 0;
 end
+
+% August 2021: Added option to choose output times for LES comparison
+if not(isfield(settings, 'output_times'))
+    settings.output_times = [14000, 21800, 32600, 42800];
+end
