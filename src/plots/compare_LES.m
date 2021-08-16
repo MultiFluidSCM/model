@@ -177,7 +177,15 @@ if istep == time.nstop
     filename = fullfile(settings.folders.data_scm, 'SCM_results.mat');
     % Save all variables whose name begins SCM...
     save(filename,'-regexp','^SCM');
-
+    
+    % Remove the "SCM_" from the variable names
+    structure_old = load(filename);
+    fieldnames_old = fieldnames(structure_old);
+    fieldnames_new = strrep(fieldnames_old, 'SCM_', ''); 
+    for z = 1:length(fieldnames_old)
+      structure_new.(fieldnames_new{z}) = structure_old.(fieldnames_old{z});
+    end
+    save(filename,'-struct','structure_new');
 end
 
 
