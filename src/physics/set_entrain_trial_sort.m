@@ -32,7 +32,8 @@ elseif ischeme == 3 | ischeme == 4
     % rate_buoy = max(-buoybar,0)./wstd;
     % rate_sort = min(20*rate_buoy,rdt);
     
-    rate_sort = min(1.5*max(0,-dw2dz),rdt);
+    % rate_sort = min(1.5*max(0,-dw2dz),rdt);
+    rate_sort = min(max(0,-dw2dz),rdt);
     % rate_sort = min(rate_sort,rdt);
     
     % [temp, cbase_index] = min(abs(grid.zw-2200));
