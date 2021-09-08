@@ -18,6 +18,8 @@ for i=1:length(forcing.t)-1
         % Fluxes at the top of the domain (W / m^2)
         force.tshf =   forcing.tshf(i) + (forcing.tshf(i+1) - forcing.tshf(i)) ...
             .*(t-forcing.t(i))./(forcing.t(i+1) - forcing.t(i)) ;
+        force.tqf  = ( forcing.tlhf(i) + (forcing.tlhf(i+1) - forcing.tlhf(i)) ...
+            .*(t-forcing.t(i))./(forcing.t(i+1) - forcing.t(i)) )./2.5e6;
     end
 end
 
@@ -26,6 +28,7 @@ if t >=forcing.t(end)
     force.sshf = forcing.shf(end);
     force.sqf  = forcing.lhf(end);
     force.tshf = forcing.tshf(end);
+    force.tqf  = forcing.tlhf(end);
 end
 
 % Note on surface moisture flux (kg / m^2 / s):

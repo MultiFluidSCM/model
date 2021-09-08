@@ -95,10 +95,14 @@ if not(isfield(settings, 'initial_theta'))
     
     settings.initial_rv.z  = [      0;       50;      350;      650;    700;    1300;   2500;   5500];
     settings.initial_rv.rv = [15.2e-3; 15.17e-3; 14.98e-3; 14.8e-3; 14.7e-3; 13.5e-3; 3.0e-3; 3.0e-3];
+    
+    settings.initial_sigma.z      = [0; 1];
+    settings.initial_sigma.sigma2 = [settings.constants.param.sigma00; settings.constants.param.sigma00];
 end
 
 % September 2021: Added option to add fluxes at the top of the domain
 if not(isfield(settings.forcing, 'tshf'))
     disp("Using no prescribed fluxes at the top of the domain");
     settings.forcing.tshf = 0*settings.forcing.t;
+    settings.forcing.tlhf = 0*settings.forcing.t;
 end

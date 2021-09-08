@@ -211,6 +211,8 @@ end
 % Include surface moisture fluxes
 F1(1) = F1(1) + surface_flux.q1;
 F2(1) = F2(1) + surface_flux.q2;
+F1(end) = F1(end) + surface_flux.q1_top;
+F2(end) = F2(end) + surface_flux.q2_top;
 
 % Mass tendencies
 tend.fluid(1).m.transport = - (F1(2:nzp) - F1(1:nz))./dzp;
@@ -257,6 +259,8 @@ end
 % Include contribution from surface flux to first interior level
 Deta1ed(1) = Deta1ed(1) + surface_flux.L1eta1;
 Deta2ed(1) = Deta2ed(1) + surface_flux.L1eta2;
+Deta1ed(end) = Deta1ed(end) + surface_flux.L1eta1_top;
+Deta2ed(end) = Deta2ed(end) + surface_flux.L1eta2_top;
 
 % Include buoyancy correlation term
 rr = 0.0;
@@ -289,6 +293,8 @@ tend.fluid(2).meta.diffuse(2:nzp) = tend.fluid(2).meta.diffuse(2:nzp) ...
 % Include surface entropy fluxes,
 tend.fluid(1).meta.diffuse(1) = tend.fluid(1).meta.diffuse(1) + surface_flux.eta1/dzw(1);
 tend.fluid(2).meta.diffuse(1) = tend.fluid(2).meta.diffuse(1) + surface_flux.eta2/dzw(1);
+tend.fluid(1).meta.diffuse(end) = tend.fluid(1).meta.diffuse(end) + surface_flux.eta1_top/dzw(end);
+tend.fluid(2).meta.diffuse(end) = tend.fluid(2).meta.diffuse(end) + surface_flux.eta2_top/dzw(end);
 
 % Tendency due to buoyancy correlation (just for diagnostics)
 tend.fluid(1).meta.buoycor(1:nz ) = - Deta1bc./dzw(1:nz);
@@ -339,6 +345,8 @@ tend.fluid(2).mq.transport(2:nzp) = tend.fluid(2).mq.transport(2:nzp) ...
 % Include surface moisture fluxes,
 tend.fluid(1).mq.transport(1) = tend.fluid(1).mq.transport(1) + surface_flux.q1/dzw(1);
 tend.fluid(2).mq.transport(1) = tend.fluid(2).mq.transport(1) + surface_flux.q2/dzw(1);
+tend.fluid(1).mq.transport(end) = tend.fluid(1).mq.transport(end) + surface_flux.q1_top/dzw(end);
+tend.fluid(2).mq.transport(end) = tend.fluid(2).mq.transport(end) + surface_flux.q2_top/dzw(end);
 
 % Diffusive water flux
 [Dq2ed, dDq2dqa, dDq2dqb, dDq2dm ] = diff_flux( grid, kdiffq2, q2 , m2, surface_flux.q2);
@@ -354,6 +362,8 @@ end
 % Include contribution from surface flux to first interior level
 Dq1ed(1) = Dq1ed(1) + surface_flux.L1q1;
 Dq2ed(1) = Dq2ed(1) + surface_flux.L1q2;
+Dq1ed(end) = Dq1ed(end) + surface_flux.L1q1_top;
+Dq2ed(end) = Dq2ed(end) + surface_flux.L1q2_top;
 
 % Include buoyancy correlation term
 % Correlations and timescales are computed above
