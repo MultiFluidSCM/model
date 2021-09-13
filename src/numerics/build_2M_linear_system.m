@@ -18,15 +18,15 @@ dq1dz   = (q1(2:nzp)   - q1(1:nz)  )./grid.dzp;
 dq2dz   = (q2(2:nzp)   - q2(1:nz)  )./grid.dzp;
 
 % Timescale for dissipation of flux in buoyancy correlation terms
-% Now in work.T_flux
+% Now in work.T_sflux
 % t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 % t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
 
 % Factors appearing in buoyancy correlation terms
-factor1_eta = work.T_flux1.*dpdzbar.*m1.*eos.drdetap1;
-factor1_q   = work.T_flux1.*dpdzbar.*m1.*eos.drdqp1;
-factor2_eta = work.T_flux2.*dpdzbar.*m2.*eos.drdetap2;
-factor2_q   = work.T_flux2.*dpdzbar.*m2.*eos.drdqp2;
+factor1_eta = work.T_sflux1.*dpdzbar.*m1.*eos.drdetap1;
+factor1_q   = work.T_sflux1.*dpdzbar.*m1.*eos.drdqp1;
+factor2_eta = work.T_sflux2.*dpdzbar.*m2.*eos.drdetap2;
+factor2_q   = work.T_sflux2.*dpdzbar.*m2.*eos.drdqp2;
 
 % Derivative of diffusivity wrt tke at p levels.
 % Assumes all diffusivities are the same

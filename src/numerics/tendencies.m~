@@ -196,14 +196,14 @@ if settings.constants.param.sigma_weighted_tke
 %         set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
 %                              tke1.*m1./(m1+m2),tke2.*m2./(m1+m2),switches.d);
     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-        set_diffusion_2a(grid,T_sflux1,T_sflux2,T_uflux1,T_uflux2, ...
+        set_diffusion_2a(grid,T_flux1,T_flux2, ...
                              tke1.*m1./(m1+m2),tke2.*m2./(m1+m2),switches.d);
 else
 %     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
 %         set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
 %                         tke1,tke2,switches.d);
     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-        set_diffusion_2a(grid,T_sflux1,T_sflux2,T_uflux1,T_uflux2, ...
+        set_diffusion_2a(grid,T_flux1,T_flux2, ...
                         tke1,tke2,switches.d);
 end
 
@@ -269,8 +269,8 @@ xcovaretaq1 = rr*sqrt(vareta1.*varq1);
 xcovaretaq2 = rr*sqrt(vareta2.*varq2);
 % t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 % t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*T_sflux1;
-Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*T_sflux2;
+Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*T_flux1;
+Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*T_flux2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_eta
@@ -367,8 +367,8 @@ xcovaretaq1 = rr*sqrt(vareta1.*varq1);
 xcovaretaq2 = rr*sqrt(vareta2.*varq2);
 % t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 % t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*T_sflux1;
-Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*T_sflux2;
+Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*T_flux1;
+Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*T_flux2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_q
@@ -1209,8 +1209,8 @@ work.dissn_rate_var1 = dissn_rate_var1;
 work.dissn_rate_var2 = dissn_rate_var2;
 work.rate_lin_fac1 = rate_lin_fac1;
 work.rate_lin_fac2 = rate_lin_fac2;
-work.T_sflux1 = T_sflux1;
-work.T_sflux2 = T_sflux2;
+work.T_flux1 = T_flux1;
+work.T_flux2 = T_flux2;
 
 % ------
 
