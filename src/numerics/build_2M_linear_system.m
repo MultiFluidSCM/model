@@ -7,7 +7,7 @@
 dpdz(2:nz)   = (p(2:nz) - p(1:nz-1))./dzw(2:nz);
 dpdz(1) = dpdz(2);
 dpdz(nzp) = dpdz(nz);
-dpdzbar = abovep.*dpdz(2:nzp) + belowp.*dpdz(1:nz);
+dpdzbar = aboves.*dpdz(2:nzp) + belows.*dpdz(1:nz);
 dpdz(1) = 0;
 dpdz(nzp) = 0;
 
