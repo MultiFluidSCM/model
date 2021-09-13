@@ -615,10 +615,9 @@ dvdz(2:nz)    = (v1(2:nz) - v1(1:nz-1))./dzw(2:nz);
 dvdz(nzp)     =  0;
 kesinkw       = - Dw1.*(w1(2:nzp) - w1(1:nz))./dzp ...
                 + eos.sigma1.*corrdew;
-Kdudzsq       = kdiffu1.*(dudz.*dudz + dvdz.*dvdz);
-Kdudzsq(1)    = - (u1(1)*Du1(1) + v1(1)*Dv1(1))/(m1bar(1)*dzw(1));
-kesinkuv      = m1.*(aboves.*Kdudzsq(2:nzp) + belows.*Kdudzsq(1:nz)) ...
-              + eos.sigma1.*(corrdeu + corrdev);
+uzDu = dudz.*Du1 + dvdz.*Dv1;
+kesinkuv = -(aboves.*uzDu(2:nzp) + belows.*uzDu(1:nz)) ...
+           + eos.sigma1.*(corrdeu + corrdev);          
 tend.fluid(1).mtke.shear = kesinkw + kesinkuv;
 dudz(1)       =  u2(1)/dzw(1);
 dudz(2:nz)    = (u2(2:nz) - u2(1:nz-1))./dzw(2:nz);
@@ -628,10 +627,9 @@ dvdz(2:nz)    = (v2(2:nz) - v2(1:nz-1))./dzw(2:nz);
 dvdz(nzp)     =  0;
 kesinkw       = - Dw2.*(w2(2:nzp) - w2(1:nz))./dzp ...
                 + eos.sigma2.*corrdew;
-Kdudzsq       = kdiffu2.*(dudz.*dudz + dvdz.*dvdz);
-Kdudzsq(1)    = - (u2(1)*Du2(1) + v2(1)*Dv2(1))/(m2bar(1)*dzw(1));
-kesinkuv      = m2.*(aboves.*Kdudzsq(2:nzp) + belows.*Kdudzsq(1:nz)) ...
-              + eos.sigma2.*(corrdeu + corrdev);
+uzDu = dudz.*Du2 + dvdz.*Dv2;
+kesinkuv = -(aboves.*uzDu(2:nzp) + belows.*uzDu(1:nz)) ...
+           + eos.sigma2.*(corrdeu + corrdev);          
 tend.fluid(2).mtke.shear = kesinkw + kesinkuv;
 
 % Buoyancy flux generation
