@@ -656,10 +656,10 @@ tend.fluid(2).mtke.dissn = - m2.*tke2.*dissn_rate_tke2;
 % ------
 
 % Include effect of buoyancy flux on internal energy
-esource = weight_to_w(grid,tend.fluid(1).mtke.bflux./m1);
-tend.fluid(1).meta.bflux = -m1bar.*esource./state.fluid(1).Tw;
-esource = weight_to_w(grid,tend.fluid(2).mtke.bflux./m2);
-tend.fluid(2).meta.bflux = -m2bar.*esource./state.fluid(2).Tw;
+% esource = weight_to_w(grid,tend.fluid(1).mtke.bflux./m1);
+% tend.fluid(1).meta.bflux = -m1bar.*esource./state.fluid(1).Tw;
+% esource = weight_to_w(grid,tend.fluid(2).mtke.bflux./m2);
+% tend.fluid(2).meta.bflux = -m2bar.*esource./state.fluid(2).Tw;
 
 % Return dissipated TKE as entropy
 esource = weight_to_w(grid,tend.fluid(1).mtke.dissn./m1);
@@ -897,14 +897,14 @@ tend.fluid(1).meta.tot = tend.fluid(1).meta.transport ...
                        + tend.fluid(1).meta.diffuse ...
                        + tend.fluid(1).meta.diffent ...
                        + tend.fluid(1).meta.relabel ...
-                       + tend.fluid(1).meta.bflux ...
                        + tend.fluid(1).meta.dissn;
+%                       + tend.fluid(1).meta.bflux ...
 tend.fluid(2).meta.tot = tend.fluid(2).meta.transport ...
                        + tend.fluid(2).meta.diffuse ...
                        + tend.fluid(2).meta.diffent ...
                        + tend.fluid(2).meta.relabel ...
-                       + tend.fluid(2).meta.bflux ...
                        + tend.fluid(2).meta.dissn;
+%                       + tend.fluid(2).meta.bflux ...
 
 % Water
 tend.fluid(1).mq.tot = tend.fluid(1).mq.transport ...
@@ -1030,7 +1030,7 @@ budgets.eta1.diffuse   = (tend.fluid(1).meta.diffuse + tend.fluid(1).meta.diffen
 budgets.eta1.buoycor   = tend.fluid(1).meta.buoycor./m1bar;
 budgets.eta1.entrain   = -relabel.M21bar.*(relabel.etahat21 - eta1)./m1bar;
 budgets.eta1.detrain   =  relabel.M12bar.*(relabel.etahat12 - eta1)./m1bar;
-budgets.eta1.bflux     = tend.fluid(1).meta.bflux./m1bar;
+% budgets.eta1.bflux     = tend.fluid(1).meta.bflux./m1bar;
 budgets.eta1.dissn     = tend.fluid(1).meta.dissn./m1bar;
 budgets.eta1.tot       = (tend.fluid(1).meta.tot - m1totbar.*eta1)./m1bar;
 
@@ -1039,7 +1039,7 @@ budgets.eta2.diffuse   = (tend.fluid(2).meta.diffuse + tend.fluid(2).meta.diffen
 budgets.eta2.buoycor   = tend.fluid(2).meta.buoycor./m2bar;
 budgets.eta2.entrain   =  relabel.M21bar.*(relabel.etahat21 - eta2)./m2bar;
 budgets.eta2.detrain   = -relabel.M12bar.*(relabel.etahat12 - eta2)./m2bar;
-budgets.eta2.bflux     = tend.fluid(2).meta.bflux./m2bar;
+% budgets.eta2.bflux     = tend.fluid(2).meta.bflux./m2bar;
 budgets.eta2.dissn     = tend.fluid(2).meta.dissn./m2bar;
 budgets.eta2.tot       = (tend.fluid(2).meta.tot - m2totbar.*eta2)./m2bar;
 

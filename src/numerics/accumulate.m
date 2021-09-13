@@ -67,8 +67,8 @@ accum.tke2_relabel = accum.tke2_relabel + accdt*sum(tend.fluid(2).mtke.relabel.*
 
 
 % Entropy source due to buoyancy flux and dissipation
-accum.eta_bflux = accum.eta_bflux + accdt*sum(tend.fluid(1).meta.bflux.*dzw ...
-                                            + tend.fluid(2).meta.bflux.*dzw);
+% accum.eta_bflux = accum.eta_bflux + accdt*sum(tend.fluid(1).meta.bflux.*dzw ...
+%                                             + tend.fluid(2).meta.bflux.*dzw);
 accum.eta_dissn = accum.eta_dissn + accdt*sum(tend.fluid(1).meta.dissn.*dzw ...
                                             + tend.fluid(2).meta.dissn.*dzw);
 

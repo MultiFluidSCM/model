@@ -119,8 +119,7 @@ if settings.switches.plot_budgets_entropy
         title('\eta_2 budget')
         xlabel('deta_2/dt')
         ylabel(labelz)
-        legend('Tr','K','E','D','Q','X','To','Location','NorthEast')
-%        legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
+        legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
         set(gca,'FontSize',14)
     else
         fig = figure(5);
@@ -139,8 +138,7 @@ if settings.switches.plot_budgets_entropy
         title('\eta_2 budget')
         xlabel('deta_2/dt')
         ylabel(labelz)
-        legend('Tr','K','E','D','Q','X','To','Location','NorthEast')
-%        legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
+        legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
         set(gca,'FontSize',fs)
         
         saveas(...
@@ -169,8 +167,8 @@ if settings.switches.plot_budgets_entropy
         title('\eta_1 budget')
         xlabel('deta_1/dt')
         ylabel(labelz)
-        legend('Tr','K','E','D','Q','X','To','Location','NorthEast')
-%        legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')        set(gca,'FontSize',fs)
+        legend('Tr','K','E','D','B','Q','X','To','Location','NorthEast')
+        set(gca,'FontSize',fs)
     else
         fig = figure(5);
         set(gcf,'Position',[76 166 657 624])
