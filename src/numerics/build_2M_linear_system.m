@@ -54,8 +54,9 @@ dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap1;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp1;
 % Dissipation term
 dd(13,ix) = dd(13,ix) + adt*m1.*work.dissn_rate_tke1.*work.rate_lin_fac1;
-% Relabelling terms - only keep dependence on tke1
+% Relabelling terms
 dd(13,ix) = dd(13,ix) + adt*M21;
+dd(14,ix) = dd(14,ix) - adt*M12;
 
 % TKE2 equation
 ix =  2:12:12*nz-10;
@@ -77,9 +78,9 @@ dd(15,ix) = dd(15,ix) - adt*dpdzbar.*eos.drdetap2;
 dd(17,ix) = dd(17,ix) - adt*dpdzbar.*eos.drdqp2;
 % Dissipation term
 dd(13,ix) = dd(13,ix) + adt*m2.*work.dissn_rate_tke2.*work.rate_lin_fac2;
-% Relabelling terms - only keep dependence on tke2
+% Relabelling terms
 dd(13,ix) = dd(13,ix) + adt*M12;
-
+dd(12,ix) = dd(12,ix) - adt*M21;
 
 % Fluid 1 SG eta flux
 ix =  3:12:12*nz-9;
