@@ -246,8 +246,8 @@ dd(13,ix ) = dd(13,ix ) + detfac_up        .*(relabel.qhat12(2:nzp) - q2(2:nzp))
 ix =  11:12:12*nz-1;
 ik = 1:nz;
 % Flux-gradient term
-dd( 5,ix) = dd( 5,ix) + work.deta1dz_modified;
-dd( 7,ix) = dd( 7,ix) + work.dq1dz_modified;
+dd( 9,ix) = dd( 9,ix) + 2*work.deta1dz_modified;
+dd( 9,ix) = dd( 9,ix) + 2*work.deta1dz_modified;
 % % Buoyancy correlation term
 %if settings.buoy_correl_eta
 %    dd(13,ix) = dd(13,ix) + factor1_q  .*work.dq1dz_modified;
@@ -273,9 +273,6 @@ dd(14,ix) = dd(14,ix) - M12(ik);
 % eta-q covariance2 equation
 ix =  12:12:12*nz;
 ik = 1:nz;
-% Flux-gradient term
-dd( 5,ix) = dd( 5,ix) + work.deta2dz_modified;
-dd( 7,ix) = dd( 7,ix) + work.dq2dz_modified;
 % % Buoyancy correlation term
 %if settings.buoy_correl_eta
 %    dd(13,ix) = dd(13,ix) + factor2_q  .*work.dq2dz_modified;
