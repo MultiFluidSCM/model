@@ -30,12 +30,8 @@ factor2_q   = work.T_sflux2.*dpdzbar.*m2.*eos.drdqp2;
 
 % Derivative of diffusivity wrt tke at p levels.
 % Assumes all diffusivities are the same
-dKdtke1 = (scales.dLdtke1 + 0.5*scales.L_turb1./tke1).*sqrt(tke1);
-dKdtke2 = (scales.dLdtke2 + 0.5*scales.L_turb2./tke2).*sqrt(tke2);
-
-% Derivative of flux timescale wrt tke at p levels.
-dTdtke1 = 3*sqrt(0.5)*settings.constants.param.MYNN.A2*(scales.dLdtke1 - 0.5*scales.L_turb1./tke1)./sqrt(tke1);
-dTdtke2 = 3*sqrt(0.5)*settings.constants.param.MYNN.A2*(scales.dLdtke2 - 0.5*scales.L_turb2./tke2)./sqrt(tke2);
+dKdtke1 = (2/3)*(tke1.*work.dTdtke1 + work.T_sflux1);
+dKdtke2 = (2/3)*(tke2.*work.dTdtke2 + work.T_sflux2);
 
 % ----
 
@@ -99,7 +95,7 @@ dd(11,ix) = dd(11,ix) + m1.*deta1dz.*dKdtke1;
 % Buoyancy correlation term
 if settings.buoy_correl_eta
     dd(17,ix) = dd(17,ix) - factor1_eta;
-    dd(11,ix) = dd(11,ix) - m1.*dpdzbar.*eos.drdetap1.*state_new.fluid(1).vareta.*dTdtke1;
+    dd(11,ix) = dd(11,ix) - m1.*dpdzbar.*eos.drdetap1.*state_new.fluid(1).vareta.*work.dTdtke1;
     dd(21,ix) = dd(21,ix) - factor1_q;
 end
 
@@ -112,7 +108,7 @@ dd(11,ix) = dd(11,ix) + m2.*deta2dz.*dKdtke2;
 % Buoyancy correlation term
 if settings.buoy_correl_eta
     dd(17,ix) = dd(17,ix) - factor2_eta;
-    dd(11,ix) = dd(11,ix) - m2.*dpdzbar.*eos.drdetap2.*state_new.fluid(2).vareta.*dTdtke2;
+    dd(11,ix) = dd(11,ix) - m2.*dpdzbar.*eos.drdetap2.*state_new.fluid(2).vareta.*work.dTdtke2;
     dd(21,ix) = dd(21,ix) - factor2_q;
 end
 
@@ -125,7 +121,7 @@ dd( 9,ix) = dd( 9,ix) + m1.*dq1dz.*dKdtke1;
 % Buoyancy correlation term
 if settings.buoy_correl_q
     dd(17,ix) = dd(17,ix) - factor1_q;
-    dd( 9,ix) = dd( 9,ix) - m1.*dpdzbar.*eos.drdqp1.*state_new.fluid(1).varq.*dTdtke1;
+    dd( 9,ix) = dd( 9,ix) - m1.*dpdzbar.*eos.drdqp1.*state_new.fluid(1).varq.*work.dTdtke1;
     dd(19,ix) = dd(19,ix) - factor1_eta;
 end
 
@@ -138,7 +134,7 @@ dd( 9,ix) = dd( 9,ix) + m2.*dq2dz.*dKdtke2;
 % Buoyancy correlation term
 if settings.buoy_correl_q
     dd(17,ix) = dd(17,ix) - factor2_q;
-    dd( 9,ix) = dd( 9,ix) - m2.*dpdzbar.*eos.drdqp2.*state_new.fluid(2).varq.*dTdtke2;
+    dd( 9,ix) = dd( 9,ix) - m2.*dpdzbar.*eos.drdqp2.*state_new.fluid(2).varq.*work.dTdtke2;
     dd(19,ix) = dd(19,ix) - factor2_eta;
 end
 

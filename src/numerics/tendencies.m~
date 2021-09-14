@@ -133,6 +133,9 @@ T_uflux2 = 3*constants.param.MYNN.A1*scales.T_turb2;
 % Time scales appearing in scalar flux calculations
 T_sflux1 = 3*constants.param.MYNN.A2*scales.T_turb1;
 T_sflux2 = 3*constants.param.MYNN.A2*scales.T_turb2;
+% Derivative of the latter wrt tke
+dTdtke1 = (scales.dLdtke1./scales.L_turb1 - 0.5).*T_sflux1;
+dTdtke2 = (scales.dLdtke2./scales.L_turb2 - 0.5).*T_sflux2;
 
 % Dissipation rates for TKE and variances
 dissn_rate_tke1 = 2./(constants.param.MYNN.B1*scales.T_turb1);
@@ -157,6 +160,7 @@ dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var1/T_sflux1) );
 % Apply bound
 rate_lin_fac1 = (safety_factor >= 1)*0.5 + 1;
+dTdtke1 = (safety_factor < 1)
 safety_factor = max(safety_factor,1);
 % dissn_rate_tke1 = dissn_rate_tke1.*safety_factor;
 dissn_rate_var1 = dissn_rate_var1.*safety_factor;
@@ -615,13 +619,9 @@ dvdz(2:nz)    = (v1(2:nz) - v1(1:nz-1))./dzw(2:nz);
 dvdz(nzp)     =  0;
 kesinkw       = - Dw1.*(w1(2:nzp) - w1(1:nz))./dzp ...
                 + eos.sigma1.*corrdew;
-Kdudzsq       = kdiffu1.*(dudz.*dudz + dvdz.*dvdz);
-Kdudzsq(1)    = - (u1(1)*Du1(1) + v1(1)*Dv1(1))/(m1bar(1)*dzw(1));
-
-uDu = 
-
-kesinkuv      = m1.*(aboves.*Kdudzsq(2:nzp) + belows.*Kdudzsq(1:nz)) ...
-              + eos.sigma1.*(corrdeu + corrdev);
+uzDu = dudz.*Du1 + dvdz.*Dv1;
+kesinkuv = -(aboves.*uzDu(2:nzp) + belows.*uzDu(1:nz)) ...
+           + eos.sigma1.*(corrdeu + corrdev);          
 tend.fluid(1).mtke.shear = kesinkw + kesinkuv;
 dudz(1)       =  u2(1)/dzw(1);
 dudz(2:nz)    = (u2(2:nz) - u2(1:nz-1))./dzw(2:nz);
@@ -631,10 +631,9 @@ dvdz(2:nz)    = (v2(2:nz) - v2(1:nz-1))./dzw(2:nz);
 dvdz(nzp)     =  0;
 kesinkw       = - Dw2.*(w2(2:nzp) - w2(1:nz))./dzp ...
                 + eos.sigma2.*corrdew;
-Kdudzsq       = kdiffu2.*(dudz.*dudz + dvdz.*dvdz);
-Kdudzsq(1)    = - (u2(1)*Du2(1) + v2(1)*Dv2(1))/(m2bar(1)*dzw(1));
-kesinkuv      = m2.*(aboves.*Kdudzsq(2:nzp) + belows.*Kdudzsq(1:nz)) ...
-              + eos.sigma2.*(corrdeu + corrdev);
+uzDu = dudz.*Du2 + dvdz.*Dv2;
+kesinkuv = -(aboves.*uzDu(2:nzp) + belows.*uzDu(1:nz)) ...
+           + eos.sigma2.*(corrdeu + corrdev);          
 tend.fluid(2).mtke.shear = kesinkw + kesinkuv;
 
 % Buoyancy flux generation
@@ -1216,6 +1215,8 @@ work.rate_lin_fac1 = rate_lin_fac1;
 work.rate_lin_fac2 = rate_lin_fac2;
 work.T_sflux1 = T_sflux1;
 work.T_sflux2 = T_sflux2;
+work.dTdtke1 = dTdtke1;
+work.dTdtke2 = dTdtke2;
 
 % ------
 

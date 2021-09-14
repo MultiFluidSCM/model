@@ -133,6 +133,9 @@ T_uflux2 = 3*constants.param.MYNN.A1*scales.T_turb2;
 % Time scales appearing in scalar flux calculations
 T_sflux1 = 3*constants.param.MYNN.A2*scales.T_turb1;
 T_sflux2 = 3*constants.param.MYNN.A2*scales.T_turb2;
+% Derivative of the latter wrt tke
+dTdtke1 = (scales.dLdtke1./scales.L_turb1 - 0.5./tke1).*T_sflux1;
+dTdtke2 = (scales.dLdtke2./scales.L_turb2 - 0.5./tke2).*T_sflux2;
 
 % Dissipation rates for TKE and variances
 dissn_rate_tke1 = 2./(constants.param.MYNN.B1*scales.T_turb1);
@@ -155,8 +158,9 @@ dbdz = dpdzbar.*(eos.drdetap1.*deta1dz + eos.drdqp1.*dq1dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 % Safety factor for fluid 1
 safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var1/T_sflux1) );
-% Apply bound
+% Apply bound; account for effect on linearization
 rate_lin_fac1 = (safety_factor >= 1)*0.5 + 1;
+dTdtke1 = (safety_factor < 1).*dTdtke1;
 safety_factor = max(safety_factor,1);
 % dissn_rate_tke1 = dissn_rate_tke1.*safety_factor;
 dissn_rate_var1 = dissn_rate_var1.*safety_factor;
@@ -167,8 +171,9 @@ dbdz = dpdzbar.*(eos.drdetap2.*deta2dz + eos.drdqp2.*dq2dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 % Safety factor for fluid 2
 safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var2/T_sflux2) );
-% Apply bound
+% Apply bound; account for effect on linearization
 rate_lin_fac2 = (safety_factor >= 1)*0.5 + 1;
+dTdtke2 = (safety_factor < 1).*dTdtke2;
 safety_factor = max(safety_factor,1);
 % dissn_rate_tke2 = dissn_rate_tke2.*safety_factor;
 dissn_rate_var2 = dissn_rate_var2.*safety_factor;
@@ -1211,6 +1216,8 @@ work.rate_lin_fac1 = rate_lin_fac1;
 work.rate_lin_fac2 = rate_lin_fac2;
 work.T_sflux1 = T_sflux1;
 work.T_sflux2 = T_sflux2;
+work.dTdtke1 = dTdtke1;
+work.dTdtke2 = dTdtke2;
 
 % ------
 
