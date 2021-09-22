@@ -8,20 +8,20 @@ function [ surface_flux ] = find_surface_flux( state, grid, eos, force, psurf, d
 % nsq_sfc = eos.sigma1(1)*eos.nsq1(1) + eos.sigma2(1)*eos.nsq2(1)
 % Normalized sigma2 to ensure fractions sum to exactly 1
 sig2norm = eos.sigma2(1)/(eos.sigma1(1) + eos.sigma2(1));
-if false
-% if force.sshf > 0
+% if false
+if force.sshf > 0
 % if nsq_sfc < 0
     % ff2 = sig2norm*(4 - 3*sig2norm);
     % ff2 = 4*sig2norm/(1 + 3*sig2norm);
     % ff2 = 0.4;
     ff2 = max(0.4,min(eos.sigma2(1) + 0.1,1));
-    ff2_top = max(0.4,min(eos.sigma2(end) + 0.1,1));
+    ff1_top = max(0.4,min(eos.sigma1(end) + 0.1,1));
 else
     ff2 = sig2norm;
-    ff2_top = sig2norm;
+    ff1_top = 1-eos.sigma2(end)/(eos.sigma1(end) + eos.sigma2(end));
 end
 ff1 = 1 - ff2;
-ff1_top = 1 - ff2_top;
+ff2_top = 1 - ff1_top;
 
 % ff1 = 0*eos.sigma2(1) + 1;
 % ff2 = 0*eos.sigma2(1);
