@@ -649,8 +649,10 @@ tend.fluid(2).mtke.bflux = max(bflux2,m2.*(constants.param.tke_min - tke2)/dt);
 % so just divide it evenly
 kesinkw = - (w1 - w2).*drag;
 tkesrc = aboves.*kesinkw(2:nzp) + belows.*kesinkw(1:nz);
-tend.fluid(1).mtke.drag = 0.5*tkesrc;
-tend.fluid(2).mtke.drag = 0.5*tkesrc;
+% tend.fluid(1).mtke.drag = 0.5*tkesrc;
+% tend.fluid(2).mtke.drag = 0.5*tkesrc;
+tend.fluid(1).mtke.drag = eos.sigma1.*tkesrc;
+tend.fluid(2).mtke.drag = eos.sigma2.*tkesrc;
 
 % Dissipation term
 tend.fluid(1).mtke.dissn = - m1.*tke1.*dissn_rate_tke1;
