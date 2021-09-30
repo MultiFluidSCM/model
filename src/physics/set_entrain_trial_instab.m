@@ -1,10 +1,10 @@
 % Instability source entrainment where stratification is unstable
 % *** Put tuneable coefficients in constants.params ***
-relabel.M12_instab = instab.detrain * 0.  * m2 .* n2pos;
+relabel.M12_instab = instab.detrain * 0.2 * m2 .* n2pos;
 relabel.M21_instab = instab.entrain * 0.2 * m1 .* n1neg;
 
 dM12dm1_instab = instab.detrain * 0.  * n2pos;
-dM12dm2_instab = instab.detrain * 0.  * n2pos;
+dM12dm2_instab = instab.detrain * 0.2 * n2pos;
 dM21dm1_instab = instab.entrain * 0.2 * n1neg;
 dM21dm2_instab = instab.entrain * 0.  * n1neg;
 

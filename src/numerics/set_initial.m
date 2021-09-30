@@ -72,9 +72,13 @@ state.fluid(1).covaretaq(1:nz) = 0;
 state.p            = p;
 % Fluid 2 is the same as fluid 1 except for m
 state.fluid(2)     = state.fluid(1);
+
 % Initial mass fractions
+for k = 1:length(zp)
+    sigma2(k) = initial_sigma(zp(k), settings.initial_sigma);
+end
 sigma00 = constants.param.sigma00;
-state.fluid(2).m   = sigma00.*rho;
+state.fluid(2).m   = sigma2.*rho;
 state.fluid(1).m   = rho - state.fluid(2).m;
 
 
