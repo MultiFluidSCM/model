@@ -84,29 +84,29 @@ else
     set(gca,'FontSize',fs)
 end
 % and time series of cloud base and top
-zcldbase = 0;
-k = 1;
-lq = liquid1(k) + liquid2(k);
-while lq < 1e-5 & k < nzp
-    k = k + 1;
-    lq = liquid1(k) + liquid2(k);
-    if lq > 1e-5
-        zcldbase = grid.zw(k);
-    end
-end
-ts.zcbase(plotstep) = zcldbase;
-zcldtop = 0;
-k = nzp;
-lq = liquid1(k) + liquid2(k);
-while lq < 1e-5 & k > 1
-    k = k - 1;
-    lq = liquid1(k) + liquid2(k);
-    if lq > 1e-5
-        zcldtop = grid.zw(k);
-    end
-end
-ts.zctop(plotstep) = zcldtop;
-ts.lnbgas(plotstep) = scales.LNBgas;
+% zcldbase = 0;
+% k = 1;
+% lq = liquid1(k) + liquid2(k);
+% while lq < 1e-5 & k < nzp
+%     k = k + 1;
+%     lq = liquid1(k) + liquid2(k);
+%     if lq > 1e-5
+%         zcldbase = grid.zw(k);
+%     end
+% end
+% ts.zcbase(plotstep) = zcldbase;
+% zcldtop = 0;
+% k = nzp;
+% lq = liquid1(k) + liquid2(k);
+% while lq < 1e-5 & k > 1
+%     k = k - 1;
+%     lq = liquid1(k) + liquid2(k);
+%     if lq > 1e-5
+%         zcldtop = grid.zw(k);
+%     end
+% end
+% ts.zctop(plotstep) = zcldtop;
+% ts.lnbgas(plotstep) = scales.LNBgas;
 if plottype == 0
     figure(2)
     subplot(2,3,4)

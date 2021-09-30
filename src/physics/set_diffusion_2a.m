@@ -1,5 +1,5 @@
 function [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-             set_diffusion_2a(grid, T_flux1, T_flux2, tke1, tke2, approx_d)
+             set_diffusion_2a(grid, T_sflux1, T_sflux2, T_uflux1, T_uflux2, tke1, tke2, approx_d)
 
 % Set diffusion coefficient at p-levels for diffusion
 % of entropy, water, and w
@@ -17,21 +17,21 @@ function [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifft
 
 nz = grid.nz;
 
-kdifft1 = T_flux1.*tke1*2/3;
+kdifft1 = T_sflux1.*tke1*2/3;
 kdiffq1 = kdifft1;
-kdiffw1 = kdifft1;
-kdiffu1(2:nz) = grid.abovew(2:nz).*kdifft1(2:nz) + grid.beloww(2:nz).*kdifft1(1:nz-1);
-kdiffu1(1)    = grid.extrapb1*kdifft1(1) + grid.extrapb2*kdifft1(2);
-kdiffu1(nz+1) = grid.extraptnz*kdifft1(nz) + grid.extraptnzm*kdifft1(nz-1);
+kdiffw1 = T_uflux1.*tke1*2/3;
+kdiffu1(2:nz) = grid.abovew(2:nz).*kdiffw1(2:nz) + grid.beloww(2:nz).*kdiffw1(1:nz-1);
+kdiffu1(1)    = grid.extrapb1*kdiffw1(1) + grid.extrapb2*kdiffw1(2);
+kdiffu1(nz+1) = grid.extraptnz*kdiffw1(nz) + grid.extraptnzm*kdiffw1(nz-1);
 kdifftke1 = kdiffu1;
 
 
-kdifft2 = T_flux2.*tke2*2/3;
+kdifft2 = T_sflux2.*tke2*2/3;
 kdiffq2 = kdifft2;
-kdiffw2 = kdifft2;
-kdiffu2(2:nz) = grid.abovew(2:nz).*kdifft2(2:nz) + grid.beloww(2:nz).*kdifft2(1:nz-1);
-kdiffu2(1)    = grid.extrapb1*kdifft2(1) + grid.extrapb2*kdifft2(2);
-kdiffu2(nz+1) = grid.extraptnz*kdifft2(nz) + grid.extraptnzm*kdifft2(nz-1);
+kdiffw2 = T_uflux2.*tke2*2/3;
+kdiffu2(2:nz) = grid.abovew(2:nz).*kdiffw2(2:nz) + grid.beloww(2:nz).*kdiffw2(1:nz-1);
+kdiffu2(1)    = grid.extrapb1*kdiffw2(1) + grid.extrapb2*kdiffw2(2);
+kdiffu2(nz+1) = grid.extraptnz*kdiffw2(nz) + grid.extraptnzm*kdiffw2(nz-1);
 kdifftke2 = kdiffu2;
 
 % ------

@@ -12,6 +12,8 @@ dzp = grid.dzp;
 dzw = grid.dzw;
 abovep = grid.abovep;
 belowp = grid.belowp;
+aboves = grid.aboves;
+belows = grid.belows;
 p    = state.p;
 m1   = state.fluid(1).m;
 m2   = state.fluid(2).m;
@@ -72,7 +74,7 @@ psurf = grid.extrapb1*p(1) + grid.extrapb2*p(2);
 dpdz(2:nz)   = (p(2:nz) - p(1:nz-1))./dzw(2:nz);
 dpdz(1) = dpdz(2);
 dpdz(nzp) = dpdz(nz);
-dpdzbar = abovep.*dpdz(2:nzp) + belowp.*dpdz(1:nz);
+dpdzbar = aboves.*dpdz(2:nzp) + belows.*dpdz(1:nz);
 dpdz(1) = 0;
 dpdz(nzp) = 0;
 
@@ -125,9 +127,15 @@ scales = find_scales(grid,settings,state,eos,surface_flux,constants,switches);
 
 % Determine various rates and time scales related to turbulence
 
-% Time scales appearing in scalar fluc calculations
-T_flux1 = 3*constants.param.MYNN.A2*scales.T_turb1;
-T_flux2 = 3*constants.param.MYNN.A2*scales.T_turb2;
+% Time scales appearing in momentum flux calculations
+T_uflux1 = 3*constants.param.MYNN.A1*scales.T_turb1;
+T_uflux2 = 3*constants.param.MYNN.A1*scales.T_turb2;
+% Time scales appearing in scalar flux calculations
+T_sflux1 = 3*constants.param.MYNN.A2*scales.T_turb1;
+T_sflux2 = 3*constants.param.MYNN.A2*scales.T_turb2;
+% Derivative of the latter wrt tke
+dTdtke1 = (scales.dLdtke1./scales.L_turb1 - 0.5./tke1).*T_sflux1;
+dTdtke2 = (scales.dLdtke2./scales.L_turb2 - 0.5./tke2).*T_sflux2;
 
 % Dissipation rates for TKE and variances
 dissn_rate_tke1 = 2./(constants.param.MYNN.B1*scales.T_turb1);
@@ -149,24 +157,28 @@ rmin = 0.5;
 dbdz = dpdzbar.*(eos.drdetap1.*deta1dz + eos.drdqp1.*dq1dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 % Safety factor for fluid 1
-safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var1/T_flux1) );
-% Apply bound
+safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var1/T_sflux1) );
+% Apply bound; account for effect on linearization
 rate_lin_fac1 = (safety_factor >= 1)*0.5 + 1;
+dTdtke1 = (safety_factor < 1).*dTdtke1;
 safety_factor = max(safety_factor,1);
 % dissn_rate_tke1 = dissn_rate_tke1.*safety_factor;
 dissn_rate_var1 = dissn_rate_var1.*safety_factor;
-T_flux1 = T_flux1./safety_factor;
+T_sflux1 = T_sflux1./safety_factor;
+T_uflux1 = T_uflux1./safety_factor;
 % Stability parameter
 dbdz = dpdzbar.*(eos.drdetap2.*deta2dz + eos.drdqp2.*dq2dz);
 dbdz = min(dbdz,0)*(settings.buoy_correl_eta || settings.buoy_correl_q);
 % Safety factor for fluid 2
-safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var2/T_flux2) );
-% Apply bound
+safety_factor = sqrt( (-2*dbdz/(1 - rmin))/(dissn_rate_var2/T_sflux2) );
+% Apply bound; account for effect on linearization
 rate_lin_fac2 = (safety_factor >= 1)*0.5 + 1;
+dTdtke2 = (safety_factor < 1).*dTdtke2;
 safety_factor = max(safety_factor,1);
 % dissn_rate_tke2 = dissn_rate_tke2.*safety_factor;
 dissn_rate_var2 = dissn_rate_var2.*safety_factor;
-T_flux2 = T_flux2./safety_factor;
+T_sflux2 = T_sflux2./safety_factor;
+T_uflux2 = T_uflux2./safety_factor;
 
 %plot_detadz
 %plot_dqdz
@@ -191,14 +203,14 @@ if settings.constants.param.sigma_weighted_tke
 %         set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
 %                              tke1.*m1./(m1+m2),tke2.*m2./(m1+m2),switches.d);
     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-        set_diffusion_2a(grid,T_flux1,T_flux2, ...
+        set_diffusion_2a(grid,T_sflux1,T_sflux2,T_uflux1,T_uflux2, ...
                              tke1.*m1./(m1+m2),tke2.*m2./(m1+m2),switches.d);
 else
 %     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
 %         set_diffusion_2(grid,scales.L_turb1,scales.L_turb2, ...
 %                         tke1,tke2,switches.d);
     [kdifft1,kdiffq1,kdiffw1,kdifft2,kdiffq2,kdiffw2,kdiffu1,kdiffu2,kdifftke1,kdifftke2] = ...
-        set_diffusion_2a(grid,T_flux1,T_flux2, ...
+        set_diffusion_2a(grid,T_sflux1,T_sflux2,T_uflux1,T_uflux2, ...
                         tke1,tke2,switches.d);
 end
 
@@ -264,8 +276,8 @@ xcovaretaq1 = rr*sqrt(vareta1.*varq1);
 xcovaretaq2 = rr*sqrt(vareta2.*varq2);
 % t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 % t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*T_flux1;
-Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*T_flux2;
+Deta1bc = dpdzbar.*m1.*(eos.drdetap1.*vareta1 + eos.drdqp1.*covaretaq1).*T_sflux1;
+Deta2bc = dpdzbar.*m2.*(eos.drdetap2.*vareta2 + eos.drdqp2.*covaretaq2).*T_sflux2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_eta
@@ -362,8 +374,8 @@ xcovaretaq1 = rr*sqrt(vareta1.*varq1);
 xcovaretaq2 = rr*sqrt(vareta2.*varq2);
 % t_scale1 = 1.5*scales.L_turb1./sqrt(tke1);
 % t_scale2 = 1.5*scales.L_turb2./sqrt(tke2);
-Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*T_flux1;
-Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*T_flux2;
+Dq1bc = dpdzbar.*m1.*(eos.drdetap1.*covaretaq1 + eos.drdqp1.*varq1).*T_sflux1;
+Dq2bc = dpdzbar.*m2.*(eos.drdetap2.*covaretaq2 + eos.drdqp2.*varq2).*T_sflux2;
 
 % Include buoyancy correlation in total SG flux
 if settings.buoy_correl_q
@@ -597,7 +609,7 @@ tend.fluid(2).mtke.diffent = - corrde;
 % Shear generation
 % Consistent with free slip at top boundary
 corrdew       = (w2 - w1).*tend.fluid(1).mw.diffent;
-corrdew       = grid.aboves.*corrdew(2:nzp) + grid.belows.*corrdew(1:nz);
+corrdew       = aboves.*corrdew(2:nzp) + belows.*corrdew(1:nz);
 corrdeu       = (u2 - u1).*tend.fluid(1).mu.diffent;
 corrdev       = (v2 - v1).*tend.fluid(1).mv.diffent;
 dudz(1)       =  u1(1)/dzw(1);
@@ -608,10 +620,9 @@ dvdz(2:nz)    = (v1(2:nz) - v1(1:nz-1))./dzw(2:nz);
 dvdz(nzp)     =  0;
 kesinkw       = - Dw1.*(w1(2:nzp) - w1(1:nz))./dzp ...
                 + eos.sigma1.*corrdew;
-Kdudzsq       = kdiffu1.*(dudz.*dudz + dvdz.*dvdz);
-Kdudzsq(1)    = - (u1(1)*Du1(1) + v1(1)*Dv1(1))/(m1bar(1)*dzw(1));
-kesinkuv      = m1.*(grid.aboves.*Kdudzsq(2:nzp) + grid.belows.*Kdudzsq(1:nz)) ...
-              + eos.sigma1.*(corrdeu + corrdev);
+uzDu = dudz.*Du1 + dvdz.*Dv1;
+kesinkuv = -(aboves.*uzDu(2:nzp) + belows.*uzDu(1:nz)) ...
+           + eos.sigma1.*(corrdeu + corrdev);          
 tend.fluid(1).mtke.shear = kesinkw + kesinkuv;
 dudz(1)       =  u2(1)/dzw(1);
 dudz(2:nz)    = (u2(2:nz) - u2(1:nz-1))./dzw(2:nz);
@@ -621,10 +632,9 @@ dvdz(2:nz)    = (v2(2:nz) - v2(1:nz-1))./dzw(2:nz);
 dvdz(nzp)     =  0;
 kesinkw       = - Dw2.*(w2(2:nzp) - w2(1:nz))./dzp ...
                 + eos.sigma2.*corrdew;
-Kdudzsq       = kdiffu2.*(dudz.*dudz + dvdz.*dvdz);
-Kdudzsq(1)    = - (u2(1)*Du2(1) + v2(1)*Dv2(1))/(m2bar(1)*dzw(1));
-kesinkuv      = m2.*(grid.aboves.*Kdudzsq(2:nzp) + grid.belows.*Kdudzsq(1:nz)) ...
-              + eos.sigma2.*(corrdeu + corrdev);
+uzDu = dudz.*Du2 + dvdz.*Dv2;
+kesinkuv = -(aboves.*uzDu(2:nzp) + belows.*uzDu(1:nz)) ...
+           + eos.sigma2.*(corrdeu + corrdev);          
 tend.fluid(2).mtke.shear = kesinkw + kesinkuv;
 
 % Buoyancy flux generation
@@ -638,9 +648,11 @@ tend.fluid(2).mtke.bflux = max(bflux2,m2.*(constants.param.tke_min - tke2)/dt);
 % It is not obvious how to partition this between fluid 1 and fluid 2
 % so just divide it evenly
 kesinkw = - (w1 - w2).*drag;
-tkesrc = grid.aboves.*kesinkw(2:nzp) + grid.belows.*kesinkw(1:nz);
-tend.fluid(1).mtke.drag = 0.5*tkesrc;
-tend.fluid(2).mtke.drag = 0.5*tkesrc;
+tkesrc = aboves.*kesinkw(2:nzp) + belows.*kesinkw(1:nz);
+% tend.fluid(1).mtke.drag = 0.5*tkesrc;
+% tend.fluid(2).mtke.drag = 0.5*tkesrc;
+tend.fluid(1).mtke.drag = eos.sigma1.*tkesrc;
+tend.fluid(2).mtke.drag = eos.sigma2.*tkesrc;
 
 % Dissipation term
 tend.fluid(1).mtke.dissn = - m1.*tke1.*dissn_rate_tke1;
@@ -649,10 +661,10 @@ tend.fluid(2).mtke.dissn = - m2.*tke2.*dissn_rate_tke2;
 % ------
 
 % Include effect of buoyancy flux on internal energy
-esource = weight_to_w(grid,tend.fluid(1).mtke.bflux./m1);
-tend.fluid(1).meta.bflux = -m1bar.*esource./state.fluid(1).Tw;
-esource = weight_to_w(grid,tend.fluid(2).mtke.bflux./m2);
-tend.fluid(2).meta.bflux = -m2bar.*esource./state.fluid(2).Tw;
+% esource = weight_to_w(grid,tend.fluid(1).mtke.bflux./m1);
+% tend.fluid(1).meta.bflux = -m1bar.*esource./state.fluid(1).Tw;
+% esource = weight_to_w(grid,tend.fluid(2).mtke.bflux./m2);
+% tend.fluid(2).meta.bflux = -m2bar.*esource./state.fluid(2).Tw;
 
 % Return dissipated TKE as entropy
 esource = weight_to_w(grid,tend.fluid(1).mtke.dissn./m1);
@@ -687,7 +699,7 @@ tend.fluid(2).mvareta.bc = -2*Deta2bc.*deta2dz_modified;
 
 % `diffent' source terms
 corrde = 2*(eta2 - eta1).*tend.fluid(1).meta.diffent;
-corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
+corrde = aboves.*corrde(2:nzp) + belows.*corrde(1:nz);
 tend.fluid(1).mvareta.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvareta.diffent = eos.sigma2.*corrde;
 
@@ -715,7 +727,7 @@ tend.fluid(2).mvarq.diffuse = -2*(Dq2ed.*dq2dz + settings.buoy_correl_q*Dq2bc.*d
 
 % `diffent' source terms
 corrde = 2*(q2 - q1).*tend.fluid(1).mq.diffent;
-corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
+corrde = aboves.*corrde(2:nzp) + belows.*corrde(1:nz);
 tend.fluid(1).mvarq.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mvarq.diffent = eos.sigma2.*corrde;
 
@@ -744,7 +756,7 @@ tend.fluid(2).mcovaretaq.bc = - (Dq2bc  .*deta2dz_modified ...
 % `diffent' source terms
 corrde = (eta2 - eta1).*tend.fluid(1).mq.diffent ...
        + (q2   - q1  ).*tend.fluid(1).meta.diffent;
-corrde = grid.aboves.*corrde(2:nzp) + grid.belows.*corrde(1:nz);
+corrde = aboves.*corrde(2:nzp) + belows.*corrde(1:nz);
 tend.fluid(1).mcovaretaq.diffent = eos.sigma1.*corrde;
 tend.fluid(2).mcovaretaq.diffent = eos.sigma2.*corrde;
 
@@ -807,19 +819,19 @@ tkehat21 = tke1;
 dwsq = (relabel.what12 - w1).^2;
 du12_1_sq = (relabel.uhat12 - u1).^2 ...
           + (relabel.vhat12 - v1).^2 ...
-          + grid.aboves.*dwsq(2:nzp) + grid.belows.*dwsq(1:nz);
+          + aboves.*dwsq(2:nzp) + belows.*dwsq(1:nz);
 dwsq = (relabel.what21 - w1).^2;
 du21_1_sq = (relabel.uhat21 - u1).^2 ...
           + (relabel.vhat21 - v1).^2 ...
-          + grid.aboves.*dwsq(2:nzp) + grid.belows.*dwsq(1:nz);
+          + aboves.*dwsq(2:nzp) + belows.*dwsq(1:nz);
 dwsq = (relabel.what12 - w2).^2;
 du12_2_sq = (relabel.uhat12 - u2).^2 ...
           + (relabel.vhat12 - v2).^2 ...
-          + grid.aboves.*dwsq(2:nzp) + grid.belows.*dwsq(1:nz);
+          + aboves.*dwsq(2:nzp) + belows.*dwsq(1:nz);
 dwsq = (relabel.what21 - w2).^2;
 du21_2_sq = (relabel.uhat21 - u2).^2 ...
           + (relabel.vhat21 - v2).^2 ...
-          + grid.aboves.*dwsq(2:nzp) + grid.belows.*dwsq(1:nz);
+          + aboves.*dwsq(2:nzp) + belows.*dwsq(1:nz);
 % TKE tendencies due to entrainment/detrainment
 tend.fluid(1).mtke.relabel = M12.*(tkehat12 + 0.5*du12_1_sq) ...
                            - M21.*(tkehat21 + 0.5*du21_1_sq);
@@ -830,13 +842,13 @@ tend.fluid(2).mtke.relabel = M21.*(tkehat21 + 0.5*du21_2_sq) ...
 % Note these are quasi-advective form tendencies
 % `Upwind' approximation for transferred variances
 temp = (relabel.etahat12 - eta1).^2;
-deta12_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+deta12_1_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.etahat21 - eta1).^2;
-deta21_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+deta21_1_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.etahat21 - eta2).^2;
-deta21_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+deta21_2_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.etahat12 - eta2).^2;
-deta12_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+deta12_2_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 tend.fluid(1).mvareta.relabel = M12.*(vareta2 - vareta1 + deta12_1_sq) ...
                               - M21.*(                    deta21_1_sq);
 tend.fluid(2).mvareta.relabel = M21.*(vareta1 - vareta2 + deta21_2_sq) ...
@@ -846,13 +858,13 @@ tend.fluid(2).mvareta.relabel = M21.*(vareta1 - vareta2 + deta21_2_sq) ...
 % Note these are quasi-advective form tendencies
 % 'Upwind' approximation for transferred variances
 temp = (relabel.qhat12 - q1).^2;
-dq12_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dq12_1_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.qhat21 - q1).^2;
-dq21_1_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dq21_1_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.qhat21 - q2).^2;
-dq21_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dq21_2_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.qhat12 - q2).^2;
-dq12_2_sq = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dq12_2_sq = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 tend.fluid(1).mvarq.relabel = M12.*(varq2 - varq1 + dq12_1_sq) ...
                             - M21.*(                dq21_1_sq);
 tend.fluid(2).mvarq.relabel = M21.*(varq1 - varq2 + dq21_2_sq) ...
@@ -863,13 +875,13 @@ tend.fluid(2).mvarq.relabel = M21.*(varq1 - varq2 + dq21_2_sq) ...
 % Note these are quasi-advective form tendencies
 % `Upwind' approximation for transferred variances
 temp = (relabel.qhat12 - q1).*(relabel.etahat12 - eta1);
-dqdeta12_1 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dqdeta12_1 = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.qhat21 - q1).*(relabel.etahat21 - eta1);
-dqdeta21_1 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dqdeta21_1 = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.qhat21 - q2).*(relabel.etahat21 - eta2);
-dqdeta21_2 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dqdeta21_2 = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 temp = (relabel.qhat12 - q2).*(relabel.etahat12 - eta2);
-dqdeta12_2 = grid.aboves.*temp(2:nzp) + grid.belows.*temp(1:nz);
+dqdeta12_2 = aboves.*temp(2:nzp) + belows.*temp(1:nz);
 tend.fluid(1).mcovaretaq.relabel = M12.*(covaretaq2 - covaretaq1 + dqdeta12_1) ...
                                  - M21.*(                          dqdeta21_1);
 tend.fluid(2).mcovaretaq.relabel = M21.*(covaretaq1 - covaretaq2 + dqdeta21_2) ...
@@ -890,14 +902,14 @@ tend.fluid(1).meta.tot = tend.fluid(1).meta.transport ...
                        + tend.fluid(1).meta.diffuse ...
                        + tend.fluid(1).meta.diffent ...
                        + tend.fluid(1).meta.relabel ...
-                       + tend.fluid(1).meta.bflux ...
                        + tend.fluid(1).meta.dissn;
+%                       + tend.fluid(1).meta.bflux ...
 tend.fluid(2).meta.tot = tend.fluid(2).meta.transport ...
                        + tend.fluid(2).meta.diffuse ...
                        + tend.fluid(2).meta.diffent ...
                        + tend.fluid(2).meta.relabel ...
-                       + tend.fluid(2).meta.bflux ...
                        + tend.fluid(2).meta.dissn;
+%                       + tend.fluid(2).meta.bflux ...
 
 % Water
 tend.fluid(1).mq.tot = tend.fluid(1).mq.transport ...
@@ -1023,7 +1035,7 @@ budgets.eta1.diffuse   = (tend.fluid(1).meta.diffuse + tend.fluid(1).meta.diffen
 budgets.eta1.buoycor   = tend.fluid(1).meta.buoycor./m1bar;
 budgets.eta1.entrain   = -relabel.M21bar.*(relabel.etahat21 - eta1)./m1bar;
 budgets.eta1.detrain   =  relabel.M12bar.*(relabel.etahat12 - eta1)./m1bar;
-budgets.eta1.bflux     = tend.fluid(1).meta.bflux./m1bar;
+% budgets.eta1.bflux     = tend.fluid(1).meta.bflux./m1bar;
 budgets.eta1.dissn     = tend.fluid(1).meta.dissn./m1bar;
 budgets.eta1.tot       = (tend.fluid(1).meta.tot - m1totbar.*eta1)./m1bar;
 
@@ -1032,7 +1044,7 @@ budgets.eta2.diffuse   = (tend.fluid(2).meta.diffuse + tend.fluid(2).meta.diffen
 budgets.eta2.buoycor   = tend.fluid(2).meta.buoycor./m2bar;
 budgets.eta2.entrain   =  relabel.M21bar.*(relabel.etahat21 - eta2)./m2bar;
 budgets.eta2.detrain   = -relabel.M12bar.*(relabel.etahat12 - eta2)./m2bar;
-budgets.eta2.bflux     = tend.fluid(2).meta.bflux./m2bar;
+% budgets.eta2.bflux     = tend.fluid(2).meta.bflux./m2bar;
 budgets.eta2.dissn     = tend.fluid(2).meta.dissn./m2bar;
 budgets.eta2.tot       = (tend.fluid(2).meta.tot - m2totbar.*eta2)./m2bar;
 
@@ -1204,8 +1216,10 @@ work.dissn_rate_var1 = dissn_rate_var1;
 work.dissn_rate_var2 = dissn_rate_var2;
 work.rate_lin_fac1 = rate_lin_fac1;
 work.rate_lin_fac2 = rate_lin_fac2;
-work.T_flux1 = T_flux1;
-work.T_flux2 = T_flux2;
+work.T_sflux1 = T_sflux1;
+work.T_sflux2 = T_sflux2;
+work.dTdtke1 = dTdtke1;
+work.dTdtke2 = dTdtke2;
 
 % ------
 

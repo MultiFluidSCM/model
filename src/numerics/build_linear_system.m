@@ -44,8 +44,8 @@ end
 % Pressure gradient term
 cc(9 ,ixc) = cc(9 ,ixc) - adt*m1bar(ikc)./(eos.rhow1(ikc).*dzw(ikc));
 cc(18,ixc) = cc(18,ixc) + adt*m1bar(ikc)./(eos.rhow1(ikc).*dzw(ikc));
-cc(7 ,ixc) = cc(7 ,ixc) + adt*work.nhpg1(ikc).*beloww(ikc);
-cc(16,ixc) = cc(16,ixc) + adt*work.nhpg1(ikc).*abovew(ikc);
+cc(7 ,ixc) = cc(7 ,ixc) + adt*work.nhpg1(ikc).*belowr(ikc);
+cc(16,ixc) = cc(16,ixc) + adt*work.nhpg1(ikc).*abover(ikc);
 % Buoyancy term
 cc(9 ,ixc) = cc(9 ,ixc) - adt*m1bar(ikc).*dpdz(ikc).*eos.drdpbar1(ikc).*beloww(ikc);
 cc(18,ixc) = cc(18,ixc) - adt*m1bar(ikc).*dpdz(ikc).*eos.drdpbar1(ikc).*abovew(ikc);
