@@ -1,12 +1,16 @@
-function force = set_forcing(forcing, t)
+function force = set_forcing(grid, forcing, t)
 
-% Interpolate forcing and fluxes from values provided
+% Forcings which aren't time dependent
 
 % Geostrophic wind
-force.ug = forcing.ug;
-force.vg = forcing.vg;
+for k = 1:length(grid.zp)
+    force.ug(k) = initial_field(grid.zp(k), forcing.ug_z, forcing.ug);
+    force.vg(k) = initial_field(grid.zp(k), forcing.vg_z, forcing.vg);
+end
 
 
+% Forcings which are time dependent
+% Interpolate forcing and fluxes from values provided
 for i=1:length(forcing.t)-1
     if (forcing.t(i) <= t && t < forcing.t(i+1))
         % Surface fluxes (W / m^2)

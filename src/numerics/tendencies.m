@@ -115,7 +115,7 @@ ddz_sigrho(nzp) = 0;
 % ------
 
 % Determine surface forcing and the partitioning of surface fluxes
-force = set_forcing(settings.forcing, t);
+force = set_forcing(grid, settings.forcing, t);
 surface_flux = find_surface_flux(state,grid,eos,force,psurf,dpdzbar,constants);
 
 % Calculate certain scales - these are non-local quantities, so difficult

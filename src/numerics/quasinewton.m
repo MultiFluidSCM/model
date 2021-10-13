@@ -601,12 +601,14 @@ save_res_convergence
     % Increment all variables
     state_new.p            =     state_new.p            + inc_p;
     state_new.fluid(1).m   =     state_new.fluid(1).m   + inc_m1;
+    % state_new.fluid(1).m   = max(state_new.fluid(1).m   + inc_m1, 0);
     state_new.fluid(1).w   =     state_new.fluid(1).w   + inc_w1;
     state_new.fluid(1).eta =     state_new.fluid(1).eta + inc_eta1;
     state_new.fluid(1).q   = max(state_new.fluid(1).q   + inc_q1, 0);
     state_new.fluid(1).T   =     state_new.fluid(1).T   + inc_T1;
     state_new.fluid(1).Tw  =     state_new.fluid(1).Tw  + inc_Tw1;
     state_new.fluid(2).m   =     state_new.fluid(2).m   + inc_m2;
+    % state_new.fluid(2).m   = max(state_new.fluid(2).m   + inc_m2, 0);
     state_new.fluid(2).w   =     state_new.fluid(2).w   + inc_w2;
     state_new.fluid(2).eta =     state_new.fluid(2).eta + inc_eta2;
     state_new.fluid(2).q   = max(state_new.fluid(2).q   + inc_q2, 0);

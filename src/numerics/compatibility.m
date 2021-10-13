@@ -106,3 +106,9 @@ if not(isfield(settings.forcing, 'tshf'))
     settings.forcing.tshf = 0*settings.forcing.t;
     settings.forcing.tlhf = 0*settings.forcing.t;
 end
+
+% October 2021: New forcing terms used in BOMEX case
+if not(isfield(settings.forcing, 'ug_z'))
+    settings.forcing.ug_z = 0;
+    settings.forcing.vg_z = 0;
+end

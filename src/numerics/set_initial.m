@@ -54,7 +54,8 @@ end
 
 
 % Set winds to geostrophic values, which are set in set_forcing
-force = set_forcing(settings.forcing, 0);
+force = set_forcing(grid, settings.forcing, 0);
+
 
 % Save in state structure
 %state.fluid(1).m   = (1.0 - constants.param.confrac)*rho;
