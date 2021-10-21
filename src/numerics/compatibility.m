@@ -89,13 +89,17 @@ end
 
 % September 2021: Removed initial theta and rv profiles so they are no longer hard-coded
 if not(isfield(settings, 'initial_theta'))
-    disp("Using default theta and rv profiles for the ARM case");
+    disp("Using default initial theta profiles for the ARM case");
     settings.initial_theta.z     = [    0;    50;   350;    650;   700;   1300;  2500;  5500];
     settings.initial_theta.theta = [299.0; 301.5; 302.5; 303.53; 303.7; 307.13; 314.0; 343.2];
-    
+end
+if not(isfield(settings, 'initial_rv'))
+    disp("Using default initial rv profiles for the ARM case");
     settings.initial_rv.z  = [      0;       50;      350;      650;    700;    1300;   2500;   5500];
     settings.initial_rv.rv = [15.2e-3; 15.17e-3; 14.98e-3; 14.8e-3; 14.7e-3; 13.5e-3; 3.0e-3; 3.0e-3];
-    
+end
+if not(isfield(settings, 'initial_sigma'))
+    disp("Using default initial sigma profiles for the ARM case");
     settings.initial_sigma.z      = [0; 1];
     settings.initial_sigma.sigma2 = [settings.constants.param.sigma00; settings.constants.param.sigma00];
 end
@@ -111,4 +115,30 @@ end
 if not(isfield(settings.forcing, 'ug_z'))
     settings.forcing.ug_z = 0;
     settings.forcing.vg_z = 0;
+end
+
+% October 2021: Added initial proviles for the horizontal velocities
+if not(isfield(settings, 'initial_u'))
+    disp("Using default initial u profiles for the ARM case");
+    settings.initial_u.z = [0];
+    settings.initial_u.u = [-10.];
+end
+if not(isfield(settings, 'initial_v'))
+    disp("Using default initial v profiles for the ARM case");
+    settings.initial_v.z = [0];
+    settings.initial_v.v = [0];
+end
+
+% October 2021: New subsidence forcing term used in BOMEX case
+if not(isfield(settings.forcing, 'wsub'))
+    disp("Using default subsidence of 0");
+    settings.forcing.wsub_z = 0;
+    settings.forcing.wsub   = 0;
+end
+
+% October 2021: New radiative cooling forcing term used in BOMEX case
+if not(isfield(settings.forcing, 'rad'))
+    disp("Using default radiative cooling of 0");
+    settings.forcing.rad_z = 0;
+    settings.forcing.rad   = 0;
 end
