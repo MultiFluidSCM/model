@@ -22,8 +22,7 @@ constants = settings.constants;
 gravity = constants.phys.gravity;
 
 % Surface pressure
-%p0s = 100000;
-p0s =  97000;
+p0s = settings.surface_pressure;
 
 
 % Specify profiles in balance with a given thetal(z)

@@ -449,8 +449,8 @@ meanGbar(nzp) = 0;
 meanGbar(2:nzp) = meanGbar(2:nzp) + grid.beloww(2:nzp).*meanG;
 % Total correction
 corrde = meanGbar.*(ddz_sigrho - (m2bar./rhobar).*ddz_rho);
-tend.fluid(1).mq.diffent =   corrde;
-tend.fluid(2).mq.diffent = - corrde;
+tend.fluid(1).mq.diffent =   corrde;%-1.2e-5;
+tend.fluid(2).mq.diffent = - corrde;%-1.2e-5;
 
 % ------
 

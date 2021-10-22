@@ -1,9 +1,9 @@
 % Save data for direct comparison with LES results
 
 % List of times at which to compare with LES
-SCM_times = settings.output_times;
+SCM_output_times = settings.output_times;
 % settings.output_times = [14000:600:42800];
-nst = numel(SCM_times); 
+nst = numel(SCM_output_times); 
 
 % Time step size
 dt = time.dt;
@@ -14,9 +14,10 @@ lsave = 0;
 ist = 0;
 while ist < nst & ~lsave
     ist = ist + 1;
-    st = SCM_times(ist);
+    st = SCM_output_times(ist);
     if (time.t - dt < st & time.t >= st)
         lsave = 1;
+        SCM_times(ist) = st;
     end
 end
 

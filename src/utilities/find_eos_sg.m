@@ -205,9 +205,11 @@ for k = 1:nzp
                                                    state.fluid(2).q(k),  ...
                                                    constants.therm);
     eos.res_eta2(k) = state.fluid(2).eta(k) + gt;
+    
     for iter = 1:3
         res = state.fluid(2).eta(k) + gt;
         T_inc = -res/gtt;
+        
         state.fluid(2).Tw(k) = state.fluid(2).Tw(k) + T_inc;
         [g,gp,gt,gw,gpp,gpt,gtt,gpw,gtw,gww,a] = gibbs(pbar,                 ...
                                                    state.fluid(2).Tw(k), ...
@@ -224,10 +226,12 @@ for k = 1:nzp
     % Need to iterate to find Tgas. [Better to include in main iteration?]
     Tgas = state.fluid(2).Tw(k);
     a = 1 - state.fluid(2).q(k);
+    
     for iter = 1:3
         [g,gp,gt,ga,gpp,gpt,gpa,gtt,gta,gaa,gtwv] = gibbsav(pbar,Tgas,a,constants.therm);
         res = state.fluid(2).eta(k) + gt;
         T_inc = -res/gtt;
+        
         Tgas = Tgas + T_inc;
     end
     rhogas = 1/gp;

@@ -8,6 +8,10 @@ eta00 = thetal2eta(thetal,ww,constants.therm,constants.phys.p00);
 % Surface exner (for estimating surface temperature when p0s differs from p00)
 exner0s = (p0s/constants.phys.p00)^constants.therm.kappa;
 
+
+
+
+
 % Search by bisection to get a sensible starting value of
 % surface temperature
 t2 = (thetal + 1.0)*exner0s;
@@ -93,6 +97,7 @@ p(1) = p1;
 % Integrate the hydrostatic relation to find the pressure
 for k = 2:nz
   p2 = p1;
+  
   % Given theta at zw(k) ...
   ww = initial_q(zw(k), settings.initial_rv);
   thetal = initial_theta(zw(k), settings.initial_theta);
@@ -101,6 +106,7 @@ for k = 2:nz
   for iter2 = 1:10
     pbar = abovew(k)*p2 + beloww(k)*p1;
     dpbydz = (p2 - p1)/dzw(k);
+    
     [g,gp,gt,gw,gpp,gpt,gtt,gpw,gtw,gww,a] = gibbs(pbar,tt,ww,constants.therm);
     r1 = gp*dpbydz + gravity;
     r2 = gt + eta00;

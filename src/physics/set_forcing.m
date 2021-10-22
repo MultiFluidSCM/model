@@ -36,9 +36,9 @@ end
 % Set forcing to last available value if time beyond interpolation range
 if t >=forcing.t(end)
     force.sshf = forcing.shf(end);
-    force.sqf  = forcing.lhf(end);
+    force.sqf  = forcing.lhf(end)./2.5e6;
     force.tshf = forcing.tshf(end);
-    force.tqf  = forcing.tlhf(end);
+    force.tqf  = forcing.tlhf(end)./2.5e6;
 end
 
 % Note on surface moisture flux (kg / m^2 / s):

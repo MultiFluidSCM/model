@@ -142,3 +142,9 @@ if not(isfield(settings.forcing, 'rad'))
     settings.forcing.rad_z = 0;
     settings.forcing.rad   = 0;
 end
+
+% October 2021: Option to set the surface pressure added
+if not(isfield(settings, 'surface_pressure'))
+    disp("Using default ARM surface pressure of 97000");
+    settings.surface_pressure = 97000;
+end
