@@ -217,8 +217,8 @@ end
 % ------
 
 % Advective mass flux
-[F1, dF1dma, dF1dmb, dF1dw] = mass_flux(grid,m1,w1+force.wsub);
-[F2, dF2dma, dF2dmb, dF2dw] = mass_flux(grid,m2,w2+force.wsub);
+[F1, dF1dma, dF1dmb, dF1dw] = mass_flux(grid,m1,w1);
+[F2, dF2dma, dF2dmb, dF2dw] = mass_flux(grid,m2,w2);
 
 % Include surface moisture fluxes
 F1(1) = F1(1) + surface_flux.q1;
@@ -332,10 +332,10 @@ for k=1:nz
     eta_init(k) = thetal2eta(theta1_init, q1(k), constants.therm, constants.phys.p00);
     eta_radf(k) = thetal2eta(theta1_radf, q1(k), constants.therm, constants.phys.p00);
 end
-tend.fluid(1).meta.radforce = m1.*(eta_radf-eta_init);
-tend.fluid(2).meta.radforce = m2.*(eta_radf-eta_init);
-tend.fluid(1).meta.radforce(end+1) = 0;
-tend.fluid(2).meta.radforce(end+1) = 0;
+tend.fluid(1).meta.force = m1.*(eta_radf-eta_init) + m1.*force.wsub(1:nz).*deta1dz;
+tend.fluid(2).meta.force = m2.*(eta_radf-eta_init) + m2.*force.wsub(1:nz).*deta2dz;
+tend.fluid(1).meta.force(end+1) = 0;
+tend.fluid(2).meta.force(end+1) = 0;
 
 % Entrainment/detrainment associated with vertical diffusion and gradients
 % of sigma
@@ -454,6 +454,8 @@ tend.fluid(2).mq.diffent = - corrde;
 % Prescribed forcings
 tend.fluid(1).mq.force = -m1bar.*force.q;
 tend.fluid(2).mq.force = -m2bar.*force.q;
+tend.fluid(1).mq.force(1:nz) = tend.fluid(1).mq.force(1:nz) - m1.*force.wsub(1:nz).*dq1dz;
+tend.fluid(2).mq.force(1:nz) = tend.fluid(2).mq.force(1:nz) - m2.*force.wsub(1:nz).*dq2dz;
 % ------
 
 % Non-hydrostatic pressure gradient terms
@@ -932,14 +934,14 @@ tend.fluid(2).m.tot = tend.fluid(2).m.transport ...
 tend.fluid(1).meta.tot = tend.fluid(1).meta.transport ...
                        + tend.fluid(1).meta.diffuse ...
                        + tend.fluid(1).meta.diffent ...
-                       + tend.fluid(1).meta.radforce ...
+                       + tend.fluid(1).meta.force ...
                        + tend.fluid(1).meta.relabel ...
                        + tend.fluid(1).meta.dissn;
 %                       + tend.fluid(1).meta.bflux ...
 tend.fluid(2).meta.tot = tend.fluid(2).meta.transport ...
                        + tend.fluid(2).meta.diffuse ...
                        + tend.fluid(2).meta.diffent ...
-                       + tend.fluid(2).meta.radforce ...
+                       + tend.fluid(2).meta.force ...
                        + tend.fluid(2).meta.relabel ...
                        + tend.fluid(2).meta.dissn;
 %                       + tend.fluid(2).meta.bflux ...
