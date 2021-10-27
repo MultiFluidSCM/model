@@ -136,6 +136,13 @@ if not(isfield(settings.forcing, 'wsub'))
     settings.forcing.wsub   = 0;
 end
 
+% October 2021: New moisture forcing
+if not(isfield(settings.forcing, 'q'))
+    disp("Using default moisture forcing of 0");
+    settings.forcing.q_z = 0;
+    settings.forcing.q   = 0;
+end
+
 % October 2021: New radiative cooling forcing term used in BOMEX case
 if not(isfield(settings.forcing, 'rad'))
     disp("Using default radiative cooling of 0");

@@ -12,6 +12,7 @@ end
 % Subsidence
 for k = 1:length(grid.zw)
     force.wsub(k) = initial_field(grid.zw(k), forcing.wsub_z, forcing.wsub);
+    force.q(k)    = initial_field(grid.zw(k), forcing.q_z,    forcing.q);
 end
 
 
