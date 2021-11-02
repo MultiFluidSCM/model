@@ -332,8 +332,8 @@ for k=1:nz
     eta_init(k) = thetal2eta(theta1_init, q1(k), constants.therm, constants.phys.p00);
     eta_radf(k) = thetal2eta(theta1_radf, q1(k), constants.therm, constants.phys.p00);
 end
-tend.fluid(1).meta.force = m1.*(eta_radf-eta_init) + m1.*force.wsub(1:nz).*deta1dz;
-tend.fluid(2).meta.force = m2.*(eta_radf-eta_init) + m2.*force.wsub(1:nz).*deta2dz;
+tend.fluid(1).meta.force = m1.*(eta_radf-eta_init) - m1.*force.wsub(1:nz).*deta1dz;
+tend.fluid(2).meta.force = m2.*(eta_radf-eta_init) - m2.*force.wsub(1:nz).*deta2dz;
 tend.fluid(1).meta.force(end+1) = 0;
 tend.fluid(2).meta.force(end+1) = 0;
 
@@ -957,7 +957,7 @@ tend.fluid(2).mq.tot = tend.fluid(2).mq.transport ...
                      + tend.fluid(2).mq.diffent ...
                      + tend.fluid(2).mq.force ...
                      + tend.fluid(2).mq.relabel;
-                 
+
 % Vertical velocity
 tend.fluid(1).mw.tot = tend.fluid(1).mw.transport ...
                      + tend.fluid(1).mw.diffuse ...

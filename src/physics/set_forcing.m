@@ -15,7 +15,6 @@ for k = 1:length(grid.zw)
     force.q(k)    = initial_field(grid.zw(k), forcing.q_z,    forcing.q);
 end
 
-
 % Forcings which are time dependent
 % Interpolate forcing and fluxes from values provided
 for i=1:length(forcing.t)-1

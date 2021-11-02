@@ -24,7 +24,6 @@ gravity = constants.phys.gravity;
 % Surface pressure
 p0s = settings.surface_pressure;
 
-
 % Specify profiles in balance with a given thetal(z)
 disp('** note that initial_theta is used as thetal **')
 % pause
