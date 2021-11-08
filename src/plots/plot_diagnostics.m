@@ -199,6 +199,27 @@ if settings.switches.plot
     
 end
 
+fig = figure(6);
+set(gcf,'Position',[76 166 757 624])
+
+LturbMax = max(max(scales.L_turb1, scales.L_turb2));
+
+subplot(1,1,1)
+qforce_1 = abovep.*tend.fluid(1).mq.force(2:nzp)...
+         + belowp.*tend.fluid(1).mq.force(1:nz );
+qforce_2 = abovep.*tend.fluid(2).mq.force(2:nzp)...
+         + belowp.*tend.fluid(2).mq.force(1:nz );
+
+q_force = (qforce_1+qforce_2)./(m1+m2);
+plot(q_force,zunitsp,'k')
+% xlim([0,max(LturbMax)])
+ylim([0,zplottop])
+title('Forcing')
+xlabel('force')
+ylabel(labelz)
+% legend('L_1,turb','L_2,turb','Location','NorthEast')
+set(gca,'FontSize',fs)
+
 % fig = figure(6);
 % set(gcf,'Position',[76 166 1257 624])
 

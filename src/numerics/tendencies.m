@@ -319,21 +319,31 @@ tend.fluid(2).meta.buoycor(2:nzp) = tend.fluid(1).meta.buoycor(2:nzp) ...
                                     + Deta2bc./dzw(2:nzp);
 
 % Tendency due to radiative forcing
+etatot = (m1bar.*eta1 + m2bar.*eta2)./rhobar;
+qtot   = (m1bar.*q1   + m2bar.*q2  )./rhobar;
+Twtot  = (m1bar.*state.fluid(1).Tw + m2bar.*state.fluid(2).Tw)./rhobar;
 for k=1:nz
-    theta1_init = eta2thetal( ...
-        state.fluid(1).eta(k), ...
-        state.fluid(1).q(k), ...
-        state.fluid(1).Tw(k), ...
+    theta_init = eta2thetal( ...
+        etatot(k), ...
+        qtot(k), ...
+        Twtot(k), ...
         constants.therm, ...
         constants.phys.p00 ...
     );
-    theta1_radf = theta1_init + force.rad(k);
+    theta_radf = theta_init + force.rad(k);
     
-    eta_init(k) = thetal2eta(theta1_init, q1(k), constants.therm, constants.phys.p00);
-    eta_radf(k) = thetal2eta(theta1_radf, q1(k), constants.therm, constants.phys.p00);
+    eta_init(k) = thetal2eta(theta_init, qtot(k), constants.therm, constants.phys.p00);
+    eta_radf(k) = thetal2eta(theta_radf, qtot(k), constants.therm, constants.phys.p00);
 end
-tend.fluid(1).meta.force = m1.*(eta_radf-eta_init) - m1.*force.wsub(1:nz).*deta1dz;
-tend.fluid(2).meta.force = m2.*(eta_radf-eta_init) - m2.*force.wsub(1:nz).*deta2dz;
+force_rad = eta_radf-eta_init;
+% Tendency due to subsidence forcing
+% metatot = (m1bar.*eta1 + m2bar.*eta2);
+% detatotdz = (metatot(2:nzp) - metatot(1:nz))./grid.dzp;
+detatotdz = (etatot(2:nzp) - etatot(1:nz))./grid.dzp;
+force_subs = -force.wsub(1:nz).*detatotdz;
+% Total forcing
+tend.fluid(1).meta.force = m1.*(force_rad + force_subs);
+tend.fluid(2).meta.force = m2.*(force_rad + force_subs);
 tend.fluid(1).meta.force(end+1) = 0;
 tend.fluid(2).meta.force(end+1) = 0;
 
@@ -452,10 +462,13 @@ corrde = meanGbar.*(ddz_sigrho - (m2bar./rhobar).*ddz_rho);
 tend.fluid(1).mq.diffent =   corrde;
 tend.fluid(2).mq.diffent = - corrde;
 % Prescribed forcings
-tend.fluid(1).mq.force = -m1bar.*force.q;
-tend.fluid(2).mq.force = -m2bar.*force.q;
-tend.fluid(1).mq.force(1:nz) = tend.fluid(1).mq.force(1:nz) - m1.*force.wsub(1:nz).*dq1dz;
-tend.fluid(2).mq.force(1:nz) = tend.fluid(2).mq.force(1:nz) - m2.*force.wsub(1:nz).*dq2dz;
+% mqtot = (m1bar.*q1 + m2bar.*q2);
+% dqtotdz = (mqtot(2:nzp) - mqtot(1:nz))./grid.dzp;
+dqtotdz = (qtot(2:nzp) - qtot(1:nz))./grid.dzp;
+tend.fluid(1).mq.force = m1bar.*force.q;
+tend.fluid(2).mq.force = m2bar.*force.q;
+tend.fluid(1).mq.force(1:nz) = tend.fluid(1).mq.force(1:nz) - m1.*force.wsub(1:nz).*dqtotdz;
+tend.fluid(2).mq.force(1:nz) = tend.fluid(2).mq.force(1:nz) - m2.*force.wsub(1:nz).*dqtotdz;
 % ------
 
 % Non-hydrostatic pressure gradient terms
