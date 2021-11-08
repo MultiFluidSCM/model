@@ -121,7 +121,7 @@ end
 if not(isfield(settings, 'initial_u'))
     disp("Using default initial u profiles for the ARM case");
     settings.initial_u.z = [0];
-    settings.initial_u.u = [-10.];
+    settings.initial_u.u = [10.];
 end
 if not(isfield(settings, 'initial_v'))
     disp("Using default initial v profiles for the ARM case");
