@@ -59,6 +59,8 @@ instab = constants.param.instab;
 
 sigma1 = eos.sigma1;
 sigma2 = eos.sigma2;
+sigma1w = weight_to_w(grid, sigma1);
+sigma2w = weight_to_w(grid, sigma2);
 
 % ------
 
