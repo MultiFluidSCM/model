@@ -155,3 +155,11 @@ if not(isfield(settings, 'surface_pressure'))
     disp("Using default ARM surface pressure of 97000");
     settings.surface_pressure = 97000;
 end
+
+% November 2021: 
+if not(isfield(settings.constants.param.instab, 'entrain_factor'))
+    settings.constants.param.instab.entrain_factor = 0.2;
+end
+if not(isfield(settings.constants.param.instab, 'detrain_factor'))
+    settings.constants.param.instab.detrain_factor = 0.2;
+end
