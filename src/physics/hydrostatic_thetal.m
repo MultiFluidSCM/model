@@ -2,7 +2,7 @@
 
 % Determine surface entropy
 thetal = initial_theta(zw(1), settings.initial_theta);
-ww = initial_q(zw(1), settings.initial_rv);
+ww = initial_q(zw(1), settings.initial_qv);
 eta00 = thetal2eta(thetal,ww,constants.therm,constants.phys.p00);
 
 % Surface exner (for estimating surface temperature when p0s differs from p00)
@@ -52,7 +52,7 @@ water(1) = ww;
 Tw(1) = tt;
 
 % Given theta at zw(2) ...
-ww = initial_q(zw(2), settings.initial_rv);
+ww = initial_q(zw(2), settings.initial_qv);
 thetal = initial_theta(zw(2), settings.initial_theta);
 eta00 = thetal2eta(thetal,ww,constants.therm,constants.phys.p00);
 
@@ -99,7 +99,7 @@ for k = 2:nz
   p2 = p1;
   
   % Given theta at zw(k) ...
-  ww = initial_q(zw(k), settings.initial_rv);
+  ww = initial_q(zw(k), settings.initial_qv);
   thetal = initial_theta(zw(k), settings.initial_theta);
   eta00 = thetal2eta(thetal,ww,constants.therm,constants.phys.p00);
   % ... find p2 and T that give hydrostatic balance with the right eta
@@ -134,7 +134,7 @@ for k = 2:nz
 end
 
 % Top boundary values
-ww = initial_q(zw(nzp), settings.initial_rv);
+ww = initial_q(zw(nzp), settings.initial_qv);
 thetal = initial_theta(zw(nzp), settings.initial_theta);
 eta00 = thetal2eta(thetal,ww,constants.therm,constants.phys.p00);
 eta(nzp) = eta00;
