@@ -1,12 +1,22 @@
-function force = set_forcing(forcing, t)
+function force = set_forcing(grid, forcing, t)
 
+% Forcings which aren't time dependent
+
+% Geostrophic wind and radiative cooling
+for k = 1:length(grid.zp)
+    force.ug(k)   = initial_field(grid.zp(k), forcing.ug_z, forcing.ug);
+    force.vg(k)   = initial_field(grid.zp(k), forcing.vg_z, forcing.vg);
+end
+
+% Subsidence
+for k = 1:length(grid.zw)
+    force.wsub(k) = initial_field(grid.zw(k), forcing.wsub_z, forcing.wsub);
+    force.rad(k)  = initial_field(grid.zw(k), forcing.rad_z,  forcing.rad);
+    force.q(k)    = initial_field(grid.zw(k), forcing.q_z,    forcing.q);
+end
+
+% Forcings which are time dependent
 % Interpolate forcing and fluxes from values provided
-
-% Geostrophic wind
-force.ug = forcing.ug;
-force.vg = forcing.vg;
-
-
 for i=1:length(forcing.t)-1
     if (forcing.t(i) <= t && t < forcing.t(i+1))
         % Surface fluxes (W / m^2)
@@ -26,9 +36,9 @@ end
 % Set forcing to last available value if time beyond interpolation range
 if t >=forcing.t(end)
     force.sshf = forcing.shf(end);
-    force.sqf  = forcing.lhf(end);
+    force.sqf  = forcing.lhf(end)./2.5e6;
     force.tshf = forcing.tshf(end);
-    force.tqf  = forcing.tlhf(end);
+    force.tqf  = forcing.tlhf(end)./2.5e6;
 end
 
 % Note on surface moisture flux (kg / m^2 / s):

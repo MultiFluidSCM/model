@@ -15,9 +15,10 @@ elseif ischeme == 3 | ischeme == 4
     tke1_res = 3*0.5*(w1-wmean).^2;
     tke2_res = 3*0.5*(w2-wmean).^2;
     tke2_res = (abovep.*tke2_res(2:nzp) + belowp.*tke2_res(1:nz));
-    velocity_scale = mix.tke1_factor*sqrt(tke1) + 2*mix.tke2_factor*sqrt(tke2);
-    % velocity_scale = mix.tke1_factor*sqrt(tke1) + 2*mix.tke2_factor*sqrt(tke2_res);
-    % velocity_scale = mix.tke1_factor*sqrt(tke1) + mix.tke2_factor*sqrt(tke2+tke2_res);
+    
+    velocity_scale = mix.tke1_factor*sqrt(tke1) + mix.tke2_factor*sqrt(tke2);
+    % velocity_scale = mix.tke1_factor*sqrt(tke1) + mix.tke2_factor*sqrt(tke2_res);
+    % velocity_scale = mix.tke1_factor*sqrt(tke1) + mix.tke2_factor*sqrt(0.5*tke2+0.5*tke2_res);
     r2 = min(velocity_scale./scales.L_plume, rdt);
     
     % Caltech mixing formulation

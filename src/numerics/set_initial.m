@@ -22,9 +22,7 @@ constants = settings.constants;
 gravity = constants.phys.gravity;
 
 % Surface pressure
-%p0s = 100000;
-p0s =  97000;
-
+p0s = settings.surface_pressure;
 
 % Specify profiles in balance with a given thetal(z)
 disp('** note that initial_theta is used as thetal **')
@@ -54,7 +52,13 @@ end
 
 
 % Set winds to geostrophic values, which are set in set_forcing
-force = set_forcing(settings.forcing, 0);
+force = set_forcing(grid, settings.forcing, 0);
+
+% Initial horizontal velocities
+for k = 1:length(zp)
+    u(k) = initial_field(zp(k), settings.initial_u.z, settings.initial_u.u);
+    v(k) = initial_field(zp(k), settings.initial_v.z, settings.initial_v.v);
+end
 
 % Save in state structure
 %state.fluid(1).m   = (1.0 - constants.param.confrac)*rho;
@@ -63,8 +67,8 @@ state.fluid(1).q   = water;
 state.fluid(1).T   = T;
 state.fluid(1).Tw  = Tw;
 state.fluid(1).w(1:nzp) = 0;
-state.fluid(1).u(1:nz) = force.ug;
-state.fluid(1).v(1:nz) = force.vg;
+state.fluid(1).u = u;
+state.fluid(1).v = v;
 state.fluid(1).tke = ones(1,nz)*constants.param.tke_min;
 state.fluid(1).vareta(1:nz)    = 0;
 state.fluid(1).varq(1:nz)      = 0;

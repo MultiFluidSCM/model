@@ -89,13 +89,22 @@ end
 
 % September 2021: Removed initial theta and rv profiles so they are no longer hard-coded
 if not(isfield(settings, 'initial_theta'))
-    disp("Using default theta and rv profiles for the ARM case");
+    disp("Using default initial theta profiles for the ARM case");
     settings.initial_theta.z     = [    0;    50;   350;    650;   700;   1300;  2500;  5500];
     settings.initial_theta.theta = [299.0; 301.5; 302.5; 303.53; 303.7; 307.13; 314.0; 343.2];
-    
+end
+if not(isfield(settings, 'initial_rv'))
+    disp("Using default initial rv profiles for the ARM case");
     settings.initial_rv.z  = [      0;       50;      350;      650;    700;    1300;   2500;   5500];
     settings.initial_rv.rv = [15.2e-3; 15.17e-3; 14.98e-3; 14.8e-3; 14.7e-3; 13.5e-3; 3.0e-3; 3.0e-3];
-    
+end
+if not(isfield(settings, 'initial_qv'))
+    disp("Converting initial rv to initial qv");
+    settings.initial_qv.z  = settings.initial_rv.z;
+    settings.initial_qv.qv = settings.initial_rv.rv./(1 + settings.initial_rv.rv);
+end
+if not(isfield(settings, 'initial_sigma'))
+    disp("Using default initial sigma profiles for the ARM case");
     settings.initial_sigma.z      = [0; 1];
     settings.initial_sigma.sigma2 = [settings.constants.param.sigma00; settings.constants.param.sigma00];
 end
@@ -105,4 +114,57 @@ if not(isfield(settings.forcing, 'tshf'))
     disp("Using no prescribed fluxes at the top of the domain");
     settings.forcing.tshf = 0*settings.forcing.t;
     settings.forcing.tlhf = 0*settings.forcing.t;
+end
+
+% October 2021: New forcing terms used in BOMEX case
+if not(isfield(settings.forcing, 'ug_z'))
+    settings.forcing.ug_z = 0;
+    settings.forcing.vg_z = 0;
+end
+
+% October 2021: Added initial proviles for the horizontal velocities
+if not(isfield(settings, 'initial_u'))
+    disp("Using default initial u profiles for the ARM case");
+    settings.initial_u.z = [0];
+    settings.initial_u.u = [10.];
+end
+if not(isfield(settings, 'initial_v'))
+    disp("Using default initial v profiles for the ARM case");
+    settings.initial_v.z = [0];
+    settings.initial_v.v = [0];
+end
+
+% October 2021: New subsidence forcing term used in BOMEX case
+if not(isfield(settings.forcing, 'wsub'))
+    disp("Using default subsidence of 0");
+    settings.forcing.wsub_z = 0;
+    settings.forcing.wsub   = 0;
+end
+
+% October 2021: New moisture forcing
+if not(isfield(settings.forcing, 'q'))
+    disp("Using default moisture forcing of 0");
+    settings.forcing.q_z = 0;
+    settings.forcing.q   = 0;
+end
+
+% October 2021: New radiative cooling forcing term used in BOMEX case
+if not(isfield(settings.forcing, 'rad'))
+    disp("Using default radiative cooling of 0");
+    settings.forcing.rad_z = 0;
+    settings.forcing.rad   = 0;
+end
+
+% October 2021: Option to set the surface pressure added
+if not(isfield(settings, 'surface_pressure'))
+    disp("Using default ARM surface pressure of 97000");
+    settings.surface_pressure = 97000;
+end
+
+% November 2021: 
+if not(isfield(settings.constants.param.instab, 'entrain_factor'))
+    settings.constants.param.instab.entrain_factor = 0.2;
+end
+if not(isfield(settings.constants.param.instab, 'detrain_factor'))
+    settings.constants.param.instab.detrain_factor = 0.2;
 end

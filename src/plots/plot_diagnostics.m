@@ -65,7 +65,7 @@ zstar = scales.zstar;
 wstar = scales.wstar;
 etastar = scales.etastar;
 thetastar = scales.thetastar;
-force2 = set_forcing(settings.forcing, time.t);
+force2 = set_forcing(grid, settings.forcing, time.t);
 qstar = scales.qstar;
 setaf = surface_flux.eta;
 sqf   = force2.sqf;
@@ -198,6 +198,24 @@ if settings.switches.plot
     end
     
 end
+
+% fig = figure(6);
+% set(gcf,'Position',[76 166 757 624])
+
+% LturbMax = max(max(scales.L_turb1, scales.L_turb2));
+% qforce_1 = abovep.*tend.fluid(1).mq.force(2:nzp)...
+         % + belowp.*tend.fluid(1).mq.force(1:nz );
+% qforce_2 = abovep.*tend.fluid(2).mq.force(2:nzp)...
+         % + belowp.*tend.fluid(2).mq.force(1:nz );
+
+% subplot(1,1,1)
+% q_force = (qforce_1+qforce_2)./(m1+m2);
+% plot(q_force,zunitsp,'k')
+% ylim([0,zplottop])
+% title('Forcing')
+% xlabel('force')
+% ylabel(labelz)
+% set(gca,'FontSize',fs)
 
 % fig = figure(6);
 % set(gcf,'Position',[76 166 1257 624])
