@@ -322,7 +322,7 @@ tend.fluid(2).meta.buoycor(2:nzp) = tend.fluid(1).meta.buoycor(2:nzp) ...
 etatot = (m1bar.*eta1 + m2bar.*eta2)./rhobar;
 qtot   = (m1bar.*q1   + m2bar.*q2  )./rhobar;
 Twtot  = (m1bar.*state.fluid(1).Tw + m2bar.*state.fluid(2).Tw)./rhobar;
-for k=1:nz
+for k=1:nzp
     theta_init = eta2thetal( ...
         etatot(k), ...
         qtot(k), ...
@@ -337,15 +337,12 @@ for k=1:nz
 end
 force_rad = eta_radf-eta_init;
 % Tendency due to subsidence forcing
-% metatot = (m1bar.*eta1 + m2bar.*eta2);
-% detatotdz = (metatot(2:nzp) - metatot(1:nz))./grid.dzp;
 detatotdz = (etatot(2:nzp) - etatot(1:nz))./grid.dzp;
-force_subs = -force.wsub(1:nz).*detatotdz;
+detatotdz(nzp) = detatotdz(nz);
+force_subs = -force.wsub.*detatotdz;
 % Total forcing
-tend.fluid(1).meta.force = m1.*(force_rad + force_subs);
-tend.fluid(2).meta.force = m2.*(force_rad + force_subs);
-tend.fluid(1).meta.force(end+1) = 0;
-tend.fluid(2).meta.force(end+1) = 0;
+tend.fluid(1).meta.force = m1bar.*(force_rad + force_subs);
+tend.fluid(2).meta.force = m2bar.*(force_rad + force_subs);
 
 % Entrainment/detrainment associated with vertical diffusion and gradients
 % of sigma
@@ -626,10 +623,12 @@ dutotdz = (u(2:nz) - u(1:nz-1))./grid.dzp(1:nz-1);
 dvtotdz = (v(2:nz) - v(1:nz-1))./grid.dzp(1:nz-1);
 dutotdz(end+1) = dutotdz(end);
 dvtotdz(end+1) = dutotdz(end);
-tend.fluid(1).mu.force = -m1.*force.wsub(1:nz).*dutotdz;
-tend.fluid(2).mu.force = -m2.*force.wsub(1:nz).*dutotdz;
-tend.fluid(1).mv.force = -m1.*force.wsub(1:nz).*dvtotdz;
-tend.fluid(2).mv.force = -m2.*force.wsub(1:nz).*dvtotdz;
+wsubbar = abovep.*force.wsub(2:nzp) + belowp.*force.wsub(1:nz);
+tend.fluid(1).mu.force = -m1.*wsubbar.*dutotdz;
+tend.fluid(2).mu.force = -m2.*wsubbar.*dutotdz;
+tend.fluid(1).mv.force = -m1.*wsubbar.*dvtotdz;
+tend.fluid(2).mv.force = -m2.*wsubbar.*dvtotdz;
+
 
 % Neglect horizontal inter-fluid PG terms for now
 % Also neglect interfluid forces due to KH instability (??)
@@ -668,8 +667,9 @@ tend.fluid(2).mtke.diffent = - corrde;
 tketot = (m1.*tke1 + m2.*tke2)./rho;
 dtketotdz = (tketot(2:nz) - tketot(1:nz-1))./grid.dzp(1:nz-1);
 dtketotdz(end+1) = dtketotdz(end);
-tend.fluid(1).mtke.force = -m1.*force.wsub(1:nz).*dtketotdz;
-tend.fluid(2).mtke.force = -m2.*force.wsub(1:nz).*dtketotdz;
+wsubbar = abovep.*force.wsub(2:nzp) + belowp.*force.wsub(1:nz);
+tend.fluid(1).mtke.force = -m1.*wsubbar.*dtketotdz;
+tend.fluid(2).mtke.force = -m2.*wsubbar.*dtketotdz;
 
 % Shear generation
 % Consistent with free slip at top boundary

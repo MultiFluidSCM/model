@@ -4,14 +4,14 @@ function force = set_forcing(grid, forcing, t)
 
 % Geostrophic wind and radiative cooling
 for k = 1:length(grid.zp)
-    force.ug(k)   = initial_field(grid.zp(k), forcing.ug_z,  forcing.ug);
-    force.vg(k)   = initial_field(grid.zp(k), forcing.vg_z,  forcing.vg);
-    force.rad(k)  = initial_field(grid.zp(k), forcing.rad_z, forcing.rad);
+    force.ug(k)   = initial_field(grid.zp(k), forcing.ug_z, forcing.ug);
+    force.vg(k)   = initial_field(grid.zp(k), forcing.vg_z, forcing.vg);
 end
 
 % Subsidence
 for k = 1:length(grid.zw)
     force.wsub(k) = initial_field(grid.zw(k), forcing.wsub_z, forcing.wsub);
+    force.rad(k)  = initial_field(grid.zw(k), forcing.rad_z,  forcing.rad);
     force.q(k)    = initial_field(grid.zw(k), forcing.q_z,    forcing.q);
 end
 
