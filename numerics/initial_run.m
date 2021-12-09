@@ -1,7 +1,7 @@
 % Set up model for an initial run
 
 % Set up the discretisation in time
-time = set_time(settings.time)
+time = set_time(settings.time);
 
 % Set up computational grid
 grid = set_grid(settings.grid);

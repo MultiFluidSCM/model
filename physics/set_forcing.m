@@ -4,42 +4,22 @@ function force = set_forcing(grid, forcing, t)
 
 % Geostrophic wind and radiative cooling
 for k = 1:length(grid.zp)
-    force.ug(k)   = initial_field(grid.zp(k), forcing.ug_z, forcing.ug);
-    force.vg(k)   = initial_field(grid.zp(k), forcing.vg_z, forcing.vg);
+    force.ug(k)   = initial_field(grid.zp(k), forcing.ug.z, forcing.ug.f);
+    force.vg(k)   = initial_field(grid.zp(k), forcing.vg.z, forcing.vg.f);
 end
 
 % Subsidence
 for k = 1:length(grid.zw)
-    force.wsub(k) = initial_field(grid.zw(k), forcing.wsub_z, forcing.wsub);
-    force.rad(k)  = initial_field(grid.zw(k), forcing.rad_z,  forcing.rad);
-    force.q(k)    = initial_field(grid.zw(k), forcing.q_z,    forcing.q);
+    force.wsub(k) = initial_field(grid.zw(k), forcing.wsub.z, forcing.wsub.f);
+    force.rad(k)  = initial_field(grid.zw(k), forcing.rad.z,  forcing.rad.f);
+    force.q(k)    = initial_field(grid.zw(k), forcing.q.z,    forcing.q.f);
 end
 
-% Forcings which are time dependent
-% Interpolate forcing and fluxes from values provided
-for i=1:length(forcing.t)-1
-    if (forcing.t(i) <= t && t < forcing.t(i+1))
-        % Surface fluxes (W / m^2)
-        force.sshf =   forcing.shf(i) + (forcing.shf(i+1) - forcing.shf(i)) ...
-            .*(t-forcing.t(i))./(forcing.t(i+1) - forcing.t(i)) ;
-        force.sqf  = ( forcing.lhf(i) + (forcing.lhf(i+1) - forcing.lhf(i)) ...
-            .*(t-forcing.t(i))./(forcing.t(i+1) - forcing.t(i)) )./2.5e6;
-        
-        % Fluxes at the top of the domain (W / m^2)
-        force.tshf =   forcing.tshf(i) + (forcing.tshf(i+1) - forcing.tshf(i)) ...
-            .*(t-forcing.t(i))./(forcing.t(i+1) - forcing.t(i)) ;
-        force.tqf  = ( forcing.tlhf(i) + (forcing.tlhf(i+1) - forcing.tlhf(i)) ...
-            .*(t-forcing.t(i))./(forcing.t(i+1) - forcing.t(i)) )./2.5e6;
-    end
-end
-
-% Set forcing to last available value if time beyond interpolation range
-if t >=forcing.t(end)
-    force.sshf = forcing.shf(end);
-    force.sqf  = forcing.lhf(end)./2.5e6;
-    force.tshf = forcing.tshf(end);
-    force.tqf  = forcing.tlhf(end)./2.5e6;
-end
+% Time-dependent forcings
+force.sshf = interpolate_forcing(forcing.sshf, t);
+force.sqf  = interpolate_forcing(forcing.slhf, t)./2.5e6;
+force.tshf = interpolate_forcing(forcing.tshf, t);
+force.tqf  = interpolate_forcing(forcing.tlhf, t)./2.5e6;
 
 % Note on surface moisture flux (kg / m^2 / s):
 % Multiply by 2.5e6 to get a rough `latent heat flux'

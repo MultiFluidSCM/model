@@ -175,7 +175,7 @@ if istep == time.nstop
     SCM_cloud_fraction2_sigma2 = ts.cloud_fraction2_sigma2;
 
     % Write to file
-    filename = fullfile(settings.folders.data_scm, 'SCM_results.mat');
+    filename = fullfile(settings.folders.data_scm, '2FSCM_results.mat');
     % Save all variables whose name begins SCM...
     save(filename,'-regexp','^SCM');
     

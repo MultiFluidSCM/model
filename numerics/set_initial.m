@@ -56,8 +56,8 @@ force = set_forcing(grid, settings.forcing, 0);
 
 % Initial horizontal velocities
 for k = 1:length(zp)
-    u(k) = initial_field(zp(k), settings.initial_u.z, settings.initial_u.u);
-    v(k) = initial_field(zp(k), settings.initial_v.z, settings.initial_v.v);
+    u(k) = initial_field(zp(k), settings.initial.u.z, settings.initial.u.f);
+    v(k) = initial_field(zp(k), settings.initial.v.z, settings.initial.v.f);
 end
 
 % Save in state structure
@@ -79,7 +79,7 @@ state.fluid(2)     = state.fluid(1);
 
 % Initial mass fractions
 for k = 1:length(zp)
-    sigma2(k) = initial_sigma(zp(k), settings.initial_sigma);
+    sigma2(k) = initial_field(zp(k), settings.initial.sigma.z, settings.initial.sigma.f);
 end
 sigma00 = constants.param.sigma00;
 state.fluid(2).m   = sigma2.*rho;
