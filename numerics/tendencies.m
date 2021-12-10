@@ -39,14 +39,6 @@ covaretaq1 = state.fluid(1).covaretaq;
 covaretaq2 = state.fluid(2).covaretaq;
 constants = settings.constants;
 gravity = constants.phys.gravity;
-bentraint = constants.param.bentraint;
-bentrainq = constants.param.bentrainq;
-bentrainw = constants.param.bentrainw;
-bentrainu = constants.param.bentrainu;
-bdetraint = constants.param.bdetraint;
-bdetrainq = constants.param.bdetrainq;
-bdetrainw = constants.param.bdetrainw;
-bdetrainu = constants.param.bdetrainu;
 
 % Remap mass to w levels
 m1bar = weight_to_w(grid,m1);
@@ -712,6 +704,7 @@ tend.fluid(2).mtke.bflux = max(bflux2,m2.*(constants.param.tke_min - tke2)/dt);
 % Drag term
 % It is not obvious how to partition this between fluid 1 and fluid 2
 % so just divide it evenly
+% UPDATE: Use weighting by volume fraction instead instead
 kesinkw = - (w1 - w2).*drag;
 tkesrc = aboves.*kesinkw(2:nzp) + belows.*kesinkw(1:nz);
 % tend.fluid(1).mtke.drag = 0.5*tkesrc;

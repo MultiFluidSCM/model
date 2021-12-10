@@ -1,8 +1,8 @@
 % Single column model of a convecting fluid
 % using a 2-component scheme
-function multi_fluid_model(settings)
+function two_fluid_scm(settings)
     
-    % Do preliminary calculations
+    % Set-up and initialisation
     preliminary
 
     % Integrate model

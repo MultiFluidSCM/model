@@ -10,11 +10,6 @@ for istep = 1:time.nstop
     end
     time.t = time.t + time.dt;
     
-    % Update cloud parameters for diagnostics
-    % if mod(istep,20) == 0
-        % update_timeseries_cloud
-    % end
-    
     % Compute diagnostics and produce plots
     if mod(istep,20) == 0
         gdiags = global_diags(grid,state_new,constants);

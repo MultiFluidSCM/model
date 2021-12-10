@@ -11,12 +11,6 @@ else
     read_restart
 end
 
-% ---
-
-% Set up timing information
-time = settings.time;
-settings.time.tstart = current_time;
-
 % First guess for next time step is the current state
 state_new = state_old;
 
