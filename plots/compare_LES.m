@@ -51,6 +51,7 @@ if lsave
     m1bar = work.m1bar;
     m2bar = work.m2bar;
     Cpd = constants.therm.Cpd;
+    % diagnostics = global_diags(grid, state_new, constants);
     
     % Determine liquid water
     disp('compare_LES: use eos.ql1, eos.ql2 for liquid water')

@@ -10,9 +10,14 @@ for istep = 1:time.nstop
     end
     time.t = time.t + time.dt;
     
+    gdiags = global_diags(grid,state_new,constants);
+    SCM_energy_time(istep)    = time.t;
+    SCM_energy_total(istep)   = gdiags.energy1 + gdiags.energy2;
+    SCM_energy_surface(istep) = time.dt*(force.sshf + 2.5e6*force.sqf);
+    
     % Compute diagnostics and produce plots
     if mod(istep,20) == 0
-        gdiags = global_diags(grid,state_new,constants);
+        % gdiags = global_diags(grid,state_new,constants);
         plottype = 0;
         plot_diagnostics
     end

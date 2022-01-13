@@ -120,6 +120,7 @@ else
     % Standard time step
     % Number of quasi-Newton iterations
     qn_iter_max = 4;
+    qn_iter_max = 8;
 
     % Carry out quasi-Newton iterations
     conv_diag = 0;
