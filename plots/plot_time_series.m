@@ -174,13 +174,25 @@ ts.etabflux(plotstep)      = accum.eta_bflux;
 ts.etadissn(plotstep)      = accum.eta_dissn;
 ts.dtke_fix(plotstep)      = accum.tke1_fix + accum.tke2_fix;
 
+SCM_rel_chg_time    = ts.time;
+SCM_rel_chg_mass    = (ts.mass - mass0)/mass0;
+SCM_rel_chg_entropy = (ts.entropy - entropy0)/entropy0;
+SCM_rel_chg_water   = (ts.water - water0)/water0;
+SCM_rel_chg_energy  = (ts.energy - energy0)/energy0;
+
+SCM_discrepancy_time    = ts.time;
+SCM_discrepancy_mass    = (ts.mass - mass0 - ts.mass_force)/mass0;
+SCM_discrepancy_entropy = (ts.entropy - entropy0 - ts.entropy_force - ts.etabflux - ts.etadissn)/entropy0;
+SCM_discrepancy_water   = (ts.water - water0 - ts.water_force)/water0;
+SCM_discrepancy_energy  = (ts.energy - energy0 - ts.energy_force - ts.dtke_fix)/energy0;
+
 if plottype == 0
     figure(2)
     subplot(2,6,3)
-    plot(ts.time/3600,(ts.mass - mass0)/mass0,'b',...
-         ts.time/3600,(ts.entropy - entropy0)/entropy0,'r',...
-         ts.time/3600,(ts.water - water0)/water0,'g',...
-         ts.time/3600,(ts.energy - energy0)/energy0,'k')
+    plot(ts.time/3600,SCM_rel_chg_mass,'b',...
+         ts.time/3600,SCM_rel_chg_entropy,'r',...
+         ts.time/3600,SCM_rel_chg_water,'g',...
+         ts.time/3600,SCM_rel_chg_energy,'k')
     xlim([0,time.tstop/3600])
     title('Rel. chg.')
     xlabel('time')
@@ -188,10 +200,10 @@ if plottype == 0
     legend('M','S','Q','E','Location','NorthWest')
     set(gca,'FontSize',fs)
     subplot(2,6,9)
-    plot(ts.time/3600,(ts.mass - mass0 - ts.mass_force)/mass0,'b',...
-         ts.time/3600,(ts.entropy - entropy0 - ts.entropy_force - ts.etabflux - ts.etadissn)/entropy0,'r',...
-         ts.time/3600,(ts.water - water0 - ts.water_force)/water0,'g',...
-         ts.time/3600,(ts.energy - energy0 - ts.energy_force - ts.dtke_fix)/energy0,'k')
+    plot(ts.time/3600,SCM_discrepancy_mass,'b',...
+         ts.time/3600,SCM_discrepancy_entropy,'r',...
+         ts.time/3600,SCM_discrepancy_water,'g',...
+         ts.time/3600,SCM_discrepancy_energy,'k')
     xlim([0,time.tstop/3600])
     title('Discrepancy')
     xlabel('time')
