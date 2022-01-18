@@ -59,7 +59,7 @@ a = 1-state.fluid(1).q(1);
     gibbsav(psurf,Teff1,a,constants.therm);
 a_top = 1-state.fluid(1).q(end);
 [g_top,gp_top,gt_top,ga_top,gpp_top,gpt_top,gpa_top,gtt_top,gta_top,gaa_top,gtwv_top] = ...
-    gibbsav(psurf,Teff1,a_top,constants.therm);
+    gibbsav(psurf,Teff1_top,a_top,constants.therm);
 
 % Surface entropy flux (fluid 1)
 surface_flux.eta1 = (force.sshf/Teff1)*ff1 - gtwv*surface_flux.q1;
