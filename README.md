@@ -14,7 +14,7 @@ The codebase is separated into the following repositories:
 Other miscilaneous repositories (some of which remain private) include:
 - [MultiFluidSCM/documentation](https://github.com/MultiFluidSCM/documentation), which documents the multi-fluid equations, the numerical methods, the closures and the tuning processes.
 - [MultiFluidSCM/settings_graphics](https://github.com/MultiFluidSCM/settings_graphics), which plots the model coefficients relative to the diagnosed values from LES.
-- [MultiFluidSCM/sensitivity_tests](https://github.com/MultiFluidSCM/sensitivity_tests), which plots the model sensitivity to various tunable parameters.
+- [MultiFluidSCM/sensitivity_plotter](https://github.com/MultiFluidSCM/sensitivity_plotter), which plots the model sensitivity to various tunable parameters.
 
 ## Installing MultiFluidSCM
 - Create a folder named MultiFluidSCM. (Use ```mkdir MultiFluidSCM``` on Unix). The naming of this folder is important as the run-time script will search for this folder name.
