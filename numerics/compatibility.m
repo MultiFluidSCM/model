@@ -24,10 +24,10 @@ end
 if not(isfield(settings, 'solver'))
     settings.solver = struct();
     if not(isfield(settings.solver, 'qn_long_timesteps'))
-        settings.solver.qn_long_timesteps = 0;
+        settings.solver.qn_start_timesteps  = 0;
         % Number of iterations for thefirst few timesteps (based on qn_long_timesteps)
-        settings.solver.qn_long_iter_max  = 8;
+        settings.solver.qn_iter_max_start   = 8;
         % Number of iterations for future timesteps, once things have stabilised
-        settings.solver.qn_short_iter_max = 4;
+        settings.solver.qn_iter_max_default = 4;
     end
 end

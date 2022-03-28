@@ -121,9 +121,9 @@ else
     % Number of quasi-Newton iterations
     qn_iter_max = 4; % default
     
-    qn_iter_max = settings.solver.qn_short_iter_max;
-    if time.istep <= settings.solver.qn_long_timesteps
-        qn_iter_max = settings.solver.qn_long_iter_max;
+    qn_iter_max = settings.solver.qn_iter_max_default;
+    if time.istep <= settings.solver.qn_start_timesteps
+        qn_iter_max = settings.solver.qn_iter_max_start;
     end
 
     % Carry out quasi-Newton iterations
