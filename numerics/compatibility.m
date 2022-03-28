@@ -19,3 +19,15 @@ end
 if not(isfield(settings.constants.param, 'use_pdf'))
     settings.constants.param.use_pdf = false;
 end
+
+% March 2022: New settings for the number of quasi-Newton iterations at the start of the run
+if not(isfield(settings, 'solver'))
+    settings.solver = struct();
+    if not(isfield(settings.solver, 'qn_long_timesteps'))
+        settings.solver.qn_long_timesteps = 0;
+        % Number of iterations for thefirst few timesteps (based on qn_long_timesteps)
+        settings.solver.qn_long_iter_max  = 8;
+        % Number of iterations for future timesteps, once things have stabilised
+        settings.solver.qn_short_iter_max = 4;
+    end
+end
