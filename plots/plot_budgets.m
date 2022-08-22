@@ -406,13 +406,14 @@ if settings.switches.plot_budgets_transfers & isfield(ts, 'time_high_res') > 0
          relabel.M21,       zunitsp,'k--',...
          [0 3e-3], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
          [0 3e-3], [SCM_zctop(end) SCM_zctop(end)],'r:')
-    xlim([0,3e-3])
+    xlim([0,1.5e-3])
     ylim([0,zplottop])
     title('Entrainment')
     xlabel('dm2/dt')
     ylabel(labelz)
-    legend('Instab','Sort','dw/dz','Mix','Total','Location','NorthEast')
     set(gca,'FontSize',fs)
+    legend({'Instab','Sort','dw/dz','Mix','Total','Location','NorthEast'},'FontSize',6)
+    
     
     subplot(2,4,2)
     plot(relabel.M12_instab,zunitsp,'r',...
@@ -422,13 +423,14 @@ if settings.switches.plot_budgets_transfers & isfield(ts, 'time_high_res') > 0
          relabel.M12,       zunitsp,'k--',...
          [0 3e-3], [SCM_zcbase(end) SCM_zcbase(end)],'k:',...
          [0 3e-3], [SCM_zctop(end)  SCM_zctop(end)] ,'r:')
-    xlim([0,3e-3])
+    xlim([0,1.5e-3])
     ylim([0,zplottop])
     title('Detrainment')
     xlabel('dm2/dt')
     ylabel(labelz)
-    legend('Instab','Sort','dw/dz','Mix','Total','Location','NorthEast')
     set(gca,'FontSize',fs)
+    legend({'Instab','Sort','dw/dz','Mix','Total','Location','NorthEast'},'FontSize',6)
+    
     
     subplot(2,4,[5 6])
     % Cloud top and base

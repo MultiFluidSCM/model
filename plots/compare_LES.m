@@ -77,8 +77,23 @@ if lsave
     vmean = (m1.*v1 + m2.*v2)./(m1 + m2);
     wmean = (m1bar.*w1 + m2bar.*w2)./(m1bar + m2bar);
     % Resolved w variance
+    Ruu1 = (umean - u1).^2;
+    Ruu2 = (umean - u2).^2;
+    Rvv1 = (vmean - v1).^2;
+    Rvv2 = (vmean - v2).^2;
     Rww1 = (wmean - w1).^2;
     Rww2 = (wmean - w2).^2;
+    % Sub-filter w variance
+    uu1 = (2/3)*state_new.fluid(1).tke;
+    uu2 = (2/3)*state_new.fluid(2).tke;
+    vv1 = (2/3)*state_new.fluid(1).tke;
+    vv2 = (2/3)*state_new.fluid(2).tke;
+    ww1 = (2/3)*state_new.fluid(1).tke;
+    ww2 = (2/3)*state_new.fluid(2).tke;
+    % Total w variance per unit mass
+    uutot = (m1.*(Ruu1 + uu1) + m2.*(Ruu2 + uu2))./(m1 + m2);
+    vvtot = (m1.*(Rvv1 + vv1) + m2.*(Rvv2 + vv2))./(m1 + m2);
+    wwtot = (m1.*(grid.aboves.*Rww1(2:nzp) + grid.belows.*Rww1(1:nz) + ww1) + m2.*(grid.aboves.*Rww2(2:nzp) + grid.belows.*Rww2(1:nz) + ww2))./(m1 + m2);
     % Resolved TKE per unit mass
     Rtke1 = 0.5*((umean - u1).^2 + (vmean - v1).^2 + grid.aboves.*Rww1(2:nzp) + grid.belows.*Rww1(1:nz));
     Rtke2 = 0.5*((umean - u2).^2 + (vmean - v2).^2 + grid.aboves.*Rww2(2:nzp) + grid.belows.*Rww2(1:nz));
@@ -87,6 +102,8 @@ if lsave
     
     % Resolved q variance
     qmean = (m1bar.*q1 + m2bar.*q2)./(m1bar + m2bar);
+    qvmean = (m1bar.*vapour1 + m2bar.*vapour2)./(m1bar + m2bar);
+    qlmean = (m1bar.*liquid1 + m2bar.*liquid2)./(m1bar + m2bar);
     Rqq1 = (q1 - qmean).^2;
     Rqq2 = (q2 - qmean).^2;
     
@@ -98,6 +115,12 @@ if lsave
     % Pack data ready for output
     
     % Mean profiles
+    SCM_m1(:,ist) = m1;
+    SCM_m2(:,ist) = m2;
+    SCM_m1w(:,ist) = m1bar;
+    SCM_m2w(:,ist) = m2bar;
+    SCM_rho1(:,ist) = eos.rho1;
+    SCM_rho2(:,ist) = eos.rho2;
     
     % Mass fractions at p levels and w levels
     SCM_sigma1(:,ist) = sigma1;
@@ -105,19 +128,32 @@ if lsave
     SCM_sigma1w(:,ist) = sigma1w;
     SCM_sigma2w(:,ist) = sigma2w;
     
+    % Horizontal velocity
+    SCM_u(:,ist) = umean;
+    SCM_u_1(:,ist) = u1;
+    SCM_u_2(:,ist) = u2;
+    SCM_v(:,ist) = vmean;
+    SCM_v_1(:,ist) = v1;
+    SCM_v_2(:,ist) = v2;
+    
     % Vertical velocity
+    SCM_w(:,ist) = wmean;
     SCM_w_1(:,ist) = w1;
     SCM_w_2(:,ist) = w2;
     
     % Water: total, vapour, and liquid
+    SCM_q(:,ist) = qmean;
     SCM_q_1(:,ist) = q1;
     SCM_q_2(:,ist) = q2;
+    SCM_qv(:,ist) = qvmean;
     SCM_qv_1(:,ist) = vapour1;
     SCM_qv_2(:,ist) = vapour2;
+    SCM_ql(:,ist) = qlmean;
     SCM_ql_1(:,ist) = liquid1;
     SCM_ql_2(:,ist) = liquid2;
     
     % (Liquid water) potential temperature
+    SCM_th(:,ist) = thetamean;
     SCM_th_1(:,ist) = eos.theta1;
     SCM_th_2(:,ist) = eos.theta2;
 
@@ -127,32 +163,108 @@ if lsave
     % Higher moments
     
     % TKE
+    SCM_e_tot(:,ist) = tketot;
+    SCM_e_res(:,ist) = (m1.*Rtke1 + m2.*Rtke2)./(m1 + m2);
     SCM_e1_res(:,ist) = Rtke1;
     SCM_e2_res(:,ist) = Rtke2;
+    SCM_e_sg(:,ist) = (m1.*tke1 + m2.*tke2)./(m1 + m2);
     SCM_e1_sg(:,ist) = state_new.fluid(1).tke;
     SCM_e2_sg(:,ist) = state_new.fluid(2).tke;
     
+    % u variance
+    SCM_uu_tot(:,ist) = uutot;
+    SCM_uu_res(:,ist) = (m1.*Ruu1 + m2.*Ruu2)./(m1 + m2);
+    SCM_uu1(:,ist) = Ruu1;
+    SCM_uu2(:,ist) = Ruu2;
+    % Estimate SG u variance assuming isotropic turbulence
+    SCM_uu_sg(:,ist) = (m1.*uu1 + m2.*uu2)./(m1 + m2);
+    SCM_uu_sg1(:,ist) = uu1;
+    SCM_uu_sg2(:,ist) = uu2;
+    
+    % v variance
+    SCM_vv_tot(:,ist) = vvtot;
+    SCM_vv_res(:,ist) = (m1.*Rvv1 + m2.*Rvv2)./(m1 + m2);
+    SCM_vv1(:,ist) = Rvv1;
+    SCM_vv2(:,ist) = Rvv2;
+    % Estimate SG v variance assuming isotropic turbulence
+    SCM_vv_sg(:,ist) = (m1.*vv1 + m2.*vv2)./(m1 + m2);
+    SCM_vv_sg1(:,ist) = vv1;
+    SCM_vv_sg2(:,ist) = vv2;
+    
     % w variance
+    SCM_ww_tot(:,ist) = wwtot;
+    SCM_ww_res(:,ist) = (m1bar.*Rww1 + m2bar.*Rww2)./(m1bar + m2bar);
     SCM_ww1(:,ist) = Rww1;
     SCM_ww2(:,ist) = Rww2;
     % Estimate SG w variance assuming isotropic turbulence
-    SCM_ww_sg1(:,ist) = (2/3)*state_new.fluid(1).tke;
-    SCM_ww_sg2(:,ist) = (2/3)*state_new.fluid(2).tke;
+    SCM_ww_sg(:,ist) = (m1.*ww1 + m2.*ww2)./(m1 + m2);
+    SCM_ww_sg1(:,ist) = ww1;
+    SCM_ww_sg2(:,ist) = ww2;
     
     % Water variance
+    qq1 = state_new.fluid(1).varq;
+    qq2 = state_new.fluid(2).varq;
+    SCM_qq_tot(:,ist) = (m1.*(grid.aboves.*Rqq1(2:nzp) + grid.belows.*Rqq1(1:nz) + qq1) + m2.*(grid.aboves.*Rqq2(2:nzp) + grid.belows.*Rqq2(1:nz) + qq2))./(m1 + m2);;
+    SCM_qq_res(:,ist) = (m1bar.*Rqq1 + m2bar.*Rqq2)./(m1bar + m2bar);
     SCM_qq1(:,ist) = Rqq1;
     SCM_qq2(:,ist) = Rqq2;
-    SCM_qq_sg1(:,ist) = state_new.fluid(1).varq;
-    SCM_qq_sg2(:,ist) = state_new.fluid(2).varq;
+    SCM_qq_sg(:,ist) = (m1.*qq1 + m2.*qq2)./(m1 + m2);
+    SCM_qq_sg1(:,ist) = qq1;
+    SCM_qq_sg2(:,ist) = qq2;
     
     % Potential temperature variance
+    thth1 = eos.Vartheta1;
+    thth2 = eos.Vartheta2;
+    SCM_thth_tot(:,ist) = (m1bar.*(Rthth1 + thth1) + m2bar.*(Rthth2 + thth2))./(m1bar + m2bar);;
+    SCM_thth_res(:,ist) = (m1bar.*Rthth1 + m2bar.*Rthth2)./(m1bar + m2bar);
     SCM_thth1(:,ist) = Rthth1;
     SCM_thth2(:,ist) = Rthth2;
     % Approximate conversion from eta variance to theta variance
     % SCM_thth_sg1(:,ist) = state_new.fluid(1).vareta.*(eos.theta1p/Cpd).^2;
     % SCM_thth_sg2(:,ist) = state_new.fluid(2).vareta.*(eos.theta2p/Cpd).^2;
-    SCM_thth_sg1(:,ist) = eos.Vartheta1;
-    SCM_thth_sg2(:,ist) = eos.Vartheta2;
+    SCM_thth_sg(:,ist) = (m1bar.*thth1 + m2bar.*thth2)./(m1bar + m2bar);
+    SCM_thth_sg1(:,ist) = thth1;
+    SCM_thth_sg2(:,ist) = thth2;
+    
+    % Moisture flux
+    wq_res1 = (w1 - wmean).*(q1 - qmean);
+    wq_res2 = (w2 - wmean).*(q2 - qmean);
+    wq_sg1 = work.Dq1ed + work.Dq1bc;
+    wq_sg2 = work.Dq2ed + work.Dq2bc;
+    SCM_wq_tot(:,ist) = (m1.*(grid.aboves.*wq_res1(2:nzp) + grid.belows.*wq_res1(1:nz) + wq_sg1) + m2.*(grid.aboves.*wq_res2(2:nzp) + grid.belows.*wq_res2(1:nz) + wq_sg2))./(m1 + m2);;
+    SCM_wq_res(:,ist) = (m1bar.*wq_res1 + m2bar.*wq_res2)./(m1bar + m2bar);
+    SCM_wq_res1(:,ist) = wq_res1;
+    SCM_wq_res2(:,ist) = wq_res2;
+    SCM_wq_sg(:,ist) = (m1.*wq_sg1 + m2.*wq_sg2)./(m1 + m2);
+    SCM_wq_sg1(:,ist) = wq_sg1;
+    SCM_wq_sg2(:,ist) = wq_sg2;
+    
+    % Potential temperature flux
+    wth_res1 = (w1 - wmean).*(eos.theta1 - thetamean);
+    wth_res2 = (w2 - wmean).*(eos.theta2 - thetamean);
+    wth_sg1 = 0*thth1(2:nzp);
+    wth_sg2 = 0*thth2(2:nzp);
+    SCM_wth_tot(:,ist) = (m1.*(grid.aboves.*wth_res1(2:nzp) + grid.belows.*wth_res1(1:nz) + wth_sg1) + m2.*(grid.aboves.*wth_res2(2:nzp) + grid.belows.*wth_res2(1:nz) + wth_sg2))./(m1 + m2);;
+    SCM_wth_res(:,ist) = (m1bar.*wth_res1 + m2bar.*wth_res2)./(m1bar + m2bar);
+    SCM_wth_res1(:,ist) = wth_res1;
+    SCM_wth_res2(:,ist) = wth_res2;
+    SCM_wth_sg(:,ist) = (m1.*wth_sg1 + m2.*wth_sg2)./(m1 + m2);
+    SCM_wth_sg1(:,ist) = wth_sg1;
+    SCM_wth_sg2(:,ist) = wth_sg2;
+    
+    % Entrainment
+    SCM_M21 = relabel.M21_instab;
+    SCM_M21 = relabel.M21_sort;
+    SCM_M21 = relabel.M21_dwdz;
+    SCM_M21 = relabel.M21_mix;
+    SCM_M21 = relabel.M21;
+    
+    % Detrainment
+    SCM_M12 = relabel.M12_instab;
+    SCM_M12 = relabel.M12_sort;
+    SCM_M12 = relabel.M12_dwdz;
+    SCM_M12 = relabel.M12_mix;
+    SCM_M12 = relabel.M12;
     
 end
 

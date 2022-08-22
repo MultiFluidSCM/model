@@ -273,9 +273,10 @@ for k = 1:nzp
 end
 
 % Smooth switch for weather a cloud is present or not
-cloud = 0.5*(1 + tanh( 2e3*(liquid2-1e-5) ));
+% cloud = 0.5*(1 + tanh( 2e3*(liquid2-1e-5) ));
+cloud = 0.5*(1 + tanh( 5e4*(liquid2-1e-4) ));
 cloudp = grid.abovep.*cloud(2:nzp) + grid.belowp.*cloud(1:nz);
-
+% display(["Min cloud: ", min(cloud), ", Max cloud: ", max(cloud)])
 % Combine transfer coefficients
 relabel.etahat12_mix       = (1-cloud).*relabel.etahat12_mix_dry       + cloud.*relabel.etahat12_mix_cloud;
 relabel.etahat21_mix       = (1-cloud).*relabel.etahat21_mix_dry       + cloud.*relabel.etahat21_mix_cloud;

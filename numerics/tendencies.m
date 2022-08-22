@@ -512,7 +512,7 @@ tend.fluid(2).mw.transport(2:nzp) = tend.fluid(2).mw.transport(2:nzp) ...
 zdrag = scales.zstar;
 % Pressure drag
 [ drag, ddragdw1, ddragdw2 ] = find_drag( m2bar, w1, w2, zdrag );
-
+% drag = 0*drag;
 % Other tendencies of mass times w
 tend.fluid(1).mw.drag = drag;
 tend.fluid(1).mw.diffuse(1) = 0;
