@@ -124,7 +124,7 @@ if lsave
     SCM_rho(:,ist) = (m1.*eos.rho1 + m2.*eos.rho2)./(m1 + m2);
     SCM_rho_1(:,ist) = eos.rho1;
     SCM_rho_2(:,ist) = eos.rho2;
-    SCM_rhow(:,ist) = weight_to_w(grid, SCM_rho(:,ist));
+    SCM_rhow(:,ist) = weight_to_w(grid, (m1.*eos.rho1 + m2.*eos.rho2)./(m1 + m2));
     SCM_rho_1w(:,ist) = weight_to_w(grid, eos.rho1);
     SCM_rho_2w(:,ist) = weight_to_w(grid, eos.rho2);
     
@@ -135,9 +135,9 @@ if lsave
     SCM_sigma2w(:,ist) = sigma2w;
     
     % Mass flux
-    SCM_mf(:,ist) = m_1w.*w_1 + m_2w.*w_2;
-    SCM_mf_1(:,ist) = m_1w.*w_1;
-    SCM_mf_2(:,ist) = m_2w.*w_2;
+    SCM_mf(:,ist) = m1bar.*w1 + m2bar.*w2;
+    SCM_mf_1(:,ist) = m1bar.*w1;
+    SCM_mf_2(:,ist) = m2bar.*w2;
     
     % Horizontal velocity
     SCM_u(:,ist) = umean;
@@ -242,26 +242,26 @@ if lsave
     wq_res2 = (w2 - wmean).*(q2 - qmean);
     wq_sg1 = work.Dq1ed + work.Dq1bc;
     wq_sg2 = work.Dq2ed + work.Dq2bc;
-    SCM_wq_tot(:,ist) = (m1.*(grid.aboves.*wq_res1(2:nzp) + grid.belows.*wq_res1(1:nz) + wq_sg1) + m2.*(grid.aboves.*wq_res2(2:nzp) + grid.belows.*wq_res2(1:nz) + wq_sg2))./(m1 + m2);;
     SCM_wq_res(:,ist) = (m1bar.*wq_res1 + m2bar.*wq_res2)./(m1bar + m2bar);
     SCM_wq_res1(:,ist) = wq_res1;
     SCM_wq_res2(:,ist) = wq_res2;
     SCM_wq_sg(:,ist) = (m1.*wq_sg1 + m2.*wq_sg2)./(m1 + m2);
     SCM_wq_sg1(:,ist) = wq_sg1;
     SCM_wq_sg2(:,ist) = wq_sg2;
+    SCM_wq_tot(:,ist) = (m1bar.*(wq_res1 + weight_to_w(grid, wq_sg1)) + m2bar.*(wq_res2 + weight_to_w(grid, wq_sg2)))./(m1bar + m2bar);;
     
     % Potential temperature flux
     wth_res1 = (w1 - wmean).*(eos.theta1 - thetamean);
     wth_res2 = (w2 - wmean).*(eos.theta2 - thetamean);
     wth_sg1 = 0*thth1(2:nzp);
     wth_sg2 = 0*thth2(2:nzp);
-    SCM_wth_tot(:,ist) = (m1.*(grid.aboves.*wth_res1(2:nzp) + grid.belows.*wth_res1(1:nz) + wth_sg1) + m2.*(grid.aboves.*wth_res2(2:nzp) + grid.belows.*wth_res2(1:nz) + wth_sg2))./(m1 + m2);;
     SCM_wth_res(:,ist) = (m1bar.*wth_res1 + m2bar.*wth_res2)./(m1bar + m2bar);
     SCM_wth_res1(:,ist) = wth_res1;
     SCM_wth_res2(:,ist) = wth_res2;
     SCM_wth_sg(:,ist) = (m1.*wth_sg1 + m2.*wth_sg2)./(m1 + m2);
     SCM_wth_sg1(:,ist) = wth_sg1;
     SCM_wth_sg2(:,ist) = wth_sg2;
+    SCM_wth_tot(:,ist) = (m1bar.*(wth_res1 + weight_to_w(grid, wth_sg1)) + m2bar.*(wth_res2 + weight_to_w(grid, wth_sg2)))./(m1bar + m2bar);;
     
     % Entrainment
     SCM_M21_instab(:,ist) = relabel.M21_instab;
