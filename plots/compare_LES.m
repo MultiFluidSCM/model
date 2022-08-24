@@ -115,18 +115,29 @@ if lsave
     % Pack data ready for output
     
     % Mean profiles
-    SCM_m1(:,ist) = m1;
-    SCM_m2(:,ist) = m2;
-    SCM_m1w(:,ist) = m1bar;
-    SCM_m2w(:,ist) = m2bar;
-    SCM_rho1(:,ist) = eos.rho1;
-    SCM_rho2(:,ist) = eos.rho2;
+    SCM_m(:,ist) = m1 + m2;
+    SCM_m_1(:,ist) = m1;
+    SCM_m_2(:,ist) = m2;
+    SCM_mw(:,ist) = m1bar + m2bar;
+    SCM_m_1w(:,ist) = m1bar;
+    SCM_m_2w(:,ist) = m2bar;
+    SCM_rho(:,ist) = (m1.*eos.rho1 + m2.*eos.rho2)./(m1 + m2);
+    SCM_rho_1(:,ist) = eos.rho1;
+    SCM_rho_2(:,ist) = eos.rho2;
+    SCM_rhow(:,ist) = weight_to_w(grid, SCM_rho(:,ist));
+    SCM_rho_1w(:,ist) = weight_to_w(grid, eos.rho1);
+    SCM_rho_2w(:,ist) = weight_to_w(grid, eos.rho2);
     
     % Mass fractions at p levels and w levels
     SCM_sigma1(:,ist) = sigma1;
     SCM_sigma2(:,ist) = sigma2;
     SCM_sigma1w(:,ist) = sigma1w;
     SCM_sigma2w(:,ist) = sigma2w;
+    
+    % Mass flux
+    SCM_mf(:,ist) = m_1w.*w_1 + m_2w.*w_2;
+    SCM_mf_1(:,ist) = m_1w.*w_1;
+    SCM_mf_2(:,ist) = m_2w.*w_2;
     
     % Horizontal velocity
     SCM_u(:,ist) = umean;
@@ -174,8 +185,8 @@ if lsave
     % u variance
     SCM_uu_tot(:,ist) = uutot;
     SCM_uu_res(:,ist) = (m1.*Ruu1 + m2.*Ruu2)./(m1 + m2);
-    SCM_uu1(:,ist) = Ruu1;
-    SCM_uu2(:,ist) = Ruu2;
+    SCM_uu_1(:,ist) = Ruu1;
+    SCM_uu_2(:,ist) = Ruu2;
     % Estimate SG u variance assuming isotropic turbulence
     SCM_uu_sg(:,ist) = (m1.*uu1 + m2.*uu2)./(m1 + m2);
     SCM_uu_sg1(:,ist) = uu1;
@@ -184,8 +195,8 @@ if lsave
     % v variance
     SCM_vv_tot(:,ist) = vvtot;
     SCM_vv_res(:,ist) = (m1.*Rvv1 + m2.*Rvv2)./(m1 + m2);
-    SCM_vv1(:,ist) = Rvv1;
-    SCM_vv2(:,ist) = Rvv2;
+    SCM_vv_1(:,ist) = Rvv1;
+    SCM_vv_2(:,ist) = Rvv2;
     % Estimate SG v variance assuming isotropic turbulence
     SCM_vv_sg(:,ist) = (m1.*vv1 + m2.*vv2)./(m1 + m2);
     SCM_vv_sg1(:,ist) = vv1;
@@ -194,8 +205,8 @@ if lsave
     % w variance
     SCM_ww_tot(:,ist) = wwtot;
     SCM_ww_res(:,ist) = (m1bar.*Rww1 + m2bar.*Rww2)./(m1bar + m2bar);
-    SCM_ww1(:,ist) = Rww1;
-    SCM_ww2(:,ist) = Rww2;
+    SCM_ww_1(:,ist) = Rww1;
+    SCM_ww_2(:,ist) = Rww2;
     % Estimate SG w variance assuming isotropic turbulence
     SCM_ww_sg(:,ist) = (m1.*ww1 + m2.*ww2)./(m1 + m2);
     SCM_ww_sg1(:,ist) = ww1;
@@ -206,8 +217,8 @@ if lsave
     qq2 = state_new.fluid(2).varq;
     SCM_qq_tot(:,ist) = (m1.*(grid.aboves.*Rqq1(2:nzp) + grid.belows.*Rqq1(1:nz) + qq1) + m2.*(grid.aboves.*Rqq2(2:nzp) + grid.belows.*Rqq2(1:nz) + qq2))./(m1 + m2);;
     SCM_qq_res(:,ist) = (m1bar.*Rqq1 + m2bar.*Rqq2)./(m1bar + m2bar);
-    SCM_qq1(:,ist) = Rqq1;
-    SCM_qq2(:,ist) = Rqq2;
+    SCM_qq_1(:,ist) = Rqq1;
+    SCM_qq_2(:,ist) = Rqq2;
     SCM_qq_sg(:,ist) = (m1.*qq1 + m2.*qq2)./(m1 + m2);
     SCM_qq_sg1(:,ist) = qq1;
     SCM_qq_sg2(:,ist) = qq2;
@@ -217,8 +228,8 @@ if lsave
     thth2 = eos.Vartheta2;
     SCM_thth_tot(:,ist) = (m1bar.*(Rthth1 + thth1) + m2bar.*(Rthth2 + thth2))./(m1bar + m2bar);;
     SCM_thth_res(:,ist) = (m1bar.*Rthth1 + m2bar.*Rthth2)./(m1bar + m2bar);
-    SCM_thth1(:,ist) = Rthth1;
-    SCM_thth2(:,ist) = Rthth2;
+    SCM_thth_1(:,ist) = Rthth1;
+    SCM_thth_2(:,ist) = Rthth2;
     % Approximate conversion from eta variance to theta variance
     % SCM_thth_sg1(:,ist) = state_new.fluid(1).vareta.*(eos.theta1p/Cpd).^2;
     % SCM_thth_sg2(:,ist) = state_new.fluid(2).vareta.*(eos.theta2p/Cpd).^2;
@@ -253,18 +264,18 @@ if lsave
     SCM_wth_sg2(:,ist) = wth_sg2;
     
     % Entrainment
-    SCM_M21 = relabel.M21_instab;
-    SCM_M21 = relabel.M21_sort;
-    SCM_M21 = relabel.M21_dwdz;
-    SCM_M21 = relabel.M21_mix;
-    SCM_M21 = relabel.M21;
+    SCM_M21_instab(:,ist) = relabel.M21_instab;
+    SCM_M21_sort(:,ist) = relabel.M21_sort;
+    SCM_M21_dwdz(:,ist) = relabel.M21_dwdz;
+    SCM_M21_mix(:,ist) = relabel.M21_mix;
+    SCM_M21(:,ist) = relabel.M21;
     
     % Detrainment
-    SCM_M12 = relabel.M12_instab;
-    SCM_M12 = relabel.M12_sort;
-    SCM_M12 = relabel.M12_dwdz;
-    SCM_M12 = relabel.M12_mix;
-    SCM_M12 = relabel.M12;
+    SCM_M12_instab(:,ist) = relabel.M12_instab;
+    SCM_M12_sort(:,ist) = relabel.M12_sort;
+    SCM_M12_dwdz(:,ist) = relabel.M12_dwdz;
+    SCM_M12_mix(:,ist) = relabel.M12_mix;
+    SCM_M12(:,ist) = relabel.M12;
     
 end
 
